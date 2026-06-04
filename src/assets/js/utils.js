@@ -2,6 +2,9 @@
    MI Technologies - Utility Functions
    ============================================ */
 
+// Global variable to track current view in SPA
+let currentView = null;
+
 /**
  * Validates if a string is empty or only whitespace
  * @param {string} value - The string to validate
@@ -184,25 +187,17 @@ function redirect(url) {
  * Prevents going back to pages outside the application
  */
 function safeGoBack() {
-  const currentPath = window.location.pathname;
-
-  // Define internal navigation routes
+  // Define internal navigation routes for SPA
   const routes = {
-    '/src/pages/usuarios1000.html': '/src/pages/dashboard1000.html',
-    '/src/pages/dashboard1000.html': null, // Dashboard has no back action
+    'usuarios': 'dashboard',
   };
 
-  // Get the back destination for current page
-  const backDestination = routes[currentPath];
+  // Get the back destination for current view
+  const backDestination = routes[currentView];
 
   if (backDestination) {
-    // Navigate to specific internal page
-    window.location.href = backDestination;
-  } else if (currentPath.includes('/src/pages/') && !currentPath.includes('dashboard1000.html')) {
-    // For any other page in /src/pages/, default to dashboard
-    window.location.href = '/src/pages/dashboard1000.html';
+    navigateTo(backDestination);
   }
-  // If we're on dashboard or unknown page, do nothing (stay on page)
 }
 
 /**
@@ -213,16 +208,7 @@ function initBackButton() {
   const backBtn = document.getElementById('backBtn');
   if (!backBtn) return;
 
-  const currentPath = window.location.pathname;
-
-  // Hide back button on dashboard
-  if (currentPath.includes('dashboard1000.html')) {
-    backBtn.style.display = 'none';
-    return;
-  }
-
-  // Remove inline onclick and add safe navigation
-  backBtn.removeAttribute('onclick');
+  // Add click handler for safe navigation
   backBtn.addEventListener('click', (e) => {
     e.preventDefault();
     safeGoBack();

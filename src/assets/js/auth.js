@@ -10,14 +10,12 @@ const STORAGE_KEYS = {
   TOKEN: 'token'
 };
 
-// Development/Testing Credentials (HARDCODED FOR REFERENCE)
+// Development/Testing Credentials
 // TODO: Remove in production - use actual authentication
 const TEST_CREDENTIALS = {
   username: 'admin',
   password: 'admin123'
 };
-// NOTE: Current mock accepts any credentials that pass validation
-// When implementing backend, use TEST_CREDENTIALS for testing
 
 /**
  * Mock login function - prepared for backend integration
@@ -45,17 +43,22 @@ async function login(username, password) {
   return data; // { success: true, token: '...', user: {...} }
   */
 
-  // Mock implementation - simulates API delay
-  return new Promise((resolve) => {
+  // Mock implementation with credential validation
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve({
-        success: true,
-        token: 'mock-token-' + Date.now(),
-        user: {
-          id: 1,
-          username: username
-        }
-      });
+      // Validate credentials against TEST_CREDENTIALS
+      if (username === TEST_CREDENTIALS.username && password === TEST_CREDENTIALS.password) {
+        resolve({
+          success: true,
+          token: 'mock-token-' + Date.now(),
+          user: {
+            id: 1,
+            username: username
+          }
+        });
+      } else {
+        reject(new Error('Usuario o contraseña incorrectos'));
+      }
     }, 800); // Simulate network delay
   });
 }
@@ -100,7 +103,7 @@ function getCurrentUser() {
  */
 function logout() {
   clearStorage();
-  redirect('index.html');
+  navigateTo('login');
 }
 
 /**
@@ -108,7 +111,7 @@ function logout() {
  */
 function requireAuth() {
   if (!isAuthenticated()) {
-    redirect('index.html');
+    navigateTo('login');
   }
 }
 
@@ -117,7 +120,7 @@ function requireAuth() {
  */
 function redirectIfAuthenticated() {
   if (isAuthenticated()) {
-    redirect('dashboard.html');
+    navigateTo('dashboard');
   }
 }
 
@@ -206,7 +209,7 @@ async function handleLogin(event) {
       await sleep(300);
 
       // Redirect to dashboard
-      redirect('dashboard.html');
+      navigateTo('dashboard');
     }
   } catch (error) {
     // Show error message
@@ -290,8 +293,15 @@ function setupInputValidation() {
  */
 function handleForgotPassword(event) {
   event.preventDefault();
-  alert('Funcionalidad en desarrollo. Contacta al administrador del sistema.');
+
+  const passwordInput = document.getElementById('password');
+  showError(passwordInput, 'Funcionalidad en desarrollo. Contacta al administrador del sistema.');
+
+  // Auto-hide message after 4 seconds
+  setTimeout(() => {
+    clearError(passwordInput);
+  }, 4000);
 
   // TODO: Implement forgot password flow
-  // redirect('recover-password.html');
+  // navigateTo('recover-password');
 }
