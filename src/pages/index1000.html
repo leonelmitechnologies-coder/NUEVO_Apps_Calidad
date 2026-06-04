@@ -38,6 +38,513 @@
     .app-shell > .app-view {
       flex: 1;
     }
+
+    /* Usuarios Module */
+    .user-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      color: #666;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #1E7CBA;
+    }
+
+    .tab-btn.active {
+      color: #1E7CBA;
+      border-bottom-color: #1E7CBA;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .user-form {
+      max-width: 600px;
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #1E7CBA;
+    }
+
+    .form-group input[readonly] {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: auto;
+    }
+
+    .photo-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .photo-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 3px solid #e0e0e0;
+    }
+
+    .photo-preview svg {
+      width: 50px;
+      height: 50px;
+      color: #bbb;
+    }
+
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-photo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #333;
+    }
+
+    .btn-photo:hover {
+      background: #f5f5f5;
+      border-color: #1E7CBA;
+      color: #1E7CBA;
+    }
+
+    .btn-photo svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-photo-remove {
+      color: #f44336;
+    }
+
+    .btn-photo-remove:hover {
+      background: #ffebee;
+      border-color: #f44336;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: #1E7CBA;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #175a91;
+    }
+
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .user-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .user-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .user-avatar-large {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1E7CBA, #2C9FD9);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .user-avatar-large img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-card-info h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .user-card-info p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .user-card-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+    }
+
+    .user-detail {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .user-detail .label {
+      color: #666;
+    }
+
+    .user-detail .value {
+      color: #333;
+      font-weight: 500;
+    }
+
+    .user-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .user-tabs {
+        gap: 4px;
+      }
+
+      .tab-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+
+      .user-form {
+        padding: 20px;
+      }
+
+      .users-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sistema de Notificaciones */
+    .toast-container {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      max-width: 400px;
+      animation: slideIn 0.3s ease;
+      border-left: 4px solid;
+    }
+
+    .toast.success {
+      border-left-color: #4caf50;
+    }
+
+    .toast.error {
+      border-left-color: #f44336;
+    }
+
+    .toast.info {
+      border-left-color: #2196f3;
+    }
+
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toast.success .toast-icon {
+      color: #4caf50;
+    }
+
+    .toast.error .toast-icon {
+      color: #f44336;
+    }
+
+    .toast.info .toast-icon {
+      color: #2196f3;
+    }
+
+    .toast-message {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    .toast.removing {
+      animation: slideOut 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .toast-container {
+        right: 10px;
+        left: 10px;
+        top: 70px;
+      }
+
+      .toast {
+        min-width: auto;
+        max-width: none;
+      }
+    }
+
+    /* Modal de Confirmación */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.2s;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      animation: scaleIn 0.2s;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 12px;
+    }
+
+    .modal-message {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-btn-cancel {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .modal-btn-cancel:hover {
+      background: #e0e0e0;
+    }
+
+    .modal-btn-confirm {
+      background: #f44336;
+      color: white;
+    }
+
+    .modal-btn-confirm:hover {
+      background: #d32f2f;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 <body>
@@ -138,6 +645,21 @@
     </div>
   </div>
 
+  <!-- Sistema de Notificaciones -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Modal de Confirmación -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="modalTitle">Confirmar</h3>
+      <p class="modal-message" id="modalMessage"></p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="modalCancel">Cancelar</button>
+        <button class="modal-btn modal-btn-confirm" id="modalConfirm">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- APP SHELL (navbar compartida + vistas autenticadas) -->
   <div id="app-shell" class="app-shell" style="display:none">
     <!-- Navbar -->
@@ -234,7 +756,115 @@
     <div id="view-usuarios" class="app-view">
       <main class="dashboard-main">
         <div class="dashboard-container">
-          <!-- Módulo vacío por ahora -->
+          <h1 class="dashboard-title">Gestión de Usuarios</h1>
+
+          <!-- Tabs -->
+          <div class="user-tabs">
+            <button class="tab-btn active" data-tab="crear">+ Crear Usuario</button>
+            <button class="tab-btn" data-tab="ver">Ver Usuarios</button>
+          </div>
+
+          <!-- Tab Crear Usuario -->
+          <div id="tab-crear" class="tab-content active">
+            <form class="user-form" id="userForm">
+              <!-- Foto de Perfil -->
+              <div class="form-group">
+                <label>Fotografía</label>
+                <div class="photo-upload">
+                  <div class="photo-preview" id="photoPreview">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                      <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                    </svg>
+                  </div>
+                  <div class="photo-actions">
+                    <input type="file" id="photoInput" accept="image/*" style="display: none">
+                    <button type="button" class="btn-photo" id="btnGallery">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
+                      </svg>
+                      Galería
+                    </button>
+                    <button type="button" class="btn-photo" id="btnCamera">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1v6zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2z"/>
+                        <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+                      </svg>
+                      Cámara
+                    </button>
+                    <button type="button" class="btn-photo btn-photo-remove" id="btnRemovePhoto" style="display: none">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="nombre">Nombre *</label>
+                  <input type="text" id="nombre" required>
+                </div>
+                <div class="form-group">
+                  <label for="apellido">Apellido *</label>
+                  <input type="text" id="apellido" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="usuario-generado">Usuario (generado automáticamente)</label>
+                <input type="text" id="usuario-generado" readonly>
+              </div>
+
+              <div class="form-group">
+                <label for="password-nuevo">Contraseña *</label>
+                <input type="password" id="password-nuevo" required minlength="6">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="puesto">Puesto *</label>
+                  <select id="puesto" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Operador">Operador</option>
+                    <option value="Analista">Analista</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="departamento">Departamento *</label>
+                  <select id="departamento" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="Calidad">Calidad</option>
+                    <option value="Producción">Producción</option>
+                    <option value="Administración">Administración</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="permiso-usuarios" checked>
+                  <span>Acceso a módulo de Usuarios</span>
+                </label>
+              </div>
+
+              <button type="submit" class="btn-primary">Crear Usuario</button>
+            </form>
+          </div>
+
+          <!-- Tab Ver Usuarios -->
+          <div id="tab-ver" class="tab-content">
+            <div class="users-grid" id="usersGrid">
+              <!-- Los usuarios se cargarán aquí dinámicamente -->
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
@@ -244,6 +874,84 @@
   <script src="../assets/js/utils.js"></script>
   <script src="../assets/js/auth.js"></script>
   <script>
+    /**
+     * Sistema de notificaciones integrado
+     * @param {string} message - Mensaje a mostrar
+     * @param {string} type - Tipo: 'success', 'error', 'info'
+     */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      const icons = {
+        success: '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>',
+        error: '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg>',
+        info: '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>'
+      };
+
+      toast.innerHTML = `
+        <div class="toast-icon">${icons[type]}</div>
+        <div class="toast-message">${message}</div>
+      `;
+
+      container.appendChild(toast);
+
+      // Auto-remove after 4 seconds
+      setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, 4000);
+    }
+
+    /**
+     * Modal de confirmación integrado (reemplaza confirm() del navegador)
+     * @param {string} message - Mensaje a mostrar
+     * @param {string} title - Título del modal
+     * @returns {Promise<boolean>} - true si confirma, false si cancela
+     */
+    function showConfirm(message, title = 'Confirmar') {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirmModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const confirmBtn = document.getElementById('modalConfirm');
+        const cancelBtn = document.getElementById('modalCancel');
+
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modal.classList.add('active');
+
+        function closeModal(result) {
+          modal.classList.remove('active');
+          confirmBtn.removeEventListener('click', onConfirm);
+          cancelBtn.removeEventListener('click', onCancel);
+          modal.removeEventListener('click', onOverlayClick);
+          resolve(result);
+        }
+
+        function onConfirm() {
+          closeModal(true);
+        }
+
+        function onCancel() {
+          closeModal(false);
+        }
+
+        function onOverlayClick(e) {
+          if (e.target === modal) {
+            closeModal(false);
+          }
+        }
+
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+        modal.addEventListener('click', onOverlayClick);
+      });
+    }
+
     /**
      * Actualiza la información del usuario en la navbar
      */
@@ -341,8 +1049,12 @@
       // Navbar - Handle logout button
       const logoutBtn = document.getElementById('logoutBtn');
       if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        logoutBtn.addEventListener('click', async () => {
+          const confirmed = await showConfirm(
+            '¿Estás seguro de que deseas cerrar sesión?',
+            'Cerrar Sesión'
+          );
+          if (confirmed) {
             logout();
           }
         });
@@ -359,7 +1071,230 @@
 
       // Vista inicial según autenticación
       navigateTo(isAuthenticated() ? 'dashboard' : 'login');
+
+      // Usuarios Module - Initialize
+      initUsuariosModule();
     });
+
+    // ============================================
+    // MÓDULO DE USUARIOS
+    // ============================================
+
+    function initUsuariosModule() {
+      // Tab switching
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tabName = btn.dataset.tab;
+
+          // Update tabs
+          tabBtns.forEach(b => b.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+
+          btn.classList.add('active');
+          document.getElementById('tab-' + tabName).classList.add('active');
+
+          // Load users when switching to "ver" tab
+          if (tabName === 'ver') {
+            loadUsers();
+          }
+        });
+      });
+
+      // Photo upload functionality
+      let currentPhoto = null;
+      const photoInput = document.getElementById('photoInput');
+      const photoPreview = document.getElementById('photoPreview');
+      const btnGallery = document.getElementById('btnGallery');
+      const btnCamera = document.getElementById('btnCamera');
+      const btnRemovePhoto = document.getElementById('btnRemovePhoto');
+
+      // Open gallery
+      btnGallery.addEventListener('click', () => {
+        photoInput.removeAttribute('capture');
+        photoInput.click();
+      });
+
+      // Open camera
+      btnCamera.addEventListener('click', () => {
+        photoInput.setAttribute('capture', 'environment');
+        photoInput.click();
+      });
+
+      // Handle photo selection
+      photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            currentPhoto = event.target.result;
+            updatePhotoPreview(currentPhoto);
+            btnRemovePhoto.style.display = 'flex';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Remove photo
+      btnRemovePhoto.addEventListener('click', () => {
+        currentPhoto = null;
+        updatePhotoPreview(null);
+        photoInput.value = '';
+        btnRemovePhoto.style.display = 'none';
+      });
+
+      function updatePhotoPreview(photoData) {
+        if (photoData) {
+          photoPreview.innerHTML = `<img src="${photoData}" alt="Preview">`;
+        } else {
+          photoPreview.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+              <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+            </svg>
+          `;
+        }
+      }
+
+      // Store currentPhoto reference for createUser function
+      window.getCurrentPhoto = () => currentPhoto;
+      window.resetPhotoUpload = () => {
+        currentPhoto = null;
+        updatePhotoPreview(null);
+        photoInput.value = '';
+        btnRemovePhoto.style.display = 'none';
+      };
+
+      // Auto-generate username from nombre + apellido
+      const nombreInput = document.getElementById('nombre');
+      const apellidoInput = document.getElementById('apellido');
+      const usuarioInput = document.getElementById('usuario-generado');
+
+      function generateUsername() {
+        const nombre = nombreInput.value.trim().toLowerCase();
+        const apellido = apellidoInput.value.trim().toLowerCase();
+
+        if (nombre && apellido) {
+          usuarioInput.value = `${nombre}.${apellido}`;
+        } else {
+          usuarioInput.value = '';
+        }
+      }
+
+      nombreInput.addEventListener('input', generateUsername);
+      apellidoInput.addEventListener('input', generateUsername);
+
+      // Handle form submission
+      const userForm = document.getElementById('userForm');
+      userForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        createUser();
+      });
+    }
+
+    function createUser() {
+      // Get form values
+      const nombre = document.getElementById('nombre').value.trim();
+      const apellido = document.getElementById('apellido').value.trim();
+      const usuario = document.getElementById('usuario-generado').value.trim();
+      const password = document.getElementById('password-nuevo').value;
+      const puesto = document.getElementById('puesto').value;
+      const departamento = document.getElementById('departamento').value;
+      const permisoUsuarios = document.getElementById('permiso-usuarios').checked;
+      const photo = window.getCurrentPhoto();
+
+      // Create user object
+      const user = {
+        id: Date.now(),
+        nombre,
+        apellido,
+        usuario,
+        password,
+        puesto,
+        departamento,
+        photo: photo || null,
+        permisos: {
+          usuarios: permisoUsuarios
+        },
+        fechaCreacion: new Date().toISOString()
+      };
+
+      // Get existing users from localStorage
+      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+
+      // Check if username already exists
+      if (users.some(u => u.usuario === usuario)) {
+        showToast('El usuario ya existe', 'error');
+        return;
+      }
+
+      // Add new user
+      users.push(user);
+      localStorage.setItem('appUsers', JSON.stringify(users));
+
+      // Show success message
+      showToast('Usuario creado exitosamente', 'success');
+
+      // Reset form
+      document.getElementById('userForm').reset();
+      window.resetPhotoUpload();
+
+      // Switch to "ver" tab
+      document.querySelector('[data-tab="ver"]').click();
+    }
+
+    function loadUsers() {
+      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+      const grid = document.getElementById('usersGrid');
+
+      if (users.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+            </svg>
+            <h3>No hay usuarios creados</h3>
+            <p>Crea tu primer usuario usando el formulario</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = users.map(user => `
+        <div class="user-card">
+          <div class="user-card-header">
+            <div class="user-avatar-large">
+              ${user.photo
+                ? `<img src="${user.photo}" alt="${user.nombre}">`
+                : getInitials(user.nombre + ' ' + user.apellido)
+              }
+            </div>
+            <div class="user-card-info">
+              <h3>${user.nombre} ${user.apellido}</h3>
+              <p>@${user.usuario}</p>
+            </div>
+          </div>
+          <div class="user-card-details">
+            <div class="user-detail">
+              <span class="label">Puesto:</span>
+              <span class="value">${user.puesto}</span>
+            </div>
+            <div class="user-detail">
+              <span class="label">Departamento:</span>
+              <span class="value">${user.departamento}</span>
+            </div>
+            <div class="user-detail">
+              <span class="label">Permisos:</span>
+              <span class="value">
+                ${user.permisos.usuarios ? '<span class="user-badge">Usuarios</span>' : '-'}
+              </span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
   </script>
 </body>
 </html>

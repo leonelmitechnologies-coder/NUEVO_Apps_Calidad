@@ -102,7 +102,11 @@ function getCurrentUser() {
  * Logs out the current user
  */
 function logout() {
-  clearStorage();
+  // Solo eliminar datos de sesión, NO los usuarios creados
+  removeStorage(STORAGE_KEYS.IS_LOGGED_IN);
+  removeStorage(STORAGE_KEYS.USERNAME);
+  removeStorage(STORAGE_KEYS.TOKEN);
+  removeStorage(STORAGE_KEYS.REMEMBER_ME);
   navigateTo('login');
 }
 
