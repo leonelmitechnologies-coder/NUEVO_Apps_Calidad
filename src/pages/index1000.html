@@ -207,21 +207,38 @@
       border-color: #f44336;
     }
 
-    .btn-primary {
-      width: 100%;
+    .form-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-primary, .btn-secondary {
+      flex: 1;
       padding: 12px;
-      background: #1E7CBA;
-      color: white;
       border: none;
       border-radius: 6px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1E7CBA;
+      color: white;
     }
 
     .btn-primary:hover {
       background: #175a91;
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
     }
 
     .users-grid {
@@ -315,6 +332,40 @@
       border-radius: 4px;
       font-size: 11px;
       font-weight: 600;
+    }
+
+    .user-card-actions {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-edit {
+      flex: 1;
+      padding: 8px 12px;
+      background: #1E7CBA;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-edit:hover {
+      background: #175a91;
+    }
+
+    .btn-edit svg {
+      width: 14px;
+      height: 14px;
     }
 
     .empty-state {
@@ -762,6 +813,7 @@
           <div class="user-tabs">
             <button class="tab-btn active" data-tab="crear">+ Crear Usuario</button>
             <button class="tab-btn" data-tab="ver">Ver Usuarios</button>
+            <button class="tab-btn" data-tab="editar" id="tabEditar" style="display: none">✏️ Editar Usuario</button>
           </div>
 
           <!-- Tab Crear Usuario -->
@@ -854,7 +906,107 @@
                 </label>
               </div>
 
-              <button type="submit" class="btn-primary">Crear Usuario</button>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary" id="btnSubmitUser">Crear Usuario</button>
+                <button type="button" class="btn-secondary" id="btnCancelEdit" style="display: none">Cancelar</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tab Editar Usuario -->
+          <div id="tab-editar" class="tab-content">
+            <form class="user-form" id="userFormEdit">
+              <!-- Foto de Perfil -->
+              <div class="form-group">
+                <label>Fotografía</label>
+                <div class="photo-upload">
+                  <div class="photo-preview" id="photoPreviewEdit">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                      <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                    </svg>
+                  </div>
+                  <div class="photo-actions">
+                    <input type="file" id="photoInputEdit" accept="image/*" style="display: none">
+                    <button type="button" class="btn-photo" id="btnGalleryEdit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
+                      </svg>
+                      Galería
+                    </button>
+                    <button type="button" class="btn-photo" id="btnCameraEdit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1v6zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2z"/>
+                        <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+                      </svg>
+                      Cámara
+                    </button>
+                    <button type="button" class="btn-photo btn-photo-remove" id="btnRemovePhotoEdit" style="display: none">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="nombreEdit">Nombre *</label>
+                  <input type="text" id="nombreEdit" required>
+                </div>
+                <div class="form-group">
+                  <label for="apellidoEdit">Apellido *</label>
+                  <input type="text" id="apellidoEdit" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="usuario-generadoEdit">Usuario (generado automáticamente)</label>
+                <input type="text" id="usuario-generadoEdit" readonly>
+              </div>
+
+              <div class="form-group">
+                <label for="password-nuevoEdit">Contraseña *</label>
+                <input type="password" id="password-nuevoEdit" required minlength="6">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="puestoEdit">Puesto *</label>
+                  <select id="puestoEdit" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Operador">Operador</option>
+                    <option value="Analista">Analista</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="departamentoEdit">Departamento *</label>
+                  <select id="departamentoEdit" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="Calidad">Calidad</option>
+                    <option value="Producción">Producción</option>
+                    <option value="Administración">Administración</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="permiso-usuariosEdit" checked>
+                  <span>Acceso a módulo de Usuarios</span>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">Actualizar Usuario</button>
+                <button type="button" class="btn-secondary" id="btnCancelEditTab">Cancelar</button>
+              </div>
             </form>
           </div>
 
@@ -1167,7 +1319,66 @@
         btnRemovePhoto.style.display = 'none';
       };
 
-      // Auto-generate username from nombre + apellido
+      // Photo upload for EDIT form
+      let currentPhotoEdit = null;
+      const photoInputEdit = document.getElementById('photoInputEdit');
+      const photoPreviewEdit = document.getElementById('photoPreviewEdit');
+      const btnGalleryEdit = document.getElementById('btnGalleryEdit');
+      const btnCameraEdit = document.getElementById('btnCameraEdit');
+      const btnRemovePhotoEdit = document.getElementById('btnRemovePhotoEdit');
+
+      btnGalleryEdit.addEventListener('click', () => {
+        photoInputEdit.removeAttribute('capture');
+        photoInputEdit.click();
+      });
+
+      btnCameraEdit.addEventListener('click', () => {
+        photoInputEdit.setAttribute('capture', 'environment');
+        photoInputEdit.click();
+      });
+
+      photoInputEdit.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            currentPhotoEdit = event.target.result;
+            updatePhotoPreviewEdit(currentPhotoEdit);
+            btnRemovePhotoEdit.style.display = 'flex';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      btnRemovePhotoEdit.addEventListener('click', () => {
+        currentPhotoEdit = null;
+        updatePhotoPreviewEdit(null);
+        photoInputEdit.value = '';
+        btnRemovePhotoEdit.style.display = 'none';
+      });
+
+      function updatePhotoPreviewEdit(photoData) {
+        if (photoData) {
+          photoPreviewEdit.innerHTML = `<img src="${photoData}" alt="Preview">`;
+        } else {
+          photoPreviewEdit.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+              <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+            </svg>
+          `;
+        }
+      }
+
+      window.getCurrentPhotoEdit = () => currentPhotoEdit;
+      window.resetPhotoUploadEdit = () => {
+        currentPhotoEdit = null;
+        updatePhotoPreviewEdit(null);
+        photoInputEdit.value = '';
+        btnRemovePhotoEdit.style.display = 'none';
+      };
+
+      // Auto-generate username from nombre + apellido (CREATE form)
       const nombreInput = document.getElementById('nombre');
       const apellidoInput = document.getElementById('apellido');
       const usuarioInput = document.getElementById('usuario-generado');
@@ -1186,11 +1397,37 @@
       nombreInput.addEventListener('input', generateUsername);
       apellidoInput.addEventListener('input', generateUsername);
 
-      // Handle form submission
+      // Auto-generate username for EDIT form
+      const nombreEditInput = document.getElementById('nombreEdit');
+      const apellidoEditInput = document.getElementById('apellidoEdit');
+      const usuarioEditInput = document.getElementById('usuario-generadoEdit');
+
+      function generateUsernameEdit() {
+        const nombre = nombreEditInput.value.trim().toLowerCase();
+        const apellido = apellidoEditInput.value.trim().toLowerCase();
+
+        if (nombre && apellido) {
+          usuarioEditInput.value = `${nombre}.${apellido}`;
+        } else {
+          usuarioEditInput.value = '';
+        }
+      }
+
+      nombreEditInput.addEventListener('input', generateUsernameEdit);
+      apellidoEditInput.addEventListener('input', generateUsernameEdit);
+
+      // Handle form submission (CREATE)
       const userForm = document.getElementById('userForm');
       userForm.addEventListener('submit', (e) => {
         e.preventDefault();
         createUser();
+      });
+
+      // Handle form submission (EDIT)
+      const userFormEdit = document.getElementById('userFormEdit');
+      userFormEdit.addEventListener('submit', (e) => {
+        e.preventDefault();
+        updateUser();
       });
     }
 
@@ -1205,7 +1442,10 @@
       const permisoUsuarios = document.getElementById('permiso-usuarios').checked;
       const photo = window.getCurrentPhoto();
 
-      // Create user object
+      // Get existing users from localStorage
+      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+
+      // Create new user
       const user = {
         id: Date.now(),
         nombre,
@@ -1221,9 +1461,6 @@
         fechaCreacion: new Date().toISOString()
       };
 
-      // Get existing users from localStorage
-      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
-
       // Check if username already exists
       if (users.some(u => u.usuario === usuario)) {
         showToast('El usuario ya existe', 'error');
@@ -1233,13 +1470,66 @@
       // Add new user
       users.push(user);
       localStorage.setItem('appUsers', JSON.stringify(users));
-
-      // Show success message
       showToast('Usuario creado exitosamente', 'success');
 
       // Reset form
       document.getElementById('userForm').reset();
       window.resetPhotoUpload();
+
+      // Switch to "ver" tab
+      document.querySelector('[data-tab="ver"]').click();
+    }
+
+    function updateUser() {
+      // Get form values from EDIT form
+      const nombre = document.getElementById('nombreEdit').value.trim();
+      const apellido = document.getElementById('apellidoEdit').value.trim();
+      const usuario = document.getElementById('usuario-generadoEdit').value.trim();
+      const password = document.getElementById('password-nuevoEdit').value;
+      const puesto = document.getElementById('puestoEdit').value;
+      const departamento = document.getElementById('departamentoEdit').value;
+      const permisoUsuarios = document.getElementById('permiso-usuariosEdit').checked;
+      const photo = window.getCurrentPhotoEdit();
+
+      // Get existing users
+      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+
+      // Find user to update
+      const userIndex = users.findIndex(u => u.id === window.editingUserId);
+
+      if (userIndex === -1) {
+        showToast('Usuario no encontrado', 'error');
+        return;
+      }
+
+      // Check if username is taken by another user
+      const existingUser = users.find(u => u.usuario === usuario && u.id !== window.editingUserId);
+      if (existingUser) {
+        showToast('El usuario ya existe', 'error');
+        return;
+      }
+
+      // Update user
+      users[userIndex] = {
+        ...users[userIndex],
+        nombre,
+        apellido,
+        usuario,
+        password,
+        puesto,
+        departamento,
+        photo: photo || null,
+        permisos: {
+          usuarios: permisoUsuarios
+        },
+        fechaActualizacion: new Date().toISOString()
+      };
+
+      localStorage.setItem('appUsers', JSON.stringify(users));
+      showToast('Usuario actualizado exitosamente', 'success');
+
+      // Reset edit mode
+      cancelEditMode();
 
       // Switch to "ver" tab
       document.querySelector('[data-tab="ver"]').click();
@@ -1292,8 +1582,85 @@
               </span>
             </div>
           </div>
+          <div class="user-card-actions">
+            <button class="btn-edit" onclick="editUser(${user.id})">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+              </svg>
+              Editar
+            </button>
+          </div>
         </div>
       `).join('');
+    }
+
+    // Edit user - Load user data into EDIT form
+    window.editUser = function(userId) {
+      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+      const user = users.find(u => u.id === userId);
+
+      if (!user) {
+        showToast('Usuario no encontrado', 'error');
+        return;
+      }
+
+      // Show edit tab
+      document.getElementById('tabEditar').style.display = 'block';
+
+      // Switch to "editar" tab
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[data-tab="editar"]').classList.add('active');
+      document.getElementById('tab-editar').classList.add('active');
+
+      // Fill EDIT form with user data
+      document.getElementById('nombreEdit').value = user.nombre;
+      document.getElementById('apellidoEdit').value = user.apellido;
+      document.getElementById('usuario-generadoEdit').value = user.usuario;
+      document.getElementById('password-nuevoEdit').value = user.password;
+      document.getElementById('puestoEdit').value = user.puesto;
+      document.getElementById('departamentoEdit').value = user.departamento;
+      document.getElementById('permiso-usuariosEdit').checked = user.permisos.usuarios;
+
+      // Load photo if exists
+      if (user.photo) {
+        const photoPreviewEdit = document.getElementById('photoPreviewEdit');
+        photoPreviewEdit.innerHTML = `<img src="${user.photo}" alt="Preview">`;
+        document.getElementById('btnRemovePhotoEdit').style.display = 'flex';
+        // Store photo in edit context
+        window.currentPhotoEdit = user.photo;
+      } else {
+        window.resetPhotoUploadEdit();
+      }
+
+      // Store editing user ID
+      window.editingUserId = userId;
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Cancel edit
+    document.getElementById('btnCancelEditTab').addEventListener('click', () => {
+      cancelEditMode();
+    });
+
+    function cancelEditMode() {
+      // Reset edit form
+      document.getElementById('userFormEdit').reset();
+      window.resetPhotoUploadEdit();
+
+      // Hide edit tab
+      document.getElementById('tabEditar').style.display = 'none';
+
+      // Clear editing user ID
+      window.editingUserId = null;
+
+      // Switch back to "ver" tab
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[data-tab="ver"]').classList.add('active');
+      document.getElementById('tab-ver').classList.add('active');
     }
   </script>
 </body>
