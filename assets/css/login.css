@@ -91,7 +91,7 @@
 }
 
 .login-logo img {
-  max-width: 200px;
+  max-width: 160px;
   height: auto;
   filter: drop-shadow(0 4px 12px rgba(30, 124, 186, 0.15));
 }
@@ -399,7 +399,7 @@
   }
 
   .login-logo img {
-    max-width: 180px;
+    max-width: 110px;
   }
 }
 
@@ -438,7 +438,7 @@
   }
 
   .login-logo img {
-    max-width: 160px;
+    max-width: 130px;
     filter: drop-shadow(0 2px 8px rgba(30, 124, 186, 0.2));
   }
 
@@ -577,7 +577,7 @@
   }
 
   .login-logo img {
-    max-width: 140px;
+    max-width: 110px;
   }
 
   .login-header {
@@ -631,7 +631,7 @@
   }
 
   .login-logo img {
-    max-width: 120px;
+    max-width: 95px;
   }
 
   .login-header {
@@ -687,7 +687,7 @@
   }
 
   .login-logo img {
-    max-width: 100px;
+    max-width: 80px;
   }
 
   .login-header {
