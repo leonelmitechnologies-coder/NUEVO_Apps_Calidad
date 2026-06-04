@@ -7,16 +7,16 @@
 
 /* CSS Variables */
 :root {
-  /* Colors - MI Technologies Palette */
-  --color-primary: #1E7CBA;
-  --color-primary-dark: #165A8F;
-  --color-primary-light: #4A9DD4;
+  /* Colors - Dark Blue Palette */
+  --color-primary: #2C4A7C;
+  --color-primary-dark: #1A2F4F;
+  --color-primary-light: #3D5A80;
   --color-white: #FFFFFF;
-  --color-bg: #F8F9FC;
-  --color-bg-dark: #E8EBF3;
-  --color-border: #E0E5ED;
-  --color-text: #1A1F36;
-  --color-text-muted: #6B7A99;
+  --color-bg: #F0F4F8;
+  --color-bg-dark: #E3E8EF;
+  --color-border: #D4DDE8;
+  --color-text: #0A1929;
+  --color-text-muted: #3D5A80;
   --color-error: #DC3545;
   --color-success: #28A745;
 
@@ -40,10 +40,10 @@
   --radius-xl: 24px;
 
   /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(30, 124, 186, 0.08);
-  --shadow-md: 0 4px 16px rgba(30, 124, 186, 0.12);
-  --shadow-lg: 0 8px 32px rgba(30, 124, 186, 0.16);
-  --shadow-xl: 0 16px 48px rgba(30, 124, 186, 0.2);
+  --shadow-sm: 0 2px 8px rgba(26, 47, 79, 0.08);
+  --shadow-md: 0 4px 16px rgba(26, 47, 79, 0.12);
+  --shadow-lg: 0 8px 32px rgba(26, 47, 79, 0.16);
+  --shadow-xl: 0 16px 48px rgba(26, 47, 79, 0.2);
 
   /* Transitions */
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);

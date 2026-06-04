@@ -169,7 +169,7 @@ async function handleLogin(event) {
 
   try {
     const result = await login(username, password);
-    redirect('dashboard.html');
+    redirect('dashboard1000.html');
   } catch (error) {
     showError(input, error.message);
   } finally {
@@ -181,7 +181,7 @@ async function handleLogin(event) {
 function handleLogin(event) {
   event.preventDefault();
   login(username, password, function(result) {
-    window.location = 'dashboard.html';
+    window.location = 'dashboard1000.html';
   });
 }
 ```

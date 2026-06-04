@@ -45,15 +45,15 @@ npx playwright install
 
 # 4. Iniciar servidor de desarrollo
 # Opción 1: VS Code Live Server
-# Clic derecho en src/pages/index.html > "Open with Live Server"
+# Clic derecho en src/pages/index1000.html > "Open with Live Server"
 
 # Opción 2: Python SimpleHTTPServer
 python -m http.server 8000
-# Abrir: http://localhost:8000/src/pages/index.html
+# Abrir: http://localhost:8000/src/pages/index1000.html
 
 # Opción 3: Node.js http-server
 npx http-server -p 8000
-# Abrir: http://localhost:8000/src/pages/index.html
+# Abrir: http://localhost:8000/src/pages/index1000.html
 ```
 
 ### Verificar Instalación
@@ -99,7 +99,7 @@ server {
     server_name staging-apps.mitechnologies.com;
 
     root /var/www/apps-calidad;
-    index src/pages/index.html;
+    index src/pages/index1000.html;
 
     location / {
         try_files $uri $uri/ =404;
@@ -178,7 +178,7 @@ server {
     ssl_ciphers HIGH:!aNULL:!MD5;
 
     root /var/www/apps-calidad;
-    index src/pages/index.html;
+    index src/pages/index1000.html;
 
     # Gzip compression
     gzip on;
@@ -286,7 +286,7 @@ netlify deploy --prod
 
 [[redirects]]
   from = "/*"
-  to = "/src/pages/index.html"
+  to = "/src/pages/index1000.html"
   status = 200
 
 [[headers]]
@@ -316,7 +316,7 @@ netlify deploy --prod
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/src/pages/index.html"
+      "dest": "/src/pages/index1000.html"
     }
   ],
   "headers": [
@@ -428,7 +428,7 @@ jobs:
 
 ### Problemas Comunes
 
-#### "Cannot GET /src/pages/index.html"
+#### "Cannot GET /src/pages/index1000.html"
 
 ```bash
 # Verificar permisos

@@ -44,8 +44,8 @@ El Sistema de Registro de Asistencia es una aplicación web client-side diseñad
 ```
 src/
 ├── pages/              # Páginas HTML (Vistas)
-│   ├── index.html     # Login page
-│   └── dashboard.html # Dashboard principal
+│   ├── index1000.html     # Login page
+│   └── dashboard1000.html # Dashboard principal
 │
 ├── assets/
 │   ├── css/           # Estilos (Presentación)
@@ -89,7 +89,7 @@ handleLogin() en auth.js
          │         │
          │         └─► localStorage.setItem()
          │
-         └─► redirect('dashboard.html')
+         └─► redirect('dashboard1000.html')
 ```
 
 ### 2. Session Management

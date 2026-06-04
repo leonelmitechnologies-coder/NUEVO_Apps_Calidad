@@ -85,8 +85,8 @@ npx playwright install
 NUEVO_Apps_Calidad/
 ├── src/                          # Código fuente
 │   ├── pages/                    # Páginas HTML
-│   │   ├── index.html           # Página de login
-│   │   └── dashboard.html       # Dashboard principal
+│   │   ├── index1000.html       # Página de login
+│   │   └── dashboard1000.html   # Dashboard principal
 │   ├── assets/                   # Recursos estáticos
 │   │   ├── css/                 # Hojas de estilo
 │   │   │   ├── main.css         # Estilos globales y variables
@@ -138,15 +138,15 @@ NUEVO_Apps_Calidad/
 
 ```bash
 # Opción 1: Live Server (VS Code extension)
-# Clic derecho en src/pages/index.html > "Open with Live Server"
+# Clic derecho en src/pages/index1000.html > "Open with Live Server"
 
 # Opción 2: Python SimpleHTTPServer
 python -m http.server 8000
-# Luego abrir: http://localhost:8000/src/pages/index.html
+# Luego abrir: http://localhost:8000/src/pages/index1000.html
 
 # Opción 3: Node.js http-server
 npx http-server -p 8000
-# Luego abrir: http://localhost:8000/src/pages/index.html
+# Luego abrir: http://localhost:8000/src/pages/index1000.html
 ```
 
 2. **Credenciales de prueba:**
@@ -205,12 +205,29 @@ npm run test:report
 
 ## 📚 Documentación
 
+### Documentación Completa
+
 Consulta la carpeta `docs/` para documentación técnica detallada:
 
-- **[Arquitectura](docs/ARCHITECTURE.md)** - Diseño del sistema
-- **[Sistema de Diseño](docs/DESIGN_SYSTEM.md)** - Guías UI/UX y componentes
-- **[API](docs/API.md)** - Documentación de API REST (futuro backend)
+#### Guías de Inicio
+- **[Guía de Inicio Rápido](docs/GETTING_STARTED.md)** - Instalación, configuración y primer uso
+- **[Índice de Documentación](docs/README.md)** - Navegación completa de toda la documentación
+
+#### Desarrollo
+- **[Arquitectura](docs/ARCHITECTURE.md)** - Diseño del sistema y patrones
+- **[Sistema de Diseño](docs/DESIGN_SYSTEM.md)** - Guías UI/UX, componentes y accesibilidad
+- **[Ejemplos de Código](docs/CODE_EXAMPLES.md)** - Patrones y ejemplos prácticos
+- **[Testing](docs/TESTING.md)** - Guía completa de testing con Playwright
+
+#### Backend (Futuro)
+- **[API](docs/API.md)** - Documentación de API REST planificada
+
+#### Despliegue
 - **[Deployment](docs/DEPLOYMENT.md)** - Guía de despliegue en producción
+
+#### Contribución
+- **[Contribución](CONTRIBUTING.md)** - Guías de contribución y estándares
+- **[Changelog](CHANGELOG.md)** - Historial de cambios del proyecto
 
 ## 🤝 Contribución
 
