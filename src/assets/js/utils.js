@@ -178,3 +178,53 @@ function formatDate(date) {
 function redirect(url) {
   window.location.href = url;
 }
+
+/**
+ * Smart navigation back that stays within the system
+ * Prevents going back to pages outside the application
+ */
+function safeGoBack() {
+  const currentPath = window.location.pathname;
+
+  // Define internal navigation routes
+  const routes = {
+    '/src/pages/usuarios1000.html': '/src/pages/dashboard1000.html',
+    '/src/pages/dashboard1000.html': null, // Dashboard has no back action
+  };
+
+  // Get the back destination for current page
+  const backDestination = routes[currentPath];
+
+  if (backDestination) {
+    // Navigate to specific internal page
+    window.location.href = backDestination;
+  } else if (currentPath.includes('/src/pages/') && !currentPath.includes('dashboard1000.html')) {
+    // For any other page in /src/pages/, default to dashboard
+    window.location.href = '/src/pages/dashboard1000.html';
+  }
+  // If we're on dashboard or unknown page, do nothing (stay on page)
+}
+
+/**
+ * Initializes the back button behavior
+ * Call this in DOMContentLoaded to setup smart navigation
+ */
+function initBackButton() {
+  const backBtn = document.getElementById('backBtn');
+  if (!backBtn) return;
+
+  const currentPath = window.location.pathname;
+
+  // Hide back button on dashboard
+  if (currentPath.includes('dashboard1000.html')) {
+    backBtn.style.display = 'none';
+    return;
+  }
+
+  // Remove inline onclick and add safe navigation
+  backBtn.removeAttribute('onclick');
+  backBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    safeGoBack();
+  });
+}
