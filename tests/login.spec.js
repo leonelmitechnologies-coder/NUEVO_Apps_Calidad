@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Login Page', () => {
   test('should load login page successfully', async ({ page }) => {
-    await page.goto('/index1000.html');
+    await page.goto('/src/pages/index.html');
 
     // Check if logo is visible
     await expect(page.locator('.login-logo img')).toBeVisible();
@@ -15,7 +15,7 @@ test.describe('Login Page', () => {
   });
 
   test('should show validation errors for empty fields', async ({ page }) => {
-    await page.goto('/index1000.html');
+    await page.goto('/src/pages/index.html');
 
     // Click login without filling fields
     await page.click('.btn-login');
@@ -25,7 +25,7 @@ test.describe('Login Page', () => {
   });
 
   test('should show error for short username', async ({ page }) => {
-    await page.goto('/index1000.html');
+    await page.goto('/src/pages/index.html');
 
     // Fill username with less than 3 characters
     await page.fill('#username', 'ab');
@@ -39,7 +39,7 @@ test.describe('Login Page', () => {
   });
 
   test('should show error for short password', async ({ page }) => {
-    await page.goto('/index1000.html');
+    await page.goto('/src/pages/index.html');
 
     // Fill password with less than 6 characters
     await page.fill('#username', 'admin');
@@ -53,7 +53,7 @@ test.describe('Login Page', () => {
   });
 
   test('should toggle password visibility', async ({ page }) => {
-    await page.goto('/index1000.html');
+    await page.goto('/src/pages/index.html');
 
     const passwordInput = page.locator('#password');
     const toggleButton = page.locator('.password-toggle');
@@ -73,7 +73,7 @@ test.describe('Login Page', () => {
   });
 
   test('should login successfully with valid credentials', async ({ page }) => {
-    await page.goto('/index1000.html');
+    await page.goto('/src/pages/index.html');
 
     // Fill form with valid credentials
     await page.fill('#username', 'admin');
@@ -86,16 +86,16 @@ test.describe('Login Page', () => {
     await page.click('.btn-login');
 
     // Wait for navigation to dashboard
-    await page.waitForURL('**/dashboard1000.html', { timeout: 5000 });
+    await page.waitForURL('**/dashboard.html', { timeout: 5000 });
 
     // Check we're on dashboard
-    expect(page.url()).toContain('dashboard1000.html');
+    expect(page.url()).toContain('dashboard.html');
   });
 
   test('should be responsive on mobile', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/index1000.html');
+    await page.goto('/src/pages/index.html');
 
     // Check if elements are still visible
     await expect(page.locator('.login-logo img')).toBeVisible();

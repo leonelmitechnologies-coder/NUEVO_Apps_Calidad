@@ -100,7 +100,7 @@ function getCurrentUser() {
  */
 function logout() {
   clearStorage();
-  redirect('index1000.html');
+  redirect('index.html');
 }
 
 /**
@@ -108,7 +108,7 @@ function logout() {
  */
 function requireAuth() {
   if (!isAuthenticated()) {
-    redirect('index1000.html');
+    redirect('index.html');
   }
 }
 
@@ -117,7 +117,7 @@ function requireAuth() {
  */
 function redirectIfAuthenticated() {
   if (isAuthenticated()) {
-    redirect('dashboard1000.html');
+    redirect('dashboard.html');
   }
 }
 
@@ -190,10 +190,9 @@ async function handleLogin(event) {
     return;
   }
 
-  // Show loading state
+  // Show loading state - keep button enabled per UX best practices
   submitButton.classList.add('loading');
-  submitButton.disabled = true;
-  submitButton.textContent = 'Iniciando sesión...';
+  submitButton.setAttribute('aria-busy', 'true');
 
   try {
     // Attempt login
@@ -207,7 +206,7 @@ async function handleLogin(event) {
       await sleep(300);
 
       // Redirect to dashboard
-      redirect('dashboard1000.html');
+      redirect('dashboard.html');
     }
   } catch (error) {
     // Show error message
@@ -217,8 +216,7 @@ async function handleLogin(event) {
   } finally {
     // Remove loading state
     submitButton.classList.remove('loading');
-    submitButton.disabled = false;
-    submitButton.textContent = 'Iniciar Sesión';
+    submitButton.setAttribute('aria-busy', 'false');
   }
 }
 
@@ -254,11 +252,10 @@ function setupPasswordToggle() {
       }
     }
 
-    // Update aria-label
-    toggleButton.setAttribute(
-      'aria-label',
-      isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-    );
+    // Update aria-label and aria-pressed for better accessibility
+    const newLabel = isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña';
+    toggleButton.setAttribute('aria-label', newLabel);
+    toggleButton.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
   });
 }
 
