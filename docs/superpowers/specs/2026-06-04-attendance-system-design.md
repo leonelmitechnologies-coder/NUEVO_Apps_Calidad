@@ -25,7 +25,7 @@ Sistema de registro de asistencia para MI Technologies. Esta fase inicial incluy
 attendance-system/
 │
 ├── index1000.html          # Página de login (punto de entrada)
-├── dashboard.html          # Página placeholder "en desarrollo"
+├── dashboard1000.html          # Página placeholder "en desarrollo"
 │
 ├── assets/
 │   ├── css/
@@ -124,7 +124,7 @@ attendance-system/
 - Padding interno: 24px
 - Logo más pequeño: 150px
 
-### 4.2 Dashboard Page (dashboard.html)
+### 4.2 Dashboard Page (dashboard1000.html)
 
 #### Estructura
 
@@ -223,7 +223,7 @@ attendance-system/
      - `isLoggedIn: true`
      - `username: valor_ingresado`
      - `rememberMe: true/false`
-   - Redirigir a `dashboard.html`
+   - Redirigir a `dashboard1000.html`
 
 #### Preparación para Backend MySQL
 
@@ -297,7 +297,7 @@ CREATE TABLE attendance (
 
 #### Protección de Rutas
 
-**dashboard.html - Verificación al cargar:**
+**dashboard1000.html - Verificación al cargar:**
 
 ```javascript
 // Ejecuta al inicio del script
@@ -318,7 +318,7 @@ checkAuth();
 function checkAlreadyLoggedIn() {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     if (isLoggedIn === 'true') {
-        window.location.href = 'dashboard.html';
+        window.location.href = 'dashboard1000.html';
     }
 }
 
@@ -462,7 +462,7 @@ async function handleLogin(e) {
             // Guardar sesión
             saveSession(result);
             // Redirigir
-            window.location.href = 'dashboard.html';
+            window.location.href = 'dashboard1000.html';
         }
     } catch (error) {
         // Mostrar error amigable
@@ -509,7 +509,7 @@ async function handleLogin(e) {
 - [ ] Validación de usuario menor a 3 caracteres muestra error
 - [ ] Validación de contraseña menor a 6 caracteres muestra error
 - [ ] Checkbox "Recordar sesión" guarda preferencia en localStorage
-- [ ] Botón de login redirige a dashboard.html correctamente
+- [ ] Botón de login redirige a dashboard1000.html correctamente
 - [ ] Link "Olvidaste contraseña" muestra alert de desarrollo
 - [ ] Toggle de mostrar/ocultar contraseña funciona
 - [ ] Errores se limpian cuando el usuario empieza a corregir

@@ -117,7 +117,7 @@ function requireAuth() {
  */
 function redirectIfAuthenticated() {
   if (isAuthenticated()) {
-    redirect('dashboard.html');
+    redirect('dashboard1000.html');
   }
 }
 
@@ -207,7 +207,7 @@ async function handleLogin(event) {
       await sleep(300);
 
       // Redirect to dashboard
-      redirect('dashboard.html');
+      redirect('dashboard1000.html');
     }
   } catch (error) {
     // Show error message
