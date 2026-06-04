@@ -773,8 +773,8 @@
               <p class="module-description">Gestión de usuarios del sistema</p>
             </a>
 
-            <!-- Módulo Asistencia (Placeholder) -->
-            <div class="module-card module-disabled">
+            <!-- Módulo Asistencia -->
+            <a href="#" id="link-asistencia" class="module-card">
               <div class="module-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
@@ -782,9 +782,8 @@
                 </svg>
               </div>
               <h3 class="module-title">Asistencia</h3>
-              <p class="module-description">Próximamente</p>
-              <span class="module-badge">Pronto</span>
-            </div>
+              <p class="module-description">Control de asistencia del personal</p>
+            </a>
 
             <!-- Módulo Reportes (Placeholder) -->
             <div class="module-card module-disabled">
@@ -1032,6 +1031,27 @@
         </div>
       </main>
     </div>
+
+    <!-- Vista Asistencia -->
+    <div id="view-asistencia" class="app-view">
+      <main class="dashboard-main">
+        <div class="dashboard-container">
+          <h1 class="dashboard-title">Asistencia</h1>
+          <p class="dashboard-subtitle">Control de asistencia del personal</p>
+
+          <!-- Contenido en blanco por ahora -->
+          <div style="padding: 40px; text-align: center; color: #999;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 16px;">
+              <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+            </svg>
+            <h3>Módulo en construcción</h3>
+            <p>Esta funcionalidad estará disponible próximamente</p>
+          </div>
+
+        </div>
+      </main>
+    </div>
   </div>
 
   <!-- Scripts -->
@@ -1179,7 +1199,8 @@
       const titles = {
         login: 'Iniciar Sesión',
         dashboard: 'Dashboard',
-        usuarios: 'Usuarios'
+        usuarios: 'Usuarios',
+        asistencia: 'Asistencia'
       };
       document.title = (titles[viewName] || 'QC Manager') + ' - QC Manager';
 
@@ -1230,6 +1251,15 @@
         linkUsuarios.addEventListener('click', (e) => {
           e.preventDefault();
           navigateTo('usuarios');
+        });
+      }
+
+      // Dashboard - Módulo Asistencia link
+      const linkAsistencia = document.getElementById('link-asistencia');
+      if (linkAsistencia) {
+        linkAsistencia.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigateTo('asistencia');
         });
       }
 

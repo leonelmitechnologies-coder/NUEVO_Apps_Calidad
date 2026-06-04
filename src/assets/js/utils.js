@@ -190,6 +190,7 @@ function safeGoBack() {
   // Define internal navigation routes for SPA
   const routes = {
     'usuarios': 'dashboard',
+    'asistencia': 'dashboard',
   };
 
   // Get the back destination for current view
