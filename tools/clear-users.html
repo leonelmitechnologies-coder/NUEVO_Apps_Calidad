@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Limpiar Datos de Usuarios</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    h1 {
+      font-size: 24px;
+      color: #1a202c;
+      margin-bottom: 12px;
+    }
+    p {
+      color: #718096;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    .status {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    .status.info {
+      background: #ebf8ff;
+      color: #2c5282;
+      border: 1px solid #bee3f8;
+    }
+    .status.success {
+      background: #f0fff4;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+    .status.warning {
+      background: #fffaf0;
+      color: #744210;
+      border: 1px solid #fbd38d;
+    }
+    button {
+      background: #e53e3e;
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 8px;
+    }
+    button:hover {
+      background: #c53030;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(229,62,62,0.4);
+    }
+    button.secondary {
+      background: #4299e1;
+    }
+    button.secondary:hover {
+      background: #3182ce;
+      box-shadow: 0 4px 12px rgba(66,153,225,0.4);
+    }
+    button:disabled {
+      background: #cbd5e0;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .count {
+      font-size: 48px;
+      font-weight: 700;
+      color: #667eea;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🗑️ Limpiar Módulo de Usuarios</h1>
+    <p>Esta herramienta eliminará todos los usuarios guardados en localStorage</p>
+
+    <div id="status" class="status info">
+      Verificando datos...
+    </div>
+
+    <div class="count" id="userCount">-</div>
+    <p style="margin-top: -15px; margin-bottom: 25px; color: #4a5568;">usuarios registrados</p>
+
+    <button id="clearBtn" onclick="clearUsers()">Eliminar Todos los Usuarios</button>
+    <button class="secondary" onclick="window.close()">Cancelar</button>
+  </div>
+
+  <script>
+    function getUsers() {
+      const users = localStorage.getItem('qc_users');
+      return users ? JSON.parse(users) : [];
+    }
+
+    function displayStatus() {
+      const users = getUsers();
+      const count = users.length;
+      const statusEl = document.getElementById('status');
+      const countEl = document.getElementById('userCount');
+      const clearBtn = document.getElementById('clearBtn');
+
+      countEl.textContent = count;
+
+      if (count === 0) {
+        statusEl.className = 'status warning';
+        statusEl.textContent = '⚠️ No hay usuarios registrados en el sistema';
+        clearBtn.disabled = true;
+      } else {
+        statusEl.className = 'status info';
+        statusEl.textContent = `📊 Se encontraron ${count} usuario${count !== 1 ? 's' : ''} en el sistema`;
+        clearBtn.disabled = false;
+      }
+    }
+
+    function clearUsers() {
+      const users = getUsers();
+
+      if (users.length === 0) {
+        alert('No hay usuarios para eliminar');
+        return;
+      }
+
+      const confirmed = confirm(
+        `⚠️ ADVERTENCIA\n\n` +
+        `Estás a punto de eliminar ${users.length} usuario${users.length !== 1 ? 's' : ''} de forma permanente.\n\n` +
+        `Esta acción NO se puede deshacer.\n\n` +
+        `¿Deseas continuar?`
+      );
+
+      if (confirmed) {
+        localStorage.removeItem('qc_users');
+
+        const statusEl = document.getElementById('status');
+        statusEl.className = 'status success';
+        statusEl.textContent = '✅ Todos los usuarios han sido eliminados exitosamente';
+
+        displayStatus();
+
+        setTimeout(() => {
+          const redirect = confirm('Datos eliminados. ¿Quieres ir al módulo de usuarios?');
+          if (redirect) {
+            window.location.href = '/src/pages/usuarios1000.html';
+          }
+        }, 1000);
+      }
+    }
+
+    // Display initial status
+    displayStatus();
+  </script>
+</body>
+</html>
