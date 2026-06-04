@@ -10,6 +10,15 @@ const STORAGE_KEYS = {
   TOKEN: 'token'
 };
 
+// Development/Testing Credentials (HARDCODED FOR REFERENCE)
+// TODO: Remove in production - use actual authentication
+const TEST_CREDENTIALS = {
+  username: 'admin',
+  password: 'admin123'
+};
+// NOTE: Current mock accepts any credentials that pass validation
+// When implementing backend, use TEST_CREDENTIALS for testing
+
 /**
  * Mock login function - prepared for backend integration
  * @param {string} username - User's username
