@@ -102,26 +102,18 @@ function getCurrentUser() {
  * Logs out the current user
  */
 function logout() {
-  console.log('[AUTH] Logging out...');
-
   // Solo eliminar datos de sesión, NO los usuarios creados
   removeStorage(STORAGE_KEYS.IS_LOGGED_IN);
   removeStorage(STORAGE_KEYS.USERNAME);
   removeStorage(STORAGE_KEYS.TOKEN);
   removeStorage(STORAGE_KEYS.REMEMBER_ME);
-
-  console.log('[AUTH] Session data cleared');
-
   clearNavigationHistory();
-
-  console.log('[AUTH] Navigating to login...');
 
   // Verificar si navigateTo existe
   if (typeof navigateTo === 'function') {
     navigateTo('login');
-    console.log('[AUTH] Logout complete');
   } else {
-    console.error('[AUTH] navigateTo function not found, reloading page...');
+    // Fallback: recargar página si navigateTo no está disponible
     window.location.reload();
   }
 }
