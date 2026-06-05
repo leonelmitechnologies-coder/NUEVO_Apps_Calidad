@@ -1807,3 +1807,74 @@
     padding: 5px 10px;
   }
 }
+
+/* ============================================
+   Módulo de Inasistencia - Resumen Colaboradores
+   ============================================ */
+
+.inasistencia-resumen-header {
+  margin-bottom: 12px;
+}
+
+.inasistencia-resumen-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.resumen-colab-card {
+  background: white;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid #DC2626;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.resumen-colab-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.resumen-colab-nombre {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.resumen-colab-total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #DC2626;
+  margin-bottom: 6px;
+}
+
+.resumen-colab-tipos {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .inasistencia-resumen-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .resumen-colab-card {
+    padding: 12px 14px;
+  }
+
+  .resumen-colab-nombre {
+    font-size: 0.9rem;
+  }
+
+  .resumen-colab-total {
+    font-size: 1rem;
+  }
+
+  .resumen-colab-tipos {
+    font-size: 0.75rem;
+  }
+}
