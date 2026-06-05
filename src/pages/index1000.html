@@ -1258,7 +1258,7 @@
 
               <div class="form-group">
                 <label for="usuario-generado">Usuario (generado automáticamente)</label>
-                <input type="text" id="usuario-generado" readonly>
+                <input type="text" id="usuario-generado" autocomplete="username" readonly>
               </div>
 
               <div class="form-group">
@@ -1349,7 +1349,7 @@
 
               <div class="form-group">
                 <label for="usuario-generadoEdit">Usuario (generado automáticamente)</label>
-                <input type="text" id="usuario-generadoEdit" readonly>
+                <input type="text" id="usuario-generadoEdit" autocomplete="username" readonly>
               </div>
 
               <div class="form-group">
@@ -1433,6 +1433,9 @@
             <div class="perfil-section">
               <h2 class="perfil-section-title">Cambiar Contraseña</h2>
               <form id="formCambiarPassword" class="perfil-password-form">
+                <!-- Hidden username field for password managers and accessibility -->
+                <input type="text" id="perfilUsername" autocomplete="username" style="display: none;">
+
                 <div class="form-group">
                   <label for="passwordActual">Contraseña Actual *</label>
                   <div class="password-input-wrapper">
@@ -6215,6 +6218,12 @@
     function initMiPerfilModule() {
       // Cargar foto de perfil actual
       cargarFotoPerfil();
+
+      // Poblar campo oculto de username para password managers
+      const perfilUsernameInput = document.getElementById('perfilUsername');
+      if (perfilUsernameInput && window.currentUser) {
+        perfilUsernameInput.value = window.currentUser.username;
+      }
 
       // Listener para cambio de foto
       const perfilFotoInput = document.getElementById('perfilFotoInput');
