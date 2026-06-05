@@ -1345,7 +1345,7 @@
      * @param {string} viewName - Nombre de la vista (login, dashboard, usuarios)
      * @param {boolean} skipHistory - Si es true, no actualiza el historial (para popstate)
      */
-    function navigateTo(viewName, skipHistory = false) {
+    window.navigateTo = function navigateTo(viewName, skipHistory = false) {
       const loginView = document.getElementById('view-login');
       const appShell = document.getElementById('app-shell');
       const backBtn = document.getElementById('backBtn');
