@@ -4728,9 +4728,9 @@
       // Mostrar toast de confirmación
       showToast(`${colab.nombres} ${colab.apellidos} ha sido dado de baja`, 'success');
 
-      // Navegar de vuelta a la lista del departamento
+      // Navegar de vuelta a la vista principal de Colaboradores (grid de departamentos)
       setTimeout(() => {
-        navigateToLocation('colaboradores-dept:' + colab.departamento);
+        navigateToLocation('colaboradores-lista');
       }, 500);
     }
 
