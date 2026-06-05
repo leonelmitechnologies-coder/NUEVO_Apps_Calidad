@@ -5737,10 +5737,76 @@
                 <span class="te-label">Autorizado por:</span>
                 <span class="te-value">${reg.autorizadoPor}</span>
               </div>
+              <div class="te-detalle-semana-actions">
+                <button class="te-btn-edit" onclick="editarRegistroTE(${reg.id})" title="Editar registro">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                  </svg>
+                  Editar
+                </button>
+                <button class="te-btn-delete" onclick="confirmarBorrarRegistroTE(${reg.id})" title="Borrar registro">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                  </svg>
+                  Borrar
+                </button>
+              </div>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    window.editarRegistroTE = function(registroId) {
+      // TODO: Implementar edición de registro
+      // Por ahora, solo mostramos un mensaje
+      showToast('Función de edición en desarrollo', 'info');
+    }
+
+    window.confirmarBorrarRegistroTE = function(registroId) {
+      const registro = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]').find(r => r.id === registroId);
+
+      if (!registro) {
+        showToast('Registro no encontrado', 'error');
+        return;
+      }
+
+      // Mostrar confirmación
+      const confirmar = confirm(
+        `¿Estás seguro de que deseas borrar este registro?\n\n` +
+        `Colaborador: ${registro.colaboradorNombre}\n` +
+        `Fecha: ${formatDate(new Date(registro.fecha + 'T00:00:00'))}\n` +
+        `Horas: ${registro.horasTotales.toFixed(2)} hrs\n\n` +
+        `Esta acción no se puede deshacer.`
+      );
+
+      if (confirmar) {
+        borrarRegistroTE(registroId);
+      }
+    }
+
+    function borrarRegistroTE(registroId) {
+      // Obtener historial
+      let historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+
+      // Filtrar el registro a borrar
+      const historialFiltrado = historial.filter(r => r.id !== registroId);
+
+      // Guardar de nuevo
+      localStorage.setItem('historialTiempoExtra', JSON.stringify(historialFiltrado));
+
+      // Mostrar mensaje de éxito
+      showToast('Registro borrado exitosamente', 'success');
+
+      // Recargar la vista actual
+      const currentLocation = window.navigationHistory[window.navigationHistory.length - 1];
+      if (currentLocation && currentLocation.startsWith('tiempo-extra-semana:')) {
+        const params = currentLocation.replace('tiempo-extra-semana:', '').split(':');
+        const dept = params[0];
+        const semanaKey = params[1];
+        cargarDetalleSemanaTE(dept, semanaKey);
+      }
     }
 
     window.verDetalleTiempoExtra = function(registroId) {

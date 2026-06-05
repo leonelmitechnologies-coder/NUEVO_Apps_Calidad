@@ -2578,6 +2578,68 @@
   flex: 1;
 }
 
+/* Botones de acciones en detalle de semana */
+.te-detalle-semana-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  justify-content: flex-end;
+}
+
+.te-btn-edit,
+.te-btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-base);
+}
+
+.te-btn-edit {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.te-btn-edit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.te-btn-edit:active {
+  transform: translateY(0);
+}
+
+.te-btn-delete {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.te-btn-delete:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+.te-btn-delete:active {
+  transform: translateY(0);
+}
+
+.te-btn-edit svg,
+.te-btn-delete svg {
+  flex-shrink: 0;
+}
+
 /* Responsive - Tiempo Extra */
 @media (max-width: 768px) {
   .te-buscador-wrapper label {
@@ -2716,5 +2778,24 @@
 
   .te-detalle-semana-row .te-value {
     font-size: 0.85rem;
+  }
+
+  .te-detalle-semana-actions {
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .te-btn-edit,
+  .te-btn-delete {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+
+  .te-btn-edit svg,
+  .te-btn-delete svg {
+    width: 12px;
+    height: 12px;
   }
 }
