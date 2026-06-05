@@ -190,12 +190,20 @@ function safeGoBack() {
   // Check if we're in a subview within Asistencia
   if (currentView === 'asistencia') {
     const asistenciaColabView = document.getElementById('asistencia-colaborador');
+    const asistenciaListaView = document.getElementById('asistencia-colaboradores-lista');
 
-    // Si el formulario de colaboradores está visible, volver al grid
+    // Si el formulario de agregar colaborador está visible, volver al grid
     if (asistenciaColabView && asistenciaColabView.style.display === 'block') {
-      // Call the volverAGrid function if it exists
       if (typeof window.volverAGrid === 'function') {
         window.volverAGrid();
+        return;
+      }
+    }
+
+    // Si la lista de colaboradores está visible, volver al grid
+    if (asistenciaListaView && asistenciaListaView.style.display === 'block') {
+      if (typeof window.volverAGridDesdeColaboradores === 'function') {
+        window.volverAGridDesdeColaboradores();
         return;
       }
     }
