@@ -2395,12 +2395,15 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   margin-bottom: 8px;
-  transition: transform 0.2s;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
 }
 
 .te-registro-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
 }
 
 .te-registro-horas {

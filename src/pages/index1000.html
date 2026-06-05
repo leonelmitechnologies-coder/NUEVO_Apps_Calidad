@@ -2023,6 +2023,75 @@
             </div>
           </div>
 
+          <!-- Vista: Tiempo Extra - Detalle de Registro -->
+          <div id="tiempo-extra-detalle" style="display: none;">
+            <div class="colab-detalle-card">
+              <div class="colab-detalle-header">
+                <div class="colab-detalle-photo" id="te-detalle-photo"></div>
+                <div class="colab-detalle-info">
+                  <h2 id="te-detalle-nombre">Nombre</h2>
+                  <p id="te-detalle-puesto">Puesto</p>
+                  <span class="colab-status" style="background: linear-gradient(135deg, rgba(30, 124, 186, 0.1), rgba(30, 124, 186, 0.05)); color: var(--color-primary); border: 1px solid rgba(30, 124, 186, 0.3);" id="te-detalle-horas">0 hrs</span>
+                </div>
+              </div>
+              <div class="colab-detalle-body">
+                <!-- Sección: Información del Registro -->
+                <div class="detalle-section">
+                  <h3 class="detalle-section-title">Información del Registro</h3>
+                  <div class="detalle-grid">
+                    <div class="detalle-item">
+                      <span class="detalle-label">Departamento</span>
+                      <span class="detalle-value" id="te-detalle-departamento">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Fecha</span>
+                      <span class="detalle-value" id="te-detalle-fecha">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Hora Inicio</span>
+                      <span class="detalle-value" id="te-detalle-hora-inicio">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Hora Fin</span>
+                      <span class="detalle-value" id="te-detalle-hora-fin">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Horas Totales</span>
+                      <span class="detalle-value" id="te-detalle-horas-totales">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Área</span>
+                      <span class="detalle-value" id="te-detalle-area">-</span>
+                    </div>
+                    <div class="detalle-item detalle-item-full">
+                      <span class="detalle-label">Motivo</span>
+                      <span class="detalle-value" id="te-detalle-motivo">-</span>
+                    </div>
+                    <div class="detalle-item detalle-item-full">
+                      <span class="detalle-label">Autorizado por</span>
+                      <span class="detalle-value" id="te-detalle-autorizado">-</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección: Información de Registro -->
+                <div class="detalle-section">
+                  <h3 class="detalle-section-title">Información de Registro</h3>
+                  <div class="detalle-grid">
+                    <div class="detalle-item">
+                      <span class="detalle-label">Registrado por</span>
+                      <span class="detalle-value" id="te-detalle-registrado-por">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Fecha de Registro</span>
+                      <span class="detalle-value" id="te-detalle-fecha-registro">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
@@ -3393,6 +3462,7 @@
       const teDeptView = document.getElementById('tiempo-extra-dept');
       const teRegistrarView = document.getElementById('tiempo-extra-registrar');
       const teHistorialView = document.getElementById('tiempo-extra-historial');
+      const teDetalleView = document.getElementById('tiempo-extra-detalle');
 
       // Ocultar todas las vistas de asistencia
       const allViews = [
@@ -3415,7 +3485,8 @@
         teListaView,
         teDeptView,
         teRegistrarView,
-        teHistorialView
+        teHistorialView,
+        teDetalleView
       ];
 
       allViews.forEach(view => {
@@ -3584,6 +3655,12 @@
             if (teHistorialView) {
               teHistorialView.style.display = 'block';
               cargarHistorialTE(dept);
+            }
+          } else if (location.startsWith('tiempo-extra-detalle:')) {
+            const registroId = parseInt(location.replace('tiempo-extra-detalle:', ''));
+            if (teDetalleView) {
+              teDetalleView.style.display = 'block';
+              cargarDetalleTiempoExtra(registroId);
             }
           }
           break;
@@ -5473,7 +5550,7 @@
             : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; font-weight: 700; font-size: 0.9rem;">${iniciales}</div>`;
 
           return `
-            <div class="te-registro-card" style="background: white; padding: 14px 16px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 8px;">
+            <div class="te-registro-card" onclick="verDetalleTiempoExtra(${reg.id})" style="background: white; padding: 14px 16px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 8px; cursor: pointer;">
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
                 <div style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
                   ${fotoHTML}
@@ -5543,6 +5620,63 @@
         contenido.style.display = 'none';
         chevron.style.transform = 'rotate(0deg)';
       }
+    }
+
+    window.verDetalleTiempoExtra = function(registroId) {
+      navigateToLocation('tiempo-extra-detalle:' + registroId);
+    }
+
+    function cargarDetalleTiempoExtra(registroId) {
+      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+      const registro = historial.find(r => r.id === registroId);
+
+      if (!registro) {
+        showToast('Registro no encontrado', 'error');
+        navigateToLocation('asistencia-grid');
+        return;
+      }
+
+      // Cargar foto
+      const photoDiv = document.getElementById('te-detalle-photo');
+      const iniciales = registro.colaboradorNombre.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+
+      if (registro.foto) {
+        photoDiv.innerHTML = `<img src="${registro.foto}" alt="${registro.colaboradorNombre}" style="width: 100%; height: 100%; object-fit: cover;">`;
+      } else {
+        photoDiv.innerHTML = `
+          <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; font-weight: 700; font-size: 2rem;">
+            ${iniciales}
+          </div>
+        `;
+      }
+
+      // Cargar información básica
+      document.getElementById('te-detalle-nombre').textContent = registro.colaboradorNombre;
+      document.getElementById('te-detalle-puesto').textContent = registro.puesto;
+      document.getElementById('te-detalle-horas').textContent = `${registro.horasTotales.toFixed(2)} hrs`;
+
+      // Cargar información del registro
+      document.getElementById('te-detalle-departamento').textContent = registro.departamento;
+      document.getElementById('te-detalle-fecha').textContent = formatDate(new Date(registro.fecha + 'T00:00:00'));
+      document.getElementById('te-detalle-hora-inicio').textContent = registro.horaInicio;
+      document.getElementById('te-detalle-hora-fin').textContent = registro.horaFin;
+      document.getElementById('te-detalle-horas-totales').textContent = `${registro.horasTotales.toFixed(2)} hrs`;
+      document.getElementById('te-detalle-area').textContent = registro.area;
+      document.getElementById('te-detalle-motivo').textContent = registro.motivo;
+      document.getElementById('te-detalle-autorizado').textContent = registro.autorizadoPor;
+
+      // Cargar información de registro
+      document.getElementById('te-detalle-registrado-por').textContent = registro.registradoPor;
+      document.getElementById('te-detalle-fecha-registro').textContent = formatDateTime(new Date(registro.fechaRegistro));
+    }
+
+    function formatDateTime(date) {
+      const dia = date.getDate().toString().padStart(2, '0');
+      const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+      const año = date.getFullYear();
+      const hora = date.getHours().toString().padStart(2, '0');
+      const minuto = date.getMinutes().toString().padStart(2, '0');
+      return `${dia}/${mes}/${año} ${hora}:${minuto}`;
     }
 
     // Funciones auxiliares para fechas
