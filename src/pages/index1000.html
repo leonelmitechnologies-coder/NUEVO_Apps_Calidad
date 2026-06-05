@@ -3406,13 +3406,19 @@
     function cargarColaboradoresAsistencia(nombreDepartamento) {
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
 
-      // Filtrar por departamento y estatus activo (TODOS los turnos)
-      const colaboradoresDept = colaboradores.filter(c =>
+      // Filtrar por departamento y estatus activo
+      const colaboradoresDeptTodos = colaboradores.filter(c =>
         c.departamento === nombreDepartamento &&
         (c.estatus || 'Activo') === 'Activo'
       );
 
-      // Agrupar por turno
+      // FILTRAR: Excluir colaboradores que ya tienen registro HOY
+      const colaboradoresDept = colaboradoresDeptTodos.filter(c => {
+        const registroHoy = obtenerRegistroAsistenciaHoy(c.id);
+        return !registroHoy; // Solo mostrar si NO tiene registro hoy
+      });
+
+      // Agrupar por turno (solo los pendientes)
       const turno1 = colaboradoresDept.filter(c => c.turno === 'Turno 1');
       const turno2 = colaboradoresDept.filter(c => c.turno === 'Turno 2');
 
@@ -3422,7 +3428,7 @@
       // Actualizar título
       document.getElementById('asistencia-dept-title').textContent = nombreDepartamento;
       document.getElementById('asistencia-dept-subtitle').textContent =
-        `${colaboradoresDept.length} colaborador${colaboradoresDept.length !== 1 ? 'es' : ''} activo${colaboradoresDept.length !== 1 ? 's' : ''}`;
+        `${colaboradoresDept.length} pendiente${colaboradoresDept.length !== 1 ? 's' : ''}`;
 
       const container = document.getElementById('asistencia-colaboradores-container');
       const emptyMessage = document.getElementById('empty-asistencia-colaboradores');
@@ -3430,14 +3436,23 @@
       if (colaboradoresDept.length === 0) {
         container.innerHTML = '';
         emptyMessage.style.display = 'block';
+
+        // Actualizar mensaje según el caso
+        const emptyMessageText = emptyMessage.querySelector('p');
+        if (colaboradoresDeptTodos.length === 0) {
+          emptyMessageText.textContent = 'No hay colaboradores activos en este departamento';
+        } else {
+          emptyMessageText.textContent = '¡Todos los colaboradores ya tienen asistencia registrada hoy!';
+        }
+
+        // Actualizar estadísticas incluso si todos están registrados
+        actualizarEstadisticasAsistencia(colaboradoresDeptTodos);
         return;
       }
 
       emptyMessage.style.display = 'none';
 
-      const fechaHoy = obtenerFechaHoy();
-
-      // Función helper para renderizar un colaborador
+      // Función helper para renderizar un colaborador (solo pendientes)
       const renderColaborador = (colab) => {
         const initials = colab.nombres && colab.apellidos
           ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
@@ -3448,27 +3463,13 @@
           ? `<img src="${colab.foto}" alt="${colab.nombres}" onclick="event.stopPropagation(); abrirModalFoto('${colab.foto}', '${nombreCompleto}')">`
           : initials;
 
-        // Verificar si ya se registró asistencia hoy
-        const registroHoy = obtenerRegistroAsistenciaHoy(colab.id);
-
-        let asistenciaHTML = '';
-        if (registroHoy) {
-          if (registroHoy.estado === 'presente') {
-            asistenciaHTML = `
-              <div class="asistencia-registrada asistencia-presente">
-                ✓ Presente
-              </div>
-            `;
-          } else {
-            const tipoLabel = registroHoy.tipoInasistencia || 'Ausente';
-            asistenciaHTML = `
-              <div class="asistencia-registrada asistencia-ausente">
-                ✗ ${tipoLabel}
-              </div>
-            `;
-          }
-        } else {
-          asistenciaHTML = `
+        return `
+          <div class="colab-card-compact">
+            <div class="colab-photo-small">${photoHTML}</div>
+            <div class="colab-info-compact">
+              <h4>${colab.nombres} ${colab.apellidos}</h4>
+              <p>${colab.puesto || 'Sin puesto'}</p>
+            </div>
             <div class="asistencia-actions">
               <button class="btn-asistencia btn-presente" onclick="marcarPresente(${colab.id}, '${colab.nombres}', '${colab.apellidos}', '${colab.departamento}')" title="Marcar presente" aria-label="Marcar presente">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
@@ -3481,17 +3482,6 @@
                 </svg>
               </button>
             </div>
-          `;
-        }
-
-        return `
-          <div class="colab-card-compact">
-            <div class="colab-photo-small">${photoHTML}</div>
-            <div class="colab-info-compact">
-              <h4>${colab.nombres} ${colab.apellidos}</h4>
-              <p>${colab.puesto || 'Sin puesto'}</p>
-            </div>
-            ${asistenciaHTML}
           </div>
         `;
       };
@@ -3523,8 +3513,8 @@
 
       container.innerHTML = turnosHTML;
 
-      // Actualizar estadísticas
-      actualizarEstadisticasAsistencia(colaboradoresDept);
+      // Actualizar estadísticas (usar el total de colaboradores activos, no solo pendientes)
+      actualizarEstadisticasAsistencia(colaboradoresDeptTodos);
     }
 
     /**
