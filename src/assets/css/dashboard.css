@@ -2352,10 +2352,10 @@
   z-index: 1;
 }
 
-.te-date-input,
-.te-time-input {
+.form-group .te-date-input,
+.form-group .te-time-input {
   width: 100%;
-  padding: 10px 12px 10px 52px;
+  padding: 10px 12px 10px 52px !important;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: 0.85rem;
@@ -2366,21 +2366,21 @@
   cursor: pointer;
 }
 
-.te-date-input:hover,
-.te-time-input:hover {
+.form-group .te-date-input:hover,
+.form-group .te-time-input:hover {
   border-color: var(--color-primary-light);
   background: var(--color-bg);
 }
 
-.te-date-input:focus,
-.te-time-input:focus {
+.form-group .te-date-input:focus,
+.form-group .te-time-input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(30, 124, 186, 0.1);
 }
 
-.te-date-input:focus + .te-input-icon,
-.te-time-input:focus + .te-input-icon {
+.form-group .te-date-input:focus + .te-input-icon,
+.form-group .te-time-input:focus + .te-input-icon {
   color: var(--color-primary);
 }
 
@@ -2644,9 +2644,9 @@
     height: 16px;
   }
 
-  .te-date-input,
-  .te-time-input {
-    padding: 8px 10px 8px 44px;
+  .form-group .te-date-input,
+  .form-group .te-time-input {
+    padding: 8px 10px 8px 44px !important;
     font-size: 0.8rem;
   }
 
