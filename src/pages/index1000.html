@@ -3157,6 +3157,12 @@
 
     // Delete user
     window.deleteUser = async function(userId, userName) {
+      // IMPORTANTE: No permitir eliminar el usuario actualmente logueado
+      if (window.currentUser && window.currentUser.id === userId) {
+        showToast('No puedes eliminar tu propio usuario', 'error');
+        return;
+      }
+
       const confirmed = await showConfirm(
         `¿Estás seguro de que deseas eliminar al usuario "${userName}"? Esta acción no se puede deshacer.`,
         'Eliminar Usuario'
