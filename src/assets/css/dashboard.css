@@ -1878,3 +1878,126 @@
     font-size: 0.75rem;
   }
 }
+
+/* ===== INASISTENCIA - LISTA DE COLABORADORES ===== */
+.colab-inasistencia-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.colab-inasistencia-card:hover {
+  background: var(--color-bg);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.colab-inasistencia-card .colab-nombre {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.inasistencia-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.badge-success {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.badge-warning {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.badge-danger {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+/* ===== INASISTENCIA - HISTORIAL DEL COLABORADOR ===== */
+.historial-inasistencia-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.historial-inasistencia-card:hover {
+  background: #FAFAFA;
+  border-color: #E5E7EB;
+}
+
+.historial-inasistencia-fecha {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  min-width: 110px;
+}
+
+.historial-inasistencia-tipo {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: #FEE2E2;
+  color: #DC2626;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 768px) {
+  .colab-inasistencia-card {
+    padding: 12px 14px;
+  }
+
+  .colab-inasistencia-card .colab-nombre {
+    font-size: 0.85rem;
+  }
+
+  .inasistencia-badge {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 0.7rem;
+  }
+
+  .historial-inasistencia-card {
+    padding: 10px 12px;
+  }
+
+  .historial-inasistencia-fecha {
+    font-size: 0.8rem;
+    min-width: 100px;
+  }
+
+  .historial-inasistencia-tipo {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+}
