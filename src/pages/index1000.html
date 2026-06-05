@@ -3505,9 +3505,9 @@
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
       const departamentosContainer = document.getElementById('departamentos-container');
 
-      // Contar colaboradores por departamento
+      // Contar colaboradores ACTIVOS por departamento
       const contadores = {};
-      colaboradores.forEach(colab => {
+      colaboradores.filter(c => (c.estatus || 'Activo') === 'Activo').forEach(colab => {
         const dept = colab.departamento || 'Sin Departamento';
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
@@ -3535,7 +3535,7 @@
 
     function cargarColaboradoresDepartamento(nombreDepartamento) {
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-      const colaboradoresDept = colaboradores.filter(c => c.departamento === nombreDepartamento);
+      const colaboradoresDept = colaboradores.filter(c => c.departamento === nombreDepartamento && (c.estatus || 'Activo') === 'Activo');
 
       // Actualizar título
       document.getElementById('dept-detalle-title').textContent = nombreDepartamento;
