@@ -2335,6 +2335,80 @@
   cursor: not-allowed;
 }
 
+/* Inputs personalizados de fecha y hora */
+.te-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.te-input-icon {
+  position: absolute;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.te-date-input,
+.te-time-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-family: var(--font-base);
+  transition: all var(--transition-fast);
+  background: white;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.te-date-input:hover,
+.te-time-input:hover {
+  border-color: var(--color-primary-light);
+  background: var(--color-bg);
+}
+
+.te-date-input:focus,
+.te-time-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 124, 186, 0.1);
+}
+
+.te-date-input:focus + .te-input-icon,
+.te-time-input:focus + .te-input-icon {
+  color: var(--color-primary);
+}
+
+/* Personalizar el icono del calendario/reloj nativo */
+.te-date-input::-webkit-calendar-picker-indicator,
+.te-time-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.te-date-input::-webkit-calendar-picker-indicator:hover,
+.te-time-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Firefox */
+.te-date-input::-moz-calendar-picker-indicator,
+.te-time-input::-moz-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* Placeholder personalizado cuando está vacío */
+.te-date-input:invalid,
+.te-time-input:invalid {
+  color: var(--color-text-muted);
+}
+
 .btn-primary-te {
   flex: 1;
   padding: 10px 16px;
@@ -2561,6 +2635,18 @@
   .form-group select,
   .form-group textarea {
     padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .te-input-icon {
+    left: 10px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .te-date-input,
+  .te-time-input {
+    padding: 8px 10px 8px 36px;
     font-size: 0.8rem;
   }
 
