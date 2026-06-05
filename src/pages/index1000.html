@@ -2157,14 +2157,18 @@
       const logoutBtn = document.getElementById('logoutBtn');
       if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
+          console.log('[UI] Logout button clicked');
           const confirmed = await showConfirm(
             '¿Estás seguro de que deseas cerrar sesión?',
             'Cerrar Sesión'
           );
+          console.log('[UI] Logout confirmed:', confirmed);
           if (confirmed) {
             logout();
           }
         });
+      } else {
+        console.error('[UI] Logout button not found in DOM');
       }
 
       // Dashboard - Módulo Usuarios link
