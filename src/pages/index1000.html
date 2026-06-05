@@ -2566,6 +2566,12 @@
           backBtn.style.display = (viewName === 'dashboard') ? 'none' : 'block';
         }
 
+        // Logout button: visible solo en dashboard, oculto en subpáginas
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+          logoutBtn.style.display = (viewName === 'dashboard') ? 'block' : 'none';
+        }
+
         // Actualizar info de usuario en navbar
         updateNavbarUser();
 
