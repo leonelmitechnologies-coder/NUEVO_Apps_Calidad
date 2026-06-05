@@ -2799,3 +2799,171 @@
     height: 12px;
   }
 }
+
+/* ============================================
+   MI PERFIL - Estilos
+   ============================================ */
+
+.perfil-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.perfil-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.perfil-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+/* Foto de Perfil */
+.perfil-foto-content {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.perfil-foto-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
+}
+
+.perfil-foto-preview svg {
+  width: 60px;
+  height: 60px;
+  color: white;
+}
+
+.perfil-foto-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.perfil-foto-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.perfil-foto-actions .btn-primary,
+.perfil-foto-actions .btn-secondary {
+  width: 100%;
+  max-width: 200px;
+}
+
+/* Formulario de Contraseña */
+.perfil-password-form {
+  max-width: 500px;
+}
+
+.perfil-password-form .form-group {
+  margin-bottom: 20px;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  flex: 1;
+  padding-right: 45px;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.btn-toggle-password:hover {
+  color: var(--color-primary);
+}
+
+.btn-toggle-password svg {
+  width: 20px;
+  height: 20px;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.perfil-password-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.perfil-password-actions .btn-primary,
+.perfil-password-actions .btn-secondary {
+  flex: 1;
+  max-width: 180px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .perfil-section {
+    padding: 20px;
+  }
+
+  .perfil-foto-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .perfil-foto-actions {
+    width: 100%;
+  }
+
+  .perfil-foto-actions .btn-primary,
+  .perfil-foto-actions .btn-secondary {
+    max-width: 100%;
+  }
+
+  .perfil-password-form {
+    max-width: 100%;
+  }
+
+  .perfil-password-actions {
+    flex-direction: column;
+  }
+
+  .perfil-password-actions .btn-primary,
+  .perfil-password-actions .btn-secondary {
+    max-width: 100%;
+  }
+}

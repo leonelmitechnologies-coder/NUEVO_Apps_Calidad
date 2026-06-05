@@ -1152,6 +1152,18 @@
               <p class="module-description">Control de asistencia del personal</p>
             </a>
 
+            <!-- Módulo Mi Perfil -->
+            <a href="#" id="link-mi-perfil" class="module-card">
+              <div class="module-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                  <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                </svg>
+              </div>
+              <h3 class="module-title">Mi Perfil</h3>
+              <p class="module-description">Editar foto y contraseña</p>
+            </a>
+
             <!-- Módulo Reportes (Placeholder) -->
             <div class="module-card module-disabled">
               <div class="module-icon">
@@ -1383,6 +1395,91 @@
             </div>
           </div>
 
+        </div>
+      </main>
+    </div>
+
+    <!-- Vista Mi Perfil -->
+    <div id="view-mi-perfil" class="app-view">
+      <main class="dashboard-main">
+        <div class="dashboard-container">
+          <h1 class="dashboard-title">Mi Perfil</h1>
+          <p class="dashboard-subtitle">Edita tu foto de perfil y contraseña</p>
+
+          <div class="perfil-container">
+            <!-- Sección: Foto de Perfil -->
+            <div class="perfil-section">
+              <h2 class="perfil-section-title">Foto de Perfil</h2>
+              <div class="perfil-foto-content">
+                <div class="perfil-foto-preview" id="perfilFotoPreview">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                  </svg>
+                </div>
+                <div class="perfil-foto-actions">
+                  <input type="file" id="perfilFotoInput" accept="image/*" style="display: none;">
+                  <button type="button" class="btn-primary" onclick="document.getElementById('perfilFotoInput').click()">
+                    Cambiar Foto
+                  </button>
+                  <button type="button" class="btn-secondary" id="btnEliminarFotoPerfil" style="display: none;">
+                    Eliminar Foto
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección: Cambiar Contraseña -->
+            <div class="perfil-section">
+              <h2 class="perfil-section-title">Cambiar Contraseña</h2>
+              <form id="formCambiarPassword" class="perfil-password-form">
+                <div class="form-group">
+                  <label for="passwordActual">Contraseña Actual *</label>
+                  <div class="password-input-wrapper">
+                    <input type="password" id="passwordActual" required placeholder="Ingresa tu contraseña actual">
+                    <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('passwordActual')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="passwordNueva">Nueva Contraseña *</label>
+                  <div class="password-input-wrapper">
+                    <input type="password" id="passwordNueva" required placeholder="Ingresa tu nueva contraseña" minlength="6">
+                    <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('passwordNueva')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <small class="form-hint">Mínimo 6 caracteres</small>
+                </div>
+
+                <div class="form-group">
+                  <label for="passwordConfirmar">Confirmar Nueva Contraseña *</label>
+                  <div class="password-input-wrapper">
+                    <input type="password" id="passwordConfirmar" required placeholder="Confirma tu nueva contraseña">
+                    <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('passwordConfirmar')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="perfil-password-actions">
+                  <button type="submit" class="btn-primary">Cambiar Contraseña</button>
+                  <button type="button" class="btn-secondary" onclick="limpiarFormularioPassword()">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </main>
     </div>
@@ -2477,7 +2574,8 @@
         const moduleNames = {
           dashboard: 'Dashboard',
           usuarios: 'Usuarios',
-          asistencia: 'Asistencia'
+          asistencia: 'Asistencia',
+          'mi-perfil': 'Mi Perfil'
         };
         if (currentModule) {
           currentModule.textContent = moduleNames[viewName] || 'QC Manager';
@@ -2487,6 +2585,11 @@
         if (viewName === 'asistencia' && typeof window.pushNavigation === 'function') {
           window.pushNavigation('asistencia-grid');
         }
+
+        // Si estamos navegando a mi-perfil, cargar la foto actual
+        if (viewName === 'mi-perfil') {
+          setTimeout(() => cargarFotoPerfil(), 100);
+        }
       }
 
       // Actualizar título del documento
@@ -2494,7 +2597,8 @@
         login: 'Iniciar Sesión',
         dashboard: 'Dashboard',
         usuarios: 'Usuarios',
-        asistencia: 'Asistencia'
+        asistencia: 'Asistencia',
+        'mi-perfil': 'Mi Perfil'
       };
       document.title = (titles[viewName] || 'QC Manager') + ' - QC Manager';
 
@@ -2557,6 +2661,15 @@
         });
       }
 
+      // Dashboard - Módulo Mi Perfil link
+      const linkMiPerfil = document.getElementById('link-mi-perfil');
+      if (linkMiPerfil) {
+        linkMiPerfil.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigateTo('mi-perfil');
+        });
+      }
+
       // Vista inicial según autenticación
       navigateTo(isAuthenticated() ? 'dashboard' : 'login');
 
@@ -2565,6 +2678,9 @@
 
       // Colaborador Module - Initialize
       initColaboradorModule();
+
+      // Mi Perfil Module - Initialize
+      initMiPerfilModule();
     });
 
     // ============================================
@@ -6051,6 +6167,217 @@
       document.addEventListener('DOMContentLoaded', initTiempoExtra);
     } else {
       initTiempoExtra();
+    }
+
+    // ============================================
+    // MÓDULO MI PERFIL
+    // ============================================
+
+    function initMiPerfilModule() {
+      // Cargar foto de perfil actual
+      cargarFotoPerfil();
+
+      // Listener para cambio de foto
+      const perfilFotoInput = document.getElementById('perfilFotoInput');
+      if (perfilFotoInput) {
+        perfilFotoInput.addEventListener('change', handleCambioFotoPerfil);
+      }
+
+      // Listener para eliminar foto
+      const btnEliminarFoto = document.getElementById('btnEliminarFotoPerfil');
+      if (btnEliminarFoto) {
+        btnEliminarFoto.addEventListener('click', eliminarFotoPerfil);
+      }
+
+      // Listener para formulario de cambio de contraseña
+      const formPassword = document.getElementById('formCambiarPassword');
+      if (formPassword) {
+        formPassword.addEventListener('submit', handleCambiarPassword);
+      }
+    }
+
+    function cargarFotoPerfil() {
+      const currentUser = window.currentUser;
+      if (!currentUser) return;
+
+      const preview = document.getElementById('perfilFotoPreview');
+      const btnEliminar = document.getElementById('btnEliminarFotoPerfil');
+
+      if (currentUser.foto) {
+        preview.innerHTML = `<img src="${currentUser.foto}" alt="${currentUser.name}">`;
+        if (btnEliminar) btnEliminar.style.display = 'block';
+      } else {
+        const iniciales = currentUser.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+        preview.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+          </svg>
+        `;
+        if (btnEliminar) btnEliminar.style.display = 'none';
+      }
+    }
+
+    function handleCambioFotoPerfil(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        showToast('Por favor selecciona una imagen válida', 'error');
+        return;
+      }
+
+      // Validar tamaño (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('La imagen no debe superar 2MB', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fotoBase64 = e.target.result;
+
+        // Actualizar usuario en localStorage
+        const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+        const userIndex = usuarios.findIndex(u => u.username === window.currentUser.username);
+
+        if (userIndex !== -1) {
+          usuarios[userIndex].foto = fotoBase64;
+          localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+          // Actualizar currentUser global
+          window.currentUser.foto = fotoBase64;
+
+          // Actualizar preview
+          const preview = document.getElementById('perfilFotoPreview');
+          preview.innerHTML = `<img src="${fotoBase64}" alt="${window.currentUser.name}">`;
+
+          // Mostrar botón eliminar
+          const btnEliminar = document.getElementById('btnEliminarFotoPerfil');
+          if (btnEliminar) btnEliminar.style.display = 'block';
+
+          // Actualizar avatar en navbar
+          updateUserAvatar();
+
+          showToast('Foto de perfil actualizada', 'success');
+        } else {
+          showToast('Error al actualizar la foto', 'error');
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function eliminarFotoPerfil() {
+      // Actualizar usuario en localStorage
+      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      const userIndex = usuarios.findIndex(u => u.username === window.currentUser.username);
+
+      if (userIndex !== -1) {
+        delete usuarios[userIndex].foto;
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+        // Actualizar currentUser global
+        delete window.currentUser.foto;
+
+        // Actualizar preview
+        cargarFotoPerfil();
+
+        // Actualizar avatar en navbar
+        updateUserAvatar();
+
+        // Limpiar input
+        const input = document.getElementById('perfilFotoInput');
+        if (input) input.value = '';
+
+        showToast('Foto de perfil eliminada', 'success');
+      } else {
+        showToast('Error al eliminar la foto', 'error');
+      }
+    }
+
+    function handleCambiarPassword(event) {
+      event.preventDefault();
+
+      const passwordActual = document.getElementById('passwordActual').value;
+      const passwordNueva = document.getElementById('passwordNueva').value;
+      const passwordConfirmar = document.getElementById('passwordConfirmar').value;
+
+      // Validar contraseña actual
+      if (passwordActual !== window.currentUser.password) {
+        showToast('La contraseña actual es incorrecta', 'error');
+        return;
+      }
+
+      // Validar que las contraseñas coincidan
+      if (passwordNueva !== passwordConfirmar) {
+        showToast('Las contraseñas nuevas no coinciden', 'error');
+        return;
+      }
+
+      // Validar longitud mínima
+      if (passwordNueva.length < 6) {
+        showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+      }
+
+      // Validar que la nueva contraseña sea diferente
+      if (passwordNueva === passwordActual) {
+        showToast('La nueva contraseña debe ser diferente a la actual', 'error');
+        return;
+      }
+
+      // Actualizar usuario en localStorage
+      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      const userIndex = usuarios.findIndex(u => u.username === window.currentUser.username);
+
+      if (userIndex !== -1) {
+        usuarios[userIndex].password = passwordNueva;
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+        // Actualizar currentUser global
+        window.currentUser.password = passwordNueva;
+
+        // Limpiar formulario
+        limpiarFormularioPassword();
+
+        showToast('Contraseña actualizada exitosamente', 'success');
+      } else {
+        showToast('Error al actualizar la contraseña', 'error');
+      }
+    }
+
+    window.togglePasswordVisibility = function(inputId) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+      } else {
+        input.type = 'password';
+      }
+    }
+
+    window.limpiarFormularioPassword = function() {
+      const form = document.getElementById('formCambiarPassword');
+      if (form) form.reset();
+    }
+
+    function updateUserAvatar() {
+      const userAvatar = document.getElementById('userAvatar');
+      if (!userAvatar) return;
+
+      if (window.currentUser && window.currentUser.foto) {
+        userAvatar.style.backgroundImage = `url(${window.currentUser.foto})`;
+        userAvatar.style.backgroundSize = 'cover';
+        userAvatar.style.backgroundPosition = 'center';
+        userAvatar.textContent = '';
+      } else if (window.currentUser) {
+        const iniciales = window.currentUser.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+        userAvatar.style.backgroundImage = 'none';
+        userAvatar.textContent = iniciales;
+      }
     }
   </script>
 </body>
