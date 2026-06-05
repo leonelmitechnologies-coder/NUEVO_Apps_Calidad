@@ -2506,7 +2506,7 @@
      * Función central de navegación para el SPA
      * @param {string} viewName - Nombre de la vista (login, dashboard, usuarios)
      */
-    window.navigateTo = function navigateTo(viewName) {
+    window.navigateTo = function navigateTo(viewName, addToHistory = true) {
       const loginView = document.getElementById('view-login');
       const appShell = document.getElementById('app-shell');
       const backBtn = document.getElementById('backBtn');
@@ -2565,22 +2565,18 @@
           currentModule.textContent = moduleNames[viewName] || 'QC Manager';
         }
 
-        // Si estamos navegando a asistencia, agregar el grid al historial
-        if (viewName === 'asistencia' && typeof window.pushNavigation === 'function') {
-          window.pushNavigation('asistencia-grid');
-        }
-
-        // Si estamos navegando a mi-perfil, agregar al historial y cargar la foto actual
-        if (viewName === 'mi-perfil') {
-          if (typeof window.pushNavigation === 'function') {
-            window.pushNavigation('mi-perfil');
+        // Agregar al historial de navegación solo si se solicita
+        if (addToHistory && typeof window.pushNavigation === 'function') {
+          if (viewName === 'asistencia') {
+            window.pushNavigation('asistencia-grid');
+          } else {
+            window.pushNavigation(viewName);
           }
-          setTimeout(() => cargarFotoPerfil(), 100);
         }
 
-        // Si estamos navegando a usuarios, agregar al historial
-        if (viewName === 'usuarios' && typeof window.pushNavigation === 'function') {
-          window.pushNavigation('usuarios');
+        // Si estamos navegando a mi-perfil, cargar la foto actual
+        if (viewName === 'mi-perfil') {
+          setTimeout(() => cargarFotoPerfil(), 100);
         }
       }
 

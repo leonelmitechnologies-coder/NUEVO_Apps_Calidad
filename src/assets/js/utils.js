@@ -230,9 +230,9 @@ function safeGoBack() {
   const previousLocation = popNavigation();
 
   if (!previousLocation) {
-    // No history, go to dashboard as fallback
+    // No history, go to dashboard as fallback (without adding to history)
     if (typeof window.navigateTo === 'function') {
-      window.navigateTo('dashboard');
+      window.navigateTo('dashboard', false);
     }
     return;
   }
@@ -242,15 +242,15 @@ function safeGoBack() {
   const isTopLevel = topLevelViews.includes(previousLocation) || previousLocation === 'asistencia-grid';
 
   if (isTopLevel) {
-    // Navigate to top-level view
+    // Navigate to top-level view (without adding to history)
     if (previousLocation === 'asistencia-grid') {
       // Special case: asistencia-grid is actually shown via navigateTo('asistencia')
       if (typeof window.navigateTo === 'function') {
-        window.navigateTo('asistencia');
+        window.navigateTo('asistencia', false); // false = don't add to history
       }
     } else {
       if (typeof window.navigateTo === 'function') {
-        window.navigateTo(previousLocation);
+        window.navigateTo(previousLocation, false); // false = don't add to history
       }
     }
   } else {
