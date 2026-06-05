@@ -4728,8 +4728,13 @@
       // Mostrar toast de confirmación
       showToast(`${colab.nombres} ${colab.apellidos} ha sido dado de baja`, 'success');
 
-      // Navegar de vuelta a la vista principal de Colaboradores (grid de departamentos)
+      // Limpiar historial de navegación y navegar a vista principal de Colaboradores
       setTimeout(() => {
+        // Limpiar el historial para evitar regresar al colaborador dado de baja
+        if (typeof clearNavigationHistory === 'function') {
+          clearNavigationHistory();
+        }
+        // Navegar y agregar solo esta ubicación al historial limpio
         navigateToLocation('colaboradores-lista');
       }, 500);
     }
