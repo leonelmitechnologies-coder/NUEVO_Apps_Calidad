@@ -107,6 +107,7 @@ function logout() {
   removeStorage(STORAGE_KEYS.USERNAME);
   removeStorage(STORAGE_KEYS.TOKEN);
   removeStorage(STORAGE_KEYS.REMEMBER_ME);
+  clearNavigationHistory();
   navigateTo('login');
 }
 

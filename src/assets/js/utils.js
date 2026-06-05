@@ -5,6 +5,9 @@
 // Global variable to track current view in SPA
 let currentView = null;
 
+// Navigation history stack for smart back navigation
+let navigationHistory = [];
+
 /**
  * Validates if a string is empty or only whitespace
  * @param {string} value - The string to validate
@@ -183,79 +186,65 @@ function redirect(url) {
 }
 
 /**
- * Smart navigation back that stays within the system
- * Prevents going back to pages outside the application
+ * Pushes a location to the navigation history
+ * @param {string} location - A unique identifier for the current view
+ */
+function pushNavigation(location) {
+  // Avoid duplicates if we're already at this location
+  if (navigationHistory[navigationHistory.length - 1] !== location) {
+    navigationHistory.push(location);
+  }
+}
+
+/**
+ * Pops the last location from navigation history
+ * @returns {string|null} The previous location or null if history is empty
+ */
+function popNavigation() {
+  // Remove current location
+  navigationHistory.pop();
+  // Return previous location
+  return navigationHistory[navigationHistory.length - 1] || null;
+}
+
+/**
+ * Clears the navigation history
+ */
+function clearNavigationHistory() {
+  navigationHistory = [];
+}
+
+/**
+ * Gets the current navigation history
+ * @returns {Array} The navigation history
+ */
+function getNavigationHistory() {
+  return [...navigationHistory];
+}
+
+/**
+ * Smart navigation back using history stack
+ * Automatically goes back to the previous view in the navigation history
  */
 function safeGoBack() {
-  // Check if we're in a subview within Asistencia
-  if (currentView === 'asistencia') {
-    const asistenciaColabView = document.getElementById('asistencia-colaborador');
-    const asistenciaListaView = document.getElementById('asistencia-colaboradores-lista');
-    const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
-    const colaboradorDetalleView = document.getElementById('asistencia-colaborador-detalle');
-    const asistenciaPasarLista = document.getElementById('asistencia-pasar-lista');
-    const asistenciaPasarDepartamento = document.getElementById('asistencia-pasar-departamento');
+  const previousLocation = popNavigation();
 
-    // Si el formulario de agregar colaborador está visible, volver al grid
-    if (asistenciaColabView && asistenciaColabView.style.display === 'block') {
-      if (typeof window.volverAGrid === 'function') {
-        window.volverAGrid();
-        return;
-      }
+  if (!previousLocation) {
+    // No history, go to default based on current view
+    const routes = {
+      'usuarios': 'dashboard',
+      'asistencia': 'dashboard',
+    };
+    const backDestination = routes[currentView];
+    if (backDestination) {
+      navigateTo(backDestination);
     }
-
-    // Si el detalle de colaborador está visible, volver a detalle de departamento
-    if (colaboradorDetalleView && colaboradorDetalleView.style.display === 'block') {
-      if (typeof window.volverADepartamento === 'function') {
-        window.volverADepartamento();
-        return;
-      }
-    }
-
-    // Si el detalle de departamento está visible, volver a lista de departamentos
-    if (departamentoDetalleView && departamentoDetalleView.style.display === 'block') {
-      if (typeof window.volverAListaDepartamentos === 'function') {
-        window.volverAListaDepartamentos();
-        return;
-      }
-    }
-
-    // Si la lista de departamentos (colaboradores) está visible, volver al grid
-    if (asistenciaListaView && asistenciaListaView.style.display === 'block') {
-      if (typeof window.volverAGridDesdeColaboradores === 'function') {
-        window.volverAGridDesdeColaboradores();
-        return;
-      }
-    }
-
-    // Si los colaboradores de pasar asistencia están visibles, volver a lista de departamentos
-    if (asistenciaPasarDepartamento && asistenciaPasarDepartamento.style.display === 'block') {
-      if (typeof window.volverAListaDepartamentosAsistencia === 'function') {
-        window.volverAListaDepartamentosAsistencia();
-        return;
-      }
-    }
-
-    // Si la lista de departamentos de pasar asistencia está visible, volver al grid
-    if (asistenciaPasarLista && asistenciaPasarLista.style.display === 'block') {
-      if (typeof window.volverAGridDesdePasarAsistencia === 'function') {
-        window.volverAGridDesdePasarAsistencia();
-        return;
-      }
-    }
+    return;
   }
 
-  // Define internal navigation routes for SPA
-  const routes = {
-    'usuarios': 'dashboard',
-    'asistencia': 'dashboard',
-  };
-
-  // Get the back destination for current view
-  const backDestination = routes[currentView];
-
-  if (backDestination) {
-    navigateTo(backDestination);
+  // Navigate to previous location using the custom navigation function
+  if (typeof window.navigateToLocation === 'function') {
+    window.navigateToLocation(previousLocation, false); // false = don't push to history
   }
 }
 

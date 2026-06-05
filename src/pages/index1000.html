@@ -470,70 +470,24 @@
     }
 
     /* Departamentos y Colaboradores */
-    .dept-module-card {
-      position: relative;
-      background: white;
-      border-radius: 8px;
-      padding: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: all 0.2s;
-      cursor: pointer;
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 12px;
-    }
 
-    .dept-module-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    }
-
-    .dept-module-icon {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #1E7CBA, #2C9FD9);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-    }
-
-    .dept-module-icon svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .dept-module-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin: 0;
-    }
-
-    .dept-module-count {
-      font-size: 13px;
-      color: #666;
-      margin: 0;
-    }
-
-    .dept-module-badge {
+    /* Badge de contador en tarjetas de departamento */
+    .dept-count-badge {
       position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #1E7CBA;
+      top: var(--spacing-sm);
+      right: var(--spacing-sm);
+      background: var(--color-primary);
       color: white;
       padding: 4px 10px;
       border-radius: 12px;
-      font-size: 11px;
+      font-size: 0.7rem;
       font-weight: 600;
+      min-width: 24px;
+      text-align: center;
     }
 
-    .dept-module-badge.zero {
-      background: #ccc;
+    .dept-count-badge.zero {
+      background: #94a3b8;
     }
 
     /* Colaboradores compactos */
@@ -552,11 +506,32 @@
       align-items: center;
       gap: 12px;
       transition: all 0.2s;
+      flex-wrap: wrap;
     }
 
     .colab-card-compact:hover {
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       border-color: #1E7CBA;
+    }
+
+    /* Cuando la tarjeta tiene botones de asistencia */
+    .colab-card-compact:has(.asistencia-actions),
+    .colab-card-compact:has(.asistencia-registrada) {
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    .colab-card-compact .asistencia-actions {
+      margin-left: auto;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+
+    .colab-card-compact .asistencia-registrada {
+      margin-left: auto;
+      margin-top: 0;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .colab-photo-small {
@@ -1647,6 +1622,12 @@
                   <p id="colab-detalle-puesto">Puesto</p>
                   <span class="colab-status" id="colab-detalle-estatus">Activo</span>
                 </div>
+                <button class="btn-edit-detalle" id="btn-edit-colaborador-detalle" onclick="editarColaboradorFromDetalle()" title="Editar colaborador">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                  </svg>
+                  Editar
+                </button>
               </div>
 
               <div class="colab-detalle-body">
@@ -1690,8 +1671,34 @@
             <h2 class="section-title" id="asistencia-dept-title">Departamento</h2>
             <p class="section-subtitle" id="asistencia-dept-subtitle">0 colaboradores</p>
 
+            <!-- Encabezado de Asistencia -->
+            <div class="asistencia-header">
+              <div class="asistencia-fecha" id="asistencia-fecha-actual"></div>
+
+              <!-- Estadísticas de Asistencia -->
+              <div class="asistencia-stats">
+                <div class="stat-item stat-total">
+                  <span class="stat-label">Total</span>
+                  <span class="stat-value" id="stat-total">0</span>
+                </div>
+                <div class="stat-item stat-presente">
+                  <span class="stat-label">Presentes</span>
+                  <span class="stat-value" id="stat-presentes">0</span>
+                </div>
+                <div class="stat-item stat-ausente">
+                  <span class="stat-label">Ausentes</span>
+                  <span class="stat-value" id="stat-ausentes">0</span>
+                </div>
+                <div class="stat-item stat-pendiente">
+                  <span class="stat-label">Pendientes</span>
+                  <span class="stat-value" id="stat-pendientes">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Colaboradores agrupados por turno -->
             <div id="asistencia-colaboradores-container">
-              <!-- Los colaboradores del departamento se cargarán aquí -->
+              <!-- Los colaboradores se cargarán aquí agrupados por turno -->
             </div>
 
             <div id="empty-asistencia-colaboradores" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
@@ -1704,6 +1711,130 @@
 
         </div>
       </main>
+    </div>
+
+    <!-- Modal de Inasistencia -->
+    <div id="modal-inasistencia" class="modal-overlay" style="display: none;">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 class="modal-title">Registrar Inasistencia</h3>
+          <button class="modal-close" onclick="cerrarModalInasistencia()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="colaborador-info-modal">
+            <div class="colaborador-avatar-modal" id="modal-colaborador-avatar"></div>
+            <div>
+              <div class="colaborador-nombre-modal" id="modal-colaborador-nombre"></div>
+              <div class="colaborador-dept-modal" id="modal-colaborador-dept"></div>
+            </div>
+          </div>
+
+          <form id="form-inasistencia">
+            <div class="form-group">
+              <label>Tipo de Inasistencia *</label>
+              <div class="inasistencia-options">
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="FI" required>
+                  <div class="option-content" data-tipo="FI">
+                    <span class="option-code">FI</span>
+                    <span class="option-label">Falta Injustificada</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="FJ" required>
+                  <div class="option-content" data-tipo="FJ">
+                    <span class="option-code">FJ</span>
+                    <span class="option-label">Falta Justificada</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="PSG" required>
+                  <div class="option-content" data-tipo="PSG">
+                    <span class="option-code">PSG</span>
+                    <span class="option-label">Permiso Sin Goce</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="PCG" required>
+                  <div class="option-content" data-tipo="PCG">
+                    <span class="option-code">PCG</span>
+                    <span class="option-label">Permiso Con Goce</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="Suspension" required>
+                  <div class="option-content" data-tipo="Suspension">
+                    <span class="option-code">SUS</span>
+                    <span class="option-label">Suspensión laboral</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="Vacaciones" required>
+                  <div class="option-content" data-tipo="Vacaciones">
+                    <span class="option-code">VAC</span>
+                    <span class="option-label">Días de vacaciones</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="IT" required>
+                  <div class="option-content" data-tipo="IT">
+                    <span class="option-code">IT</span>
+                    <span class="option-label">Incapacidad Temporal</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="RET" required>
+                  <div class="option-content" data-tipo="RET">
+                    <span class="option-code">RET</span>
+                    <span class="option-label">Retardo</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="CUM" required>
+                  <div class="option-content" data-tipo="CUM">
+                    <span class="option-code">CUM</span>
+                    <span class="option-label">Día por cumpleaños</span>
+                  </div>
+                </label>
+                <label class="inasistencia-option">
+                  <input type="radio" name="tipoInasistencia" value="FES" required>
+                  <div class="option-content" data-tipo="FES">
+                    <span class="option-code">FES</span>
+                    <span class="option-label">Festivo Laborado</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="comentario-inasistencia">Comentario (opcional)</label>
+              <textarea id="comentario-inasistencia" rows="2" placeholder="Agrega detalles..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-secondary" onclick="cerrarModalInasistencia()">Cancelar</button>
+              <button type="submit" class="btn-danger">Registrar Inasistencia</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Lightbox para Fotos -->
+  <div id="modal-foto" class="modal-overlay" style="display: none;" onclick="cerrarModalFoto()">
+    <div class="modal-foto-container" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="cerrarModalFoto()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+        </svg>
+      </button>
+      <img id="modal-foto-img" src="" alt="Foto colaborador">
+      <div class="modal-foto-info" id="modal-foto-info"></div>
     </div>
   </div>
 
@@ -1866,6 +1997,11 @@
         };
         if (currentModule) {
           currentModule.textContent = moduleNames[viewName] || 'QC Manager';
+        }
+
+        // Si estamos navegando a asistencia, agregar el grid al historial
+        if (viewName === 'asistencia' && typeof window.pushNavigation === 'function') {
+          window.pushNavigation('asistencia-grid');
         }
       }
 
@@ -2420,8 +2556,6 @@
 
     function initColaboradorModule() {
       const linkAgregarColab = document.getElementById('link-agregar-colaborador');
-      const asistenciaMain = document.getElementById('asistencia-main');
-      const asistenciaColabView = document.getElementById('asistencia-colaborador');
       const btnCancelColab = document.getElementById('btnCancelColab');
       const colaboradorForm = document.getElementById('colaboradorForm');
 
@@ -2429,22 +2563,26 @@
       if (linkAgregarColab) {
         linkAgregarColab.addEventListener('click', (e) => {
           e.preventDefault();
-          asistenciaMain.style.display = 'none';
-          asistenciaColabView.style.display = 'block';
+          navigateToLocation('agregar-colaborador');
         });
       }
 
-      // Volver al grid de asistencia (global para usar desde navbar back button)
-      window.volverAGrid = function() {
-        asistenciaMain.style.display = 'grid';
-        asistenciaColabView.style.display = 'none';
-        colaboradorForm.reset();
+      // Función para limpiar y volver al grid
+      const volverYLimpiar = function() {
+        if (colaboradorForm) colaboradorForm.reset();
         currentPhotoColab = null;
         updatePhotoPreviewColab(null);
+
+        // Clear edit mode
+        window.editingColaboradorId = null;
+        document.querySelector('#colaboradorForm .btn-primary').textContent = 'Registrar Colaborador';
+        document.querySelector('#asistencia-colaborador .section-title').textContent = 'Agregar Colaborador';
+
+        navigateToLocation('asistencia-grid');
       }
 
       if (btnCancelColab) {
-        btnCancelColab.addEventListener('click', volverAGrid);
+        btnCancelColab.addEventListener('click', volverYLimpiar);
       }
 
       // Manejo de fotos
@@ -2502,32 +2640,127 @@
       colaboradorForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const colaborador = {
-          id: Date.now(),
-          foto: currentPhotoColab,
-          nombres: document.getElementById('nombresColab').value,
-          apellidos: document.getElementById('apellidosColab').value,
-          departamento: document.getElementById('departamentoColab').value,
-          puesto: document.getElementById('puestoColab').value,
-          turno: document.getElementById('turnoColab').value,
-          numeroEmpleado: document.getElementById('numeroEmpleadoColab').value,
-          fechaIngreso: document.getElementById('fechaIngresoColab').value,
-          estatus: document.getElementById('estatusColab').value,
-          fechaRegistro: new Date().toISOString()
-        };
-
-        // Guardar en localStorage
         const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-        colaboradores.push(colaborador);
-        localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
 
-        // Mostrar notificación
-        showToast(`Colaborador ${colaborador.nombres} ${colaborador.apellidos} registrado exitosamente`, 'success');
+        // Check if we're editing an existing colaborador
+        if (window.editingColaboradorId) {
+          // UPDATE existing colaborador
+          const index = colaboradores.findIndex(c => c.id === window.editingColaboradorId);
+
+          if (index !== -1) {
+            colaboradores[index] = {
+              ...colaboradores[index],
+              foto: currentPhotoColab,
+              nombres: document.getElementById('nombresColab').value,
+              apellidos: document.getElementById('apellidosColab').value,
+              departamento: document.getElementById('departamentoColab').value,
+              puesto: document.getElementById('puestoColab').value,
+              turno: document.getElementById('turnoColab').value,
+              numeroEmpleado: document.getElementById('numeroEmpleadoColab').value,
+              fechaIngreso: document.getElementById('fechaIngresoColab').value,
+              estatus: document.getElementById('estatusColab').value
+            };
+
+            localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+            showToast(`Colaborador actualizado exitosamente`, 'success');
+
+            // Clear edit mode
+            window.editingColaboradorId = null;
+            document.querySelector('#colaboradorForm .btn-primary').textContent = 'Registrar Colaborador';
+          }
+        } else {
+          // CREATE new colaborador
+          const colaborador = {
+            id: Date.now(),
+            foto: currentPhotoColab,
+            nombres: document.getElementById('nombresColab').value,
+            apellidos: document.getElementById('apellidosColab').value,
+            departamento: document.getElementById('departamentoColab').value,
+            puesto: document.getElementById('puestoColab').value,
+            turno: document.getElementById('turnoColab').value,
+            numeroEmpleado: document.getElementById('numeroEmpleadoColab').value,
+            fechaIngreso: document.getElementById('fechaIngresoColab').value,
+            estatus: document.getElementById('estatusColab').value,
+            fechaRegistro: new Date().toISOString()
+          };
+
+          colaboradores.push(colaborador);
+          localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+          showToast(`Colaborador ${colaborador.nombres} ${colaborador.apellidos} registrado exitosamente`, 'success');
+        }
 
         // Volver al grid
-        volverAGrid();
+        navigateToLocation('asistencia-grid');
       });
     }
+
+    // ===================================
+    // Editar Colaborador
+    // ===================================
+    window.editarColaborador = function(colaboradorId) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colaborador = colaboradores.find(c => c.id === colaboradorId);
+
+      if (!colaborador) {
+        showToast('Colaborador no encontrado', 'error');
+        return;
+      }
+
+      // Navigate to colaborador form
+      navigateToLocation('agregar-colaborador');
+
+      // Fill form with colaborador data
+      document.getElementById('nombresColab').value = colaborador.nombres || '';
+      document.getElementById('apellidosColab').value = colaborador.apellidos || '';
+      document.getElementById('departamentoColab').value = colaborador.departamento || '';
+      document.getElementById('puestoColab').value = colaborador.puesto || '';
+      document.getElementById('turnoColab').value = colaborador.turno || '';
+      document.getElementById('numeroEmpleadoColab').value = colaborador.numeroEmpleado || '';
+      document.getElementById('fechaIngresoColab').value = colaborador.fechaIngreso || '';
+      document.getElementById('estatusColab').value = colaborador.estatus || 'Activo';
+
+      // Load photo if exists
+      if (colaborador.foto) {
+        const photoPreview = document.getElementById('photoPreviewColab');
+        photoPreview.innerHTML = `<img src="${colaborador.foto}" alt="Preview">`;
+        document.getElementById('btnRemovePhotoColab').style.display = 'flex';
+        window.currentPhotoColab = colaborador.foto;
+      } else {
+        const photoPreview = document.getElementById('photoPreviewColab');
+        photoPreview.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+            <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+          </svg>
+        `;
+        document.getElementById('btnRemovePhotoColab').style.display = 'none';
+        window.currentPhotoColab = null;
+      }
+
+      // Set edit mode
+      window.editingColaboradorId = colaboradorId;
+
+      // Change button text
+      const submitBtn = document.querySelector('#colaboradorForm .btn-primary');
+      submitBtn.textContent = 'Actualizar Colaborador';
+
+      // Change title
+      document.querySelector('#asistencia-colaborador .section-title').textContent = 'Editar Colaborador';
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // ===================================
+    // Editar Colaborador desde Detalle
+    // ===================================
+    window.editarColaboradorFromDetalle = function() {
+      if (window.currentColaboradorDetalleId) {
+        editarColaborador(window.currentColaboradorDetalleId);
+      } else {
+        showToast('No se pudo cargar la información del colaborador', 'error');
+      }
+    };
 
     // ===================================
     // Autocomplete Departamentos
@@ -2741,6 +2974,94 @@
     }
 
     // ===================================
+    // SISTEMA DE NAVEGACIÓN CENTRALIZADO
+    // ===================================
+
+    /**
+     * Función centralizada de navegación que maneja todas las vistas
+     * @param {string} location - Identificador único de la vista
+     * @param {boolean} addToHistory - Si agregar a historial (default: true)
+     */
+    window.navigateToLocation = function(location, addToHistory = true) {
+      // Obtener todos los contenedores de vistas
+      const asistenciaMain = document.getElementById('asistencia-main');
+      const colaboradoresListaView = document.getElementById('asistencia-colaboradores-lista');
+      const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
+      const colaboradorDetalleView = document.getElementById('asistencia-colaborador-detalle');
+      const asistenciaColabView = document.getElementById('asistencia-colaborador');
+      const asistenciaPasarLista = document.getElementById('asistencia-pasar-lista');
+      const asistenciaPasarDepartamento = document.getElementById('asistencia-pasar-departamento');
+
+      // Ocultar todas las vistas de asistencia
+      const allViews = [
+        asistenciaMain,
+        colaboradoresListaView,
+        departamentoDetalleView,
+        colaboradorDetalleView,
+        asistenciaColabView,
+        asistenciaPasarLista,
+        asistenciaPasarDepartamento
+      ];
+
+      allViews.forEach(view => {
+        if (view) view.style.display = 'none';
+      });
+
+      // Agregar a historial si se solicita
+      if (addToHistory) {
+        window.pushNavigation(location);
+      }
+
+      // Mostrar la vista correspondiente según el location
+      switch(location) {
+        case 'asistencia-grid':
+          if (asistenciaMain) asistenciaMain.style.display = 'grid';
+          break;
+
+        case 'colaboradores-lista':
+          if (colaboradoresListaView) {
+            colaboradoresListaView.style.display = 'block';
+            cargarDepartamentos();
+          }
+          break;
+
+        case 'agregar-colaborador':
+          if (asistenciaColabView) asistenciaColabView.style.display = 'block';
+          break;
+
+        case 'pasar-asistencia-lista':
+          if (asistenciaPasarLista) {
+            asistenciaPasarLista.style.display = 'block';
+            cargarDepartamentosAsistencia();
+          }
+          break;
+
+        default:
+          // Para locations dinámicos (departamento específico, colaborador específico, etc.)
+          if (location.startsWith('colaboradores-dept:')) {
+            const dept = location.replace('colaboradores-dept:', '');
+            if (departamentoDetalleView) {
+              departamentoDetalleView.style.display = 'block';
+              cargarColaboradoresDepartamento(dept);
+            }
+          } else if (location.startsWith('colaborador-detalle:')) {
+            const id = parseInt(location.replace('colaborador-detalle:', ''));
+            if (colaboradorDetalleView) {
+              colaboradorDetalleView.style.display = 'block';
+              cargarDetalleColaborador(id);
+            }
+          } else if (location.startsWith('pasar-asistencia-dept:')) {
+            const dept = location.replace('pasar-asistencia-dept:', '');
+            if (asistenciaPasarDepartamento) {
+              asistenciaPasarDepartamento.style.display = 'block';
+              cargarColaboradoresAsistencia(dept);
+            }
+          }
+          break;
+      }
+    }
+
+    // ===================================
     // Lista de Colaboradores por Departamento
     // ===================================
 
@@ -2779,56 +3100,21 @@
 
     function initColaboradoresLista() {
       const linkColabLista = document.getElementById('link-colaboradores-lista');
-      const asistenciaMain = document.getElementById('asistencia-main');
-      const colaboradoresListaView = document.getElementById('asistencia-colaboradores-lista');
-      const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
-      const colaboradorDetalleView = document.getElementById('asistencia-colaborador-detalle');
 
       if (linkColabLista) {
         linkColabLista.addEventListener('click', (e) => {
           e.preventDefault();
-          asistenciaMain.style.display = 'none';
-          colaboradoresListaView.style.display = 'block';
-          departamentoDetalleView.style.display = 'none';
-          colaboradorDetalleView.style.display = 'none';
-          cargarDepartamentos();
+          navigateToLocation('colaboradores-lista');
         });
       }
 
-      // Función global para volver al grid desde lista de departamentos
-      window.volverAGridDesdeColaboradores = function() {
-        asistenciaMain.style.display = 'grid';
-        colaboradoresListaView.style.display = 'none';
-        departamentoDetalleView.style.display = 'none';
-        colaboradorDetalleView.style.display = 'none';
-      }
-
-      // Función global para volver a lista de departamentos desde detalle de departamento
-      window.volverAListaDepartamentos = function() {
-        colaboradoresListaView.style.display = 'block';
-        departamentoDetalleView.style.display = 'none';
-        colaboradorDetalleView.style.display = 'none';
-      }
-
-      // Función global para volver a detalle de departamento desde detalle de colaborador
-      window.volverADepartamento = function() {
-        departamentoDetalleView.style.display = 'block';
-        colaboradorDetalleView.style.display = 'none';
-      }
-
-      // Función global para ver detalle de departamento
+      // Funciones globales simplificadas - ahora solo llaman a navigateToLocation
       window.verDepartamentoDetalle = function(nombreDepartamento) {
-        colaboradoresListaView.style.display = 'none';
-        departamentoDetalleView.style.display = 'block';
-        colaboradorDetalleView.style.display = 'none';
-        cargarColaboradoresDepartamento(nombreDepartamento);
+        navigateToLocation('colaboradores-dept:' + nombreDepartamento);
       }
 
-      // Función global para ver detalle de colaborador
       window.verColaboradorDetalle = function(colaboradorId) {
-        departamentoDetalleView.style.display = 'none';
-        colaboradorDetalleView.style.display = 'block';
-        cargarDetalleColaborador(colaboradorId);
+        navigateToLocation('colaborador-detalle:' + colaboradorId);
       }
     }
 
@@ -2850,15 +3136,15 @@
         const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR']; // Fallback a HR si no existe
 
         return `
-          <div class="dept-module-card" onclick="verDepartamentoDetalle('${dept}')">
-            <span class="dept-module-badge ${badgeClass}">${count}</span>
-            <div class="dept-module-icon">
+          <div class="module-card" onclick="verDepartamentoDetalle('${dept}')">
+            <span class="dept-count-badge ${badgeClass}">${count}</span>
+            <div class="module-icon">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                 ${icon}
               </svg>
             </div>
-            <h3 class="dept-module-name">${dept}</h3>
-            <p class="dept-module-count">${count} ${count === 1 ? 'colaborador' : 'colaboradores'}</p>
+            <h3 class="module-title">${dept}</h3>
+            <p class="module-description">${count} ${count === 1 ? 'activo' : 'activos'}</p>
           </div>
         `;
       }).join('');
@@ -2892,8 +3178,9 @@
               ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
               : '??';
 
+            const nombreCompleto = `${colab.nombres} ${colab.apellidos}`;
             const photoHTML = colab.foto
-              ? `<img src="${colab.foto}" alt="${colab.nombres}">`
+              ? `<img src="${colab.foto}" alt="${colab.nombres}" onclick="event.stopPropagation(); abrirModalFoto('${colab.foto}', '${nombreCompleto}')">`
               : initials;
 
             const estatusClass = (colab.estatus || 'Activo').toLowerCase();
@@ -2903,7 +3190,7 @@
                 <div class="colab-photo-small">${photoHTML}</div>
                 <div class="colab-info-compact">
                   <h4>${colab.nombres} ${colab.apellidos}</h4>
-                  <p>${colab.puesto || 'Sin puesto'} • ${colab.numeroEmpleado || 'N/A'}</p>
+                  <p>${colab.puesto || 'Sin puesto'}</p>
                 </div>
                 <div class="colab-status-compact ${estatusClass}" title="${colab.estatus || 'Activo'}"></div>
               </div>
@@ -2922,14 +3209,18 @@
         return;
       }
 
+      // Store the colaborador ID for the edit button
+      window.currentColaboradorDetalleId = colaboradorId;
+
       // Actualizar foto
       const photoContainer = document.getElementById('colab-detalle-photo');
       const initials = colab.nombres && colab.apellidos
         ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
         : '??';
 
+      const nombreCompleto = `${colab.nombres} ${colab.apellidos}`;
       if (colab.foto) {
-        photoContainer.innerHTML = `<img src="${colab.foto}" alt="${colab.nombres}">`;
+        photoContainer.innerHTML = `<img src="${colab.foto}" alt="${colab.nombres}" onclick="abrirModalFoto('${colab.foto}', '${nombreCompleto}')" style="cursor: pointer;">`;
       } else {
         photoContainer.textContent = initials;
       }
@@ -2967,38 +3258,17 @@
 
     function initPasarAsistencia() {
       const linkPasarAsistencia = document.getElementById('link-pasar-asistencia');
-      const asistenciaMain = document.getElementById('asistencia-main');
-      const asistenciaPasarLista = document.getElementById('asistencia-pasar-lista');
-      const asistenciaPasarDepartamento = document.getElementById('asistencia-pasar-departamento');
 
       if (linkPasarAsistencia) {
         linkPasarAsistencia.addEventListener('click', (e) => {
           e.preventDefault();
-          asistenciaMain.style.display = 'none';
-          asistenciaPasarLista.style.display = 'block';
-          asistenciaPasarDepartamento.style.display = 'none';
-          cargarDepartamentosAsistencia();
+          navigateToLocation('pasar-asistencia-lista');
         });
       }
 
-      // Función global para volver al grid desde pasar asistencia
-      window.volverAGridDesdePasarAsistencia = function() {
-        asistenciaMain.style.display = 'grid';
-        asistenciaPasarLista.style.display = 'none';
-        asistenciaPasarDepartamento.style.display = 'none';
-      }
-
-      // Función global para volver a lista de departamentos desde asistencia departamento
-      window.volverAListaDepartamentosAsistencia = function() {
-        asistenciaPasarLista.style.display = 'block';
-        asistenciaPasarDepartamento.style.display = 'none';
-      }
-
-      // Función global para ver departamento de asistencia
+      // Función global simplificada
       window.verDepartamentoAsistencia = function(nombreDepartamento) {
-        asistenciaPasarLista.style.display = 'none';
-        asistenciaPasarDepartamento.style.display = 'block';
-        cargarColaboradoresAsistencia(nombreDepartamento);
+        navigateToLocation('pasar-asistencia-dept:' + nombreDepartamento);
       }
     }
 
@@ -3020,25 +3290,62 @@
         const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];
 
         return `
-          <div class="dept-module-card" onclick="verDepartamentoAsistencia('${dept}')">
-            <span class="dept-module-badge ${badgeClass}">${count}</span>
-            <div class="dept-module-icon">
+          <div class="module-card" onclick="verDepartamentoAsistencia('${dept}')">
+            <span class="dept-count-badge ${badgeClass}">${count}</span>
+            <div class="module-icon">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                 ${icon}
               </svg>
             </div>
-            <h3 class="dept-module-name">${dept}</h3>
-            <p class="dept-module-count">${count} activo${count !== 1 ? 's' : ''}</p>
+            <h3 class="module-title">${dept}</h3>
+            <p class="module-description">${count} activo${count !== 1 ? 's' : ''}</p>
           </div>
         `;
       }).join('');
     }
 
+    /**
+     * Actualiza la fecha actual en el encabezado
+     */
+    function actualizarFechaAsistencia() {
+      const fechaElement = document.getElementById('asistencia-fecha-actual');
+      if (!fechaElement) return;
+
+      const hoy = new Date();
+
+      // Formato compacto para móvil
+      if (window.innerWidth <= 768) {
+        const diaSemana = hoy.toLocaleDateString('es-MX', { weekday: 'short' });
+        const dia = hoy.getDate();
+        const mes = hoy.toLocaleDateString('es-MX', { month: 'short' });
+        const año = hoy.getFullYear();
+        // Capitalizar primera letra y quitar punto del día de la semana
+        const diaCapitalizado = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1).replace('.', '');
+        const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '');
+        fechaElement.textContent = `${diaCapitalizado}, ${dia} ${mesCapitalizado} ${año}`;
+      } else {
+        // Formato completo para desktop
+        const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const fechaFormateada = hoy.toLocaleDateString('es-MX', opciones);
+        fechaElement.textContent = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+      }
+    }
+
     function cargarColaboradoresAsistencia(nombreDepartamento) {
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+
+      // Filtrar por departamento y estatus activo (TODOS los turnos)
       const colaboradoresDept = colaboradores.filter(c =>
-        c.departamento === nombreDepartamento && (c.estatus || 'Activo') === 'Activo'
+        c.departamento === nombreDepartamento &&
+        (c.estatus || 'Activo') === 'Activo'
       );
+
+      // Agrupar por turno
+      const turno1 = colaboradoresDept.filter(c => c.turno === 'Turno 1');
+      const turno2 = colaboradoresDept.filter(c => c.turno === 'Turno 2');
+
+      // Actualizar fecha
+      actualizarFechaAsistencia();
 
       // Actualizar título
       document.getElementById('asistencia-dept-title').textContent = nombreDepartamento;
@@ -3056,32 +3363,304 @@
 
       emptyMessage.style.display = 'none';
 
-      // Renderizar colaboradores compactos (igual que en lista de colaboradores)
-      container.innerHTML = `
-        <div class="colab-list">
-          ${colaboradoresDept.map(colab => {
-            const initials = colab.nombres && colab.apellidos
-              ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
-              : '??';
+      const fechaHoy = obtenerFechaHoy();
 
-            const photoHTML = colab.foto
-              ? `<img src="${colab.foto}" alt="${colab.nombres}">`
-              : initials;
+      // Función helper para renderizar un colaborador
+      const renderColaborador = (colab) => {
+        const initials = colab.nombres && colab.apellidos
+          ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+          : '??';
 
-            return `
-              <div class="colab-card-compact">
-                <div class="colab-photo-small">${photoHTML}</div>
-                <div class="colab-info-compact">
-                  <h4>${colab.nombres} ${colab.apellidos}</h4>
-                  <p>${colab.puesto || 'Sin puesto'} • ${colab.numeroEmpleado || 'N/A'}</p>
-                </div>
-                <div class="colab-status-compact activo" title="Activo"></div>
+        const nombreCompleto = `${colab.nombres} ${colab.apellidos}`;
+        const photoHTML = colab.foto
+          ? `<img src="${colab.foto}" alt="${colab.nombres}" onclick="event.stopPropagation(); abrirModalFoto('${colab.foto}', '${nombreCompleto}')">`
+          : initials;
+
+        // Verificar si ya se registró asistencia hoy
+        const registroHoy = obtenerRegistroAsistenciaHoy(colab.id);
+
+        let asistenciaHTML = '';
+        if (registroHoy) {
+          if (registroHoy.estado === 'presente') {
+            asistenciaHTML = `
+              <div class="asistencia-registrada asistencia-presente">
+                ✓ Presente
               </div>
             `;
-          }).join('')}
-        </div>
-      `;
+          } else {
+            const tipoLabel = registroHoy.tipoInasistencia || 'Ausente';
+            asistenciaHTML = `
+              <div class="asistencia-registrada asistencia-ausente">
+                ✗ ${tipoLabel}
+              </div>
+            `;
+          }
+        } else {
+          asistenciaHTML = `
+            <div class="asistencia-actions">
+              <button class="btn-asistencia btn-presente" onclick="marcarPresente(${colab.id}, '${colab.nombres}', '${colab.apellidos}', '${colab.departamento}')" title="Marcar presente" aria-label="Marcar presente">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                </svg>
+              </button>
+              <button class="btn-asistencia btn-ausente" onclick="abrirModalInasistencia(${colab.id}, '${colab.nombres}', '${colab.apellidos}', '${colab.departamento}')" title="Registrar inasistencia" aria-label="Registrar inasistencia">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                </svg>
+              </button>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="colab-card-compact">
+            <div class="colab-photo-small">${photoHTML}</div>
+            <div class="colab-info-compact">
+              <h4>${colab.nombres} ${colab.apellidos}</h4>
+              <p>${colab.puesto || 'Sin puesto'}</p>
+            </div>
+            ${asistenciaHTML}
+          </div>
+        `;
+      };
+
+      // Renderizar colaboradores agrupados por turno
+      let turnosHTML = '';
+
+      if (turno1.length > 0) {
+        turnosHTML += `
+          <div class="turno-section">
+            <h3 class="turno-header">1er Turno</h3>
+            <div class="colab-list">
+              ${turno1.map(renderColaborador).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      if (turno2.length > 0) {
+        turnosHTML += `
+          <div class="turno-section">
+            <h3 class="turno-header">2do Turno</h3>
+            <div class="colab-list">
+              ${turno2.map(renderColaborador).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = turnosHTML;
+
+      // Actualizar estadísticas
+      actualizarEstadisticasAsistencia(colaboradoresDept);
     }
+
+    /**
+     * Actualiza las estadísticas de asistencia
+     */
+    function actualizarEstadisticasAsistencia(colaboradores) {
+      const total = colaboradores.length;
+      let presentes = 0;
+      let ausentes = 0;
+
+      colaboradores.forEach(colab => {
+        const registro = obtenerRegistroAsistenciaHoy(colab.id);
+        if (registro) {
+          if (registro.estado === 'presente') {
+            presentes++;
+          } else {
+            ausentes++;
+          }
+        }
+      });
+
+      const pendientes = total - presentes - ausentes;
+
+      // Actualizar los elementos
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-presentes').textContent = presentes;
+      document.getElementById('stat-ausentes').textContent = ausentes;
+      document.getElementById('stat-pendientes').textContent = pendientes;
+    }
+
+    // ===================================
+    // FUNCIONES DE ASISTENCIA
+    // ===================================
+
+    /**
+     * Obtiene la fecha de hoy en formato YYYY-MM-DD
+     */
+    function obtenerFechaHoy() {
+      const hoy = new Date();
+      const año = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoy.getDate()).padStart(2, '0');
+      return `${año}-${mes}-${dia}`;
+    }
+
+    /**
+     * Obtiene el registro de asistencia de hoy para un colaborador
+     */
+    function obtenerRegistroAsistenciaHoy(colaboradorId) {
+      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+      const fechaHoy = obtenerFechaHoy();
+      return historial.find(r => r.colaboradorId === colaboradorId && r.fecha === fechaHoy);
+    }
+
+    /**
+     * Marca un colaborador como presente
+     */
+    window.marcarPresente = function(colaboradorId, nombres, apellidos, departamento) {
+      const fechaHoy = obtenerFechaHoy();
+      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+
+      // Verificar si ya existe un registro para hoy
+      const existeRegistro = historial.some(r => r.colaboradorId === colaboradorId && r.fecha === fechaHoy);
+
+      if (existeRegistro) {
+        showToast('Ya se registró la asistencia de este colaborador hoy', 'warning');
+        return;
+      }
+
+      // Crear nuevo registro
+      const registro = {
+        id: Date.now(),
+        colaboradorId: colaboradorId,
+        colaboradorNombre: `${nombres} ${apellidos}`,
+        departamento: departamento,
+        fecha: fechaHoy,
+        hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+        estado: 'presente',
+        tipoInasistencia: null,
+        comentario: null
+      };
+
+      historial.push(registro);
+      localStorage.setItem('historialAsistencia', JSON.stringify(historial));
+
+      showToast(`${nombres} ${apellidos} marcado como presente`, 'success');
+
+      // Recargar la vista
+      cargarColaboradoresAsistencia(departamento);
+    }
+
+    /**
+     * Abre el modal de inasistencia
+     */
+    let colaboradorSeleccionado = null;
+
+    window.abrirModalInasistencia = function(colaboradorId, nombres, apellidos, departamento) {
+      colaboradorSeleccionado = {
+        id: colaboradorId,
+        nombres: nombres,
+        apellidos: apellidos,
+        departamento: departamento
+      };
+
+      // Actualizar información en el modal
+      const initials = (nombres.charAt(0) + apellidos.charAt(0)).toUpperCase();
+      document.getElementById('modal-colaborador-avatar').textContent = initials;
+      document.getElementById('modal-colaborador-nombre').textContent = `${nombres} ${apellidos}`;
+      document.getElementById('modal-colaborador-dept').textContent = departamento;
+
+      // Limpiar formulario
+      document.getElementById('form-inasistencia').reset();
+
+      // Mostrar modal
+      document.getElementById('modal-inasistencia').style.display = 'flex';
+    }
+
+    /**
+     * Cierra el modal de inasistencia
+     */
+    window.cerrarModalInasistencia = function() {
+      document.getElementById('modal-inasistencia').style.display = 'none';
+      colaboradorSeleccionado = null;
+    }
+
+    /**
+     * Maneja el envío del formulario de inasistencia
+     */
+    document.getElementById('form-inasistencia').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!colaboradorSeleccionado) return;
+
+      const tipoInasistencia = document.querySelector('input[name="tipoInasistencia"]:checked').value;
+      const comentario = document.getElementById('comentario-inasistencia').value.trim();
+      const fechaHoy = obtenerFechaHoy();
+      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+
+      // Verificar si ya existe un registro para hoy
+      const existeRegistro = historial.some(r =>
+        r.colaboradorId === colaboradorSeleccionado.id && r.fecha === fechaHoy
+      );
+
+      if (existeRegistro) {
+        showToast('Ya se registró la asistencia de este colaborador hoy', 'warning');
+        cerrarModalInasistencia();
+        return;
+      }
+
+      // Crear nuevo registro
+      const registro = {
+        id: Date.now(),
+        colaboradorId: colaboradorSeleccionado.id,
+        colaboradorNombre: `${colaboradorSeleccionado.nombres} ${colaboradorSeleccionado.apellidos}`,
+        departamento: colaboradorSeleccionado.departamento,
+        fecha: fechaHoy,
+        hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+        estado: 'ausente',
+        tipoInasistencia: tipoInasistencia,
+        comentario: comentario || null
+      };
+
+      historial.push(registro);
+      localStorage.setItem('historialAsistencia', JSON.stringify(historial));
+
+      showToast(`Inasistencia registrada: ${tipoInasistencia}`, 'success');
+
+      cerrarModalInasistencia();
+
+      // Recargar la vista
+      cargarColaboradoresAsistencia(colaboradorSeleccionado.departamento);
+    });
+
+    // ===================================
+    // MODAL LIGHTBOX PARA FOTOS
+    // ===================================
+
+    /**
+     * Abre el modal para ver la foto en grande
+     */
+    window.abrirModalFoto = function(fotoUrl, nombreColaborador) {
+      if (!fotoUrl) {
+        showToast('Este colaborador no tiene foto', 'info');
+        return;
+      }
+
+      document.getElementById('modal-foto-img').src = fotoUrl;
+      document.getElementById('modal-foto-info').textContent = nombreColaborador;
+      document.getElementById('modal-foto').style.display = 'flex';
+    }
+
+    /**
+     * Cierra el modal de foto
+     */
+    window.cerrarModalFoto = function() {
+      document.getElementById('modal-foto').style.display = 'none';
+      document.getElementById('modal-foto-img').src = '';
+    }
+
+    // Cerrar modal con tecla ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const modalFoto = document.getElementById('modal-foto');
+        if (modalFoto && modalFoto.style.display === 'flex') {
+          cerrarModalFoto();
+        }
+      }
+    });
 
     // Inicializar módulo de pasar asistencia
     if (document.readyState === 'loading') {
