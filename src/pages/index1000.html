@@ -1463,7 +1463,7 @@
             </a>
 
             <!-- Tiempo Extra -->
-            <div class="module-card module-disabled">
+            <a href="#" id="link-tiempo-extra" class="module-card">
               <div class="module-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
@@ -1471,8 +1471,7 @@
               </div>
               <h3 class="module-title">Tiempo Extra</h3>
               <p class="module-description">Control de horas extras</p>
-              <span class="module-badge">Pronto</span>
-            </div>
+            </a>
           </div>
 
           <!-- Vista: Agregar Colaborador -->
@@ -1907,6 +1906,120 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Vista: Tiempo Extra - Lista de Departamentos -->
+          <div id="tiempo-extra-lista" style="display: none;">
+            <h2 class="section-title">Tiempo Extra</h2>
+            <p class="section-subtitle">Selecciona un departamento</p>
+            <div id="te-departamentos-container" class="modules-grid"></div>
+          </div>
+
+          <!-- Vista: Tiempo Extra - Sub-módulos del Departamento -->
+          <div id="tiempo-extra-dept" style="display: none;">
+            <h2 class="section-title" id="te-dept-title">Departamento</h2>
+            <p class="section-subtitle">Selecciona una opción</p>
+            <div class="modules-grid">
+              <a href="#" class="module-card" id="link-te-registrar">
+                <div class="module-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5z"/>
+                  </svg>
+                </div>
+                <h3 class="module-title">Registrar</h3>
+                <p class="module-description">Registrar tiempo extra</p>
+              </a>
+              <a href="#" class="module-card" id="link-te-historial">
+                <div class="module-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                  </svg>
+                </div>
+                <h3 class="module-title">Historial</h3>
+                <p class="module-description">Ver registros de tiempo extra</p>
+              </a>
+            </div>
+          </div>
+
+          <!-- Vista: Tiempo Extra - Registrar -->
+          <div id="tiempo-extra-registrar" style="display: none;">
+            <h2 class="section-title" id="te-registrar-title">Registrar Tiempo Extra</h2>
+            <p class="section-subtitle" id="te-registrar-subtitle">Departamento</p>
+
+            <!-- Buscador de colaborador -->
+            <div class="te-buscador-wrapper">
+              <label>Buscar Colaborador *</label>
+              <div class="te-search-input-wrapper">
+                <input type="text" id="te-buscar-colaborador" placeholder="Escribe el nombre..." autocomplete="off">
+                <div id="te-search-dropdown" class="te-search-dropdown"></div>
+              </div>
+            </div>
+
+            <!-- Colaborador seleccionado (oculto hasta seleccionar) -->
+            <div id="te-colaborador-seleccionado" style="display: none;">
+              <div class="te-colab-selected-card">
+                <div class="te-colab-photo" id="te-colab-photo"></div>
+                <div class="te-colab-info">
+                  <h4 id="te-colab-nombre">Nombre</h4>
+                  <p id="te-colab-puesto">Puesto</p>
+                </div>
+                <button type="button" class="te-colab-change" onclick="limpiarSeleccionTE()">Cambiar</button>
+              </div>
+            </div>
+
+            <!-- Formulario de tiempo extra (oculto hasta seleccionar colaborador) -->
+            <form id="form-tiempo-extra" style="display: none;" onsubmit="registrarTiempoExtra(event)">
+              <div class="te-form-grid">
+                <div class="form-group">
+                  <label for="te-fecha">Fecha *</label>
+                  <input type="date" id="te-fecha" required>
+                </div>
+                <div class="form-group">
+                  <label for="te-hora-inicio">Hora Inicio *</label>
+                  <input type="time" id="te-hora-inicio" required>
+                </div>
+                <div class="form-group">
+                  <label for="te-hora-fin">Hora Fin *</label>
+                  <input type="time" id="te-hora-fin" required>
+                </div>
+                <div class="form-group">
+                  <label for="te-horas-totales">Horas Totales</label>
+                  <input type="text" id="te-horas-totales" readonly placeholder="Auto-calculado">
+                </div>
+                <div class="form-group">
+                  <label for="te-area">Área donde trabajó *</label>
+                  <input type="text" id="te-area" required placeholder="Ej: Producción, Almacén...">
+                </div>
+                <div class="form-group">
+                  <label for="te-motivo">Motivo *</label>
+                  <input type="text" id="te-motivo" required placeholder="Ej: Demanda alta de producción...">
+                </div>
+                <div class="form-group te-form-full">
+                  <label for="te-autorizado">Autorizado por *</label>
+                  <input type="text" id="te-autorizado" required placeholder="Nombre del supervisor...">
+                </div>
+              </div>
+              <div class="modal-actions" style="margin-top: 16px;">
+                <button type="button" class="btn-secondary" onclick="limpiarFormularioTE()">Cancelar</button>
+                <button type="submit" class="btn-primary-te">Registrar Tiempo Extra</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Vista: Tiempo Extra - Historial -->
+          <div id="tiempo-extra-historial" style="display: none;">
+            <h2 class="section-title" id="te-historial-title">Historial Tiempo Extra</h2>
+            <p class="section-subtitle" id="te-historial-subtitle">Departamento</p>
+            <div id="te-historial-container">
+              <!-- Semanas se generan dinámicamente -->
+            </div>
+            <div id="te-historial-empty" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16" style="margin-bottom: 16px;">
+                <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
+              </svg>
+              <p>No hay registros de tiempo extra en este departamento</p>
             </div>
           </div>
 
@@ -3276,6 +3389,10 @@
       const bajasListaView = document.getElementById('bajas-lista');
       const bajasDeptView = document.getElementById('bajas-dept');
       const bajasDetalleView = document.getElementById('bajas-colaborador-detalle');
+      const teListaView = document.getElementById('tiempo-extra-lista');
+      const teDeptView = document.getElementById('tiempo-extra-dept');
+      const teRegistrarView = document.getElementById('tiempo-extra-registrar');
+      const teHistorialView = document.getElementById('tiempo-extra-historial');
 
       // Ocultar todas las vistas de asistencia
       const allViews = [
@@ -3294,7 +3411,11 @@
         inasistenciaColabView,
         bajasListaView,
         bajasDeptView,
-        bajasDetalleView
+        bajasDetalleView,
+        teListaView,
+        teDeptView,
+        teRegistrarView,
+        teHistorialView
       ];
 
       allViews.forEach(view => {
@@ -3379,6 +3500,13 @@
           }
           break;
 
+        case 'tiempo-extra-lista':
+          if (teListaView) {
+            teListaView.style.display = 'block';
+            cargarDepartamentosTE();
+          }
+          break;
+
         default:
           // Para locations dinámicos (departamento específico, colaborador específico, etc.)
           if (location.startsWith('colaboradores-dept:')) {
@@ -3438,6 +3566,24 @@
             if (bajasDetalleView) {
               bajasDetalleView.style.display = 'block';
               cargarDetalleBaja(id);
+            }
+          } else if (location.startsWith('tiempo-extra-dept:')) {
+            const dept = location.replace('tiempo-extra-dept:', '');
+            if (teDeptView) {
+              teDeptView.style.display = 'block';
+              cargarSubmodulosTE(dept);
+            }
+          } else if (location.startsWith('tiempo-extra-registrar:')) {
+            const dept = location.replace('tiempo-extra-registrar:', '');
+            if (teRegistrarView) {
+              teRegistrarView.style.display = 'block';
+              cargarFormularioTE(dept);
+            }
+          } else if (location.startsWith('tiempo-extra-historial:')) {
+            const dept = location.replace('tiempo-extra-historial:', '');
+            if (teHistorialView) {
+              teHistorialView.style.display = 'block';
+              cargarHistorialTE(dept);
             }
           }
           break;
@@ -4897,6 +5043,535 @@
       document.addEventListener('DOMContentLoaded', initBajas);
     } else {
       initBajas();
+    }
+
+    // ===================================
+    // Módulo de Tiempo Extra
+    // ===================================
+
+    function initTiempoExtra() {
+      const linkTiempoExtra = document.getElementById('link-tiempo-extra');
+
+      if (linkTiempoExtra) {
+        linkTiempoExtra.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigateToLocation('tiempo-extra-lista');
+        });
+      }
+
+      // Funciones globales para navegación
+      window.verTiempoExtraDept = function(nombreDepartamento) {
+        navigateToLocation('tiempo-extra-dept:' + nombreDepartamento);
+      };
+
+      window.verTERegistrar = function(dept) {
+        navigateToLocation('tiempo-extra-registrar:' + dept);
+      };
+
+      window.verTEHistorial = function(dept) {
+        navigateToLocation('tiempo-extra-historial:' + dept);
+      };
+    }
+
+    function cargarDepartamentosTE() {
+      const registros = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+      const container = document.getElementById('te-departamentos-container');
+
+      // Contar registros por departamento
+      const contadores = {};
+      registros.forEach(reg => {
+        const dept = reg.departamento || 'Sin Departamento';
+        contadores[dept] = (contadores[dept] || 0) + 1;
+      });
+
+      // Renderizar TODOS los departamentos
+      container.innerHTML = DEPARTAMENTOS.map(dept => {
+        const count = contadores[dept] || 0;
+        const badgeClass = count === 0 ? 'zero' : '';
+        const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];
+
+        return `
+          <div class="module-card" onclick="verTiempoExtraDept('${dept}')">
+            <span class="dept-count-badge ${badgeClass}">${count}</span>
+            <div class="module-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                ${icon}
+              </svg>
+            </div>
+            <h3 class="module-title">${dept}</h3>
+            <p class="module-description">${count} ${count === 1 ? 'registro' : 'registros'}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function cargarSubmodulosTE(dept) {
+      // Actualizar título
+      document.getElementById('te-dept-title').textContent = dept;
+
+      // Guardar departamento actual
+      window.currentTEDept = dept;
+
+      // Agregar listeners a los sub-módulos
+      const linkRegistrar = document.getElementById('link-te-registrar');
+      const linkHistorial = document.getElementById('link-te-historial');
+
+      if (linkRegistrar) {
+        linkRegistrar.onclick = (e) => {
+          e.preventDefault();
+          verTERegistrar(dept);
+        };
+      }
+
+      if (linkHistorial) {
+        linkHistorial.onclick = (e) => {
+          e.preventDefault();
+          verTEHistorial(dept);
+        };
+      }
+    }
+
+    function cargarFormularioTE(dept) {
+      // Actualizar título y subtítulo
+      document.getElementById('te-registrar-title').textContent = 'Registrar Tiempo Extra';
+      document.getElementById('te-registrar-subtitle').textContent = dept;
+
+      // Guardar departamento actual
+      window.currentTEDept = dept;
+
+      // Limpiar todo
+      limpiarSeleccionTE();
+
+      // Establecer fecha de hoy por defecto
+      const fechaInput = document.getElementById('te-fecha');
+      if (fechaInput) {
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaInput.value = hoy;
+      }
+
+      // Inicializar buscador
+      initBuscadorTE(dept);
+
+      // Agregar listeners para cálculo automático de horas
+      const horaInicio = document.getElementById('te-hora-inicio');
+      const horaFin = document.getElementById('te-hora-fin');
+
+      if (horaInicio && horaFin) {
+        horaInicio.addEventListener('change', calcularHorasTE);
+        horaFin.addEventListener('change', calcularHorasTE);
+      }
+    }
+
+    function initBuscadorTE(dept) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const input = document.getElementById('te-buscar-colaborador');
+      const dropdown = document.getElementById('te-search-dropdown');
+
+      if (!input || !dropdown) return;
+
+      // Filtrar colaboradores activos del departamento
+      const colaboradoresDept = colaboradores.filter(c =>
+        c.departamento === dept && (c.estatus || 'Activo') === 'Activo'
+      );
+
+      // Limpiar input
+      input.value = '';
+      dropdown.innerHTML = '';
+      dropdown.style.display = 'none';
+
+      // Event listener para búsqueda
+      input.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+
+        if (searchTerm.length < 2) {
+          dropdown.innerHTML = '';
+          dropdown.style.display = 'none';
+          return;
+        }
+
+        // Buscar por nombre completo
+        const filtered = colaboradoresDept.filter(c => {
+          const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
+          return nombreCompleto.includes(searchTerm);
+        }).slice(0, 5); // Máximo 5 resultados
+
+        if (filtered.length === 0) {
+          dropdown.innerHTML = '<div class="te-search-no-results" style="padding: 12px; text-align: center; color: #999; font-size: 0.85rem;">No se encontraron resultados</div>';
+          dropdown.style.display = 'block';
+          return;
+        }
+
+        // Renderizar resultados
+        dropdown.innerHTML = filtered.map(c => {
+          const iniciales = (c.nombres.charAt(0) + c.apellidos.charAt(0)).toUpperCase();
+          const fotoHTML = c.foto
+            ? `<img src="${c.foto}" alt="${c.nombres}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+            : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; font-weight: 700; font-size: 0.9rem; border-radius: 50%;">${iniciales}</div>`;
+
+          return `
+            <div class="te-search-result" data-id="${c.id}">
+              <div class="te-search-result-photo" style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
+                ${fotoHTML}
+              </div>
+              <div class="te-search-result-info" style="flex: 1;">
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--color-text);">${c.nombres} ${c.apellidos}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);">${c.puesto}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        dropdown.style.display = 'block';
+
+        // Agregar listeners a los resultados
+        dropdown.querySelectorAll('.te-search-result').forEach(result => {
+          result.addEventListener('click', () => {
+            const colaboradorId = parseInt(result.dataset.id);
+            const colaborador = colaboradores.find(c => c.id === colaboradorId);
+            if (colaborador) {
+              seleccionarColaboradorTE(colaborador);
+            }
+          });
+        });
+      });
+
+      // Cerrar dropdown al hacer click fuera
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    function seleccionarColaboradorTE(colaborador) {
+      // Guardar ID del colaborador
+      window.currentTEColaboradorId = colaborador.id;
+
+      // Ocultar buscador
+      document.querySelector('.te-buscador-wrapper').style.display = 'none';
+
+      // Mostrar colaborador seleccionado
+      const seleccionadoDiv = document.getElementById('te-colaborador-seleccionado');
+      const photoDiv = document.getElementById('te-colab-photo');
+      const nombreDiv = document.getElementById('te-colab-nombre');
+      const puestoDiv = document.getElementById('te-colab-puesto');
+
+      const iniciales = (colaborador.nombres.charAt(0) + colaborador.apellidos.charAt(0)).toUpperCase();
+
+      if (colaborador.foto) {
+        photoDiv.innerHTML = `<img src="${colaborador.foto}" alt="${colaborador.nombres}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+      } else {
+        photoDiv.innerHTML = `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; font-weight: 700; font-size: 1.1rem;">${iniciales}</div>`;
+      }
+
+      nombreDiv.textContent = `${colaborador.nombres} ${colaborador.apellidos}`;
+      puestoDiv.textContent = colaborador.puesto;
+
+      seleccionadoDiv.style.display = 'block';
+
+      // Mostrar formulario
+      document.getElementById('form-tiempo-extra').style.display = 'block';
+
+      // Ocultar dropdown
+      document.getElementById('te-search-dropdown').style.display = 'none';
+    }
+
+    window.limpiarSeleccionTE = function() {
+      // Mostrar buscador
+      document.querySelector('.te-buscador-wrapper').style.display = 'block';
+
+      // Ocultar colaborador seleccionado
+      document.getElementById('te-colaborador-seleccionado').style.display = 'none';
+
+      // Ocultar formulario
+      document.getElementById('form-tiempo-extra').style.display = 'none';
+
+      // Limpiar input de búsqueda
+      document.getElementById('te-buscar-colaborador').value = '';
+
+      // Limpiar ID guardado
+      window.currentTEColaboradorId = null;
+    }
+
+    function calcularHorasTE() {
+      const horaInicio = document.getElementById('te-hora-inicio').value;
+      const horaFin = document.getElementById('te-hora-fin').value;
+      const horasTotalesInput = document.getElementById('te-horas-totales');
+
+      if (!horaInicio || !horaFin) {
+        horasTotalesInput.value = '';
+        return;
+      }
+
+      // Convertir a minutos
+      const [hInicio, mInicio] = horaInicio.split(':').map(Number);
+      const [hFin, mFin] = horaFin.split(':').map(Number);
+
+      let minutosInicio = hInicio * 60 + mInicio;
+      let minutosFin = hFin * 60 + mFin;
+
+      // Si hora fin es menor, agregar 24 horas (turno nocturno)
+      if (minutosFin < minutosInicio) {
+        minutosFin += 24 * 60;
+      }
+
+      const diferenciaMinutos = minutosFin - minutosInicio;
+      const horas = Math.floor(diferenciaMinutos / 60);
+      const minutos = diferenciaMinutos % 60;
+
+      // Formato decimal
+      const horasDecimal = (horas + minutos / 60).toFixed(2);
+      horasTotalesInput.value = `${horasDecimal} hrs`;
+    }
+
+    window.registrarTiempoExtra = function(event) {
+      event.preventDefault();
+
+      if (!window.currentTEColaboradorId) {
+        showToast('Por favor selecciona un colaborador', 'error');
+        return;
+      }
+
+      // Obtener datos del colaborador
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colaborador = colaboradores.find(c => c.id === window.currentTEColaboradorId);
+
+      if (!colaborador) {
+        showToast('Colaborador no encontrado', 'error');
+        return;
+      }
+
+      // Obtener datos del formulario
+      const fecha = document.getElementById('te-fecha').value;
+      const horaInicio = document.getElementById('te-hora-inicio').value;
+      const horaFin = document.getElementById('te-hora-fin').value;
+      const area = document.getElementById('te-area').value;
+      const motivo = document.getElementById('te-motivo').value;
+      const autorizadoPor = document.getElementById('te-autorizado').value;
+
+      // Calcular horas totales en decimal
+      const [hInicio, mInicio] = horaInicio.split(':').map(Number);
+      const [hFin, mFin] = horaFin.split(':').map(Number);
+      let minutosInicio = hInicio * 60 + mInicio;
+      let minutosFin = hFin * 60 + mFin;
+      if (minutosFin < minutosInicio) minutosFin += 24 * 60;
+      const horasTotales = ((minutosFin - minutosInicio) / 60);
+
+      // Crear registro
+      const registro = {
+        id: Date.now(),
+        colaboradorId: colaborador.id,
+        colaboradorNombre: `${colaborador.nombres} ${colaborador.apellidos}`,
+        departamento: window.currentTEDept,
+        puesto: colaborador.puesto,
+        foto: colaborador.foto || null,
+        fecha: fecha,
+        horaInicio: horaInicio,
+        horaFin: horaFin,
+        horasTotales: horasTotales,
+        area: area,
+        motivo: motivo,
+        autorizadoPor: autorizadoPor,
+        registradoPor: window.currentUser ? window.currentUser.name : 'Sistema',
+        fechaRegistro: new Date().toISOString()
+      };
+
+      // Guardar en localStorage
+      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+      historial.push(registro);
+      localStorage.setItem('historialTiempoExtra', JSON.stringify(historial));
+
+      // Mostrar toast de éxito
+      showToast('Tiempo extra registrado exitosamente', 'success');
+
+      // Limpiar formulario y volver a sub-módulos
+      limpiarFormularioTE();
+      navigateToLocation('tiempo-extra-dept:' + window.currentTEDept);
+    }
+
+    window.limpiarFormularioTE = function() {
+      // Resetear formulario
+      const form = document.getElementById('form-tiempo-extra');
+      if (form) form.reset();
+
+      // Limpiar selección
+      limpiarSeleccionTE();
+
+      // Restablecer fecha de hoy
+      const fechaInput = document.getElementById('te-fecha');
+      if (fechaInput) {
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaInput.value = hoy;
+      }
+    }
+
+    function cargarHistorialTE(dept) {
+      // Actualizar título
+      document.getElementById('te-historial-title').textContent = 'Historial Tiempo Extra';
+      document.getElementById('te-historial-subtitle').textContent = dept;
+
+      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+      const registrosDept = historial.filter(r => r.departamento === dept);
+
+      const container = document.getElementById('te-historial-container');
+      const emptyDiv = document.getElementById('te-historial-empty');
+
+      if (registrosDept.length === 0) {
+        container.innerHTML = '';
+        emptyDiv.style.display = 'block';
+        return;
+      }
+
+      emptyDiv.style.display = 'none';
+
+      // Agrupar por semana ISO (lunes a domingo)
+      const semanas = {};
+
+      registrosDept.forEach(reg => {
+        const fecha = new Date(reg.fecha + 'T00:00:00');
+        const semanaNum = getWeekNumber(fecha);
+        const año = fecha.getFullYear();
+        const semanaKey = `${año}-W${semanaNum}`;
+
+        if (!semanas[semanaKey]) {
+          semanas[semanaKey] = {
+            registros: [],
+            fechaInicio: getMonday(fecha),
+            semanaNum: semanaNum,
+            año: año
+          };
+        }
+
+        semanas[semanaKey].registros.push(reg);
+      });
+
+      // Ordenar semanas de más reciente a más antigua
+      const semanasOrdenadas = Object.keys(semanas).sort((a, b) => {
+        const [añoA, semA] = a.split('-W').map(Number);
+        const [añoB, semB] = b.split('-W').map(Number);
+        if (añoB !== añoA) return añoB - añoA;
+        return semB - semA;
+      });
+
+      // Renderizar semanas
+      container.innerHTML = semanasOrdenadas.map(semanaKey => {
+        const semana = semanas[semanaKey];
+        const totalRegistros = semana.registros.length;
+        const totalHoras = semana.registros.reduce((sum, r) => sum + r.horasTotales, 0).toFixed(2);
+
+        // Calcular rango de fechas
+        const fechaInicio = semana.fechaInicio;
+        const fechaFin = new Date(fechaInicio);
+        fechaFin.setDate(fechaFin.getDate() + 6);
+
+        const rangoFechas = `${formatDateShort(fechaInicio)} - ${formatDateShort(fechaFin)}`;
+
+        const registrosHTML = semana.registros.map(reg => {
+          const iniciales = reg.colaboradorNombre.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+          const fotoHTML = reg.foto
+            ? `<img src="${reg.foto}" alt="${reg.colaboradorNombre}" style="width: 100%; height: 100%; object-fit: cover;">`
+            : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; font-weight: 700; font-size: 0.9rem;">${iniciales}</div>`;
+
+          return `
+            <div class="te-registro-card" style="background: white; padding: 14px 16px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
+                  ${fotoHTML}
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; font-size: 0.95rem; color: var(--color-text); margin-bottom: 2px;">${reg.colaboradorNombre}</div>
+                  <div style="font-size: 0.8rem; color: var(--color-text-muted);">${reg.puesto}</div>
+                </div>
+                <div class="te-registro-horas" style="padding: 6px 12px; background: linear-gradient(135deg, rgba(30, 124, 186, 0.1), rgba(30, 124, 186, 0.05)); border: 1px solid rgba(30, 124, 186, 0.2); border-radius: var(--radius-sm); font-weight: 700; font-size: 0.85rem; color: var(--color-primary);">
+                  ${reg.horasTotales.toFixed(2)} hrs
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.8rem;">
+                <div>
+                  <span style="color: var(--color-text-muted);">Fecha:</span>
+                  <span style="font-weight: 600; margin-left: 4px;">${formatDate(new Date(reg.fecha + 'T00:00:00'))}</span>
+                </div>
+                <div>
+                  <span style="color: var(--color-text-muted);">Horario:</span>
+                  <span style="font-weight: 600; margin-left: 4px;">${reg.horaInicio} - ${reg.horaFin}</span>
+                </div>
+                <div>
+                  <span style="color: var(--color-text-muted);">Área:</span>
+                  <span style="font-weight: 600; margin-left: 4px;">${reg.area}</span>
+                </div>
+                <div>
+                  <span style="color: var(--color-text-muted);">Motivo:</span>
+                  <span style="font-weight: 600; margin-left: 4px;">${reg.motivo}</span>
+                </div>
+                <div style="grid-column: 1 / -1;">
+                  <span style="color: var(--color-text-muted);">Autorizado por:</span>
+                  <span style="font-weight: 600; margin-left: 4px;">${reg.autorizadoPor}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="te-semana-grupo" style="background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 12px;">
+            <div class="te-semana-header" onclick="toggleSemanaTE(this)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; background: white; transition: background 0.2s; border-bottom: 1px solid var(--color-border);">
+              <div style="flex: 1;">
+                <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text); margin-bottom: 4px;">Semana ${semana.semanaNum} - ${semana.año}</div>
+                <div style="font-size: 0.85rem; color: #666;">${rangoFechas} • ${totalRegistros} ${totalRegistros === 1 ? 'registro' : 'registros'} • ${totalHoras} hrs totales</div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="transition: transform 0.2s; color: var(--color-primary); flex-shrink: 0;">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </div>
+            <div class="te-semana-contenido" style="padding: 12px; background: var(--color-bg); display: none;">
+              ${registrosHTML}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.toggleSemanaTE = function(header) {
+      const grupo = header.closest('.te-semana-grupo');
+      const contenido = grupo.querySelector('.te-semana-contenido');
+      const chevron = header.querySelector('svg');
+
+      if (contenido.style.display === 'none') {
+        contenido.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        contenido.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Funciones auxiliares para fechas
+    function getWeekNumber(date) {
+      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    function getMonday(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      return new Date(d.setDate(diff));
+    }
+
+    function formatDateShort(date) {
+      const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      return `${dias[date.getDay()]} ${date.getDate()} ${meses[date.getMonth()]}`;
+    }
+
+    // Inicializar módulo de Tiempo Extra
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTiempoExtra);
+    } else {
+      initTiempoExtra();
     }
   </script>
 </body>
