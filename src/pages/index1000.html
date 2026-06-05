@@ -980,13 +980,10 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="puesto">Puesto *</label>
-                  <select id="puesto" required>
-                    <option value="">Seleccionar...</option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Supervisor">Supervisor</option>
-                    <option value="Operador">Operador</option>
-                    <option value="Analista">Analista</option>
-                  </select>
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="puesto" class="autocomplete-input" required placeholder="Escribe para buscar..." autocomplete="off" data-autocomplete="puestos">
+                    <div class="autocomplete-dropdown" id="puesto-dropdown"></div>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="departamento">Departamento *</label>
@@ -1074,13 +1071,10 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="puestoEdit">Puesto *</label>
-                  <select id="puestoEdit" required>
-                    <option value="">Seleccionar...</option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Supervisor">Supervisor</option>
-                    <option value="Operador">Operador</option>
-                    <option value="Analista">Analista</option>
-                  </select>
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="puestoEdit" class="autocomplete-input" required placeholder="Escribe para buscar..." autocomplete="off" data-autocomplete="puestos">
+                    <div class="autocomplete-dropdown" id="puestoEdit-dropdown"></div>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="departamentoEdit">Departamento *</label>
@@ -1271,7 +1265,10 @@
                 </div>
                 <div class="form-group">
                   <label for="puestoColab">Puesto *</label>
-                  <input type="text" id="puestoColab" required placeholder="ej. Operador, Supervisor, etc.">
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="puestoColab" class="autocomplete-input" required placeholder="Escribe para buscar..." autocomplete="off" data-autocomplete="puestos">
+                    <div class="autocomplete-dropdown" id="puestoColab-dropdown"></div>
+                  </div>
                 </div>
               </div>
 
@@ -2175,8 +2172,83 @@
       'TRANSPORTE'
     ];
 
+    const PUESTOS = [
+      'ALMACENISTA',
+      'ANALISTA DE NEGOCIOS',
+      'ARQUITECTO',
+      'ASISTENTE',
+      'AUDITOR',
+      'AUXILIAR',
+      'AUXILIAR COMPRAS',
+      'AUXILIAR DE MANTENIMIENTO',
+      'AUXILIAR DE MESA',
+      'AUXILIAR DE NOMINA',
+      'AUXILIAR DE TRAFICO',
+      'AUXILIAR INSUMOS',
+      'AYUDANTE DE MANTENIMIENTO',
+      'Ayudante de Almacen',
+      'Ayudante General',
+      'CAJAS',
+      'CAPACITACION',
+      'CAPTURISTA',
+      'COMPRADOR',
+      'CONDUCTOR',
+      'COORDINADOR',
+      'DES. SOFTWARE',
+      'ENFERMERO',
+      'GENERALISTA CAP. HUMANO',
+      'GERENTE',
+      'GERENTE DE OPERACIONES',
+      'Gerente de Produccion',
+      'GUARDIA',
+      'INGENIERO',
+      'INGENIERO JR',
+      'INSPECTOR DE CALIDAD',
+      'INTENDENTE',
+      'Ingeniero de Calidad',
+      'Ingeniero de Procesos',
+      'Inspector de Auditoria',
+      'Investigación',
+      'JEFE DE LINEA',
+      'Jefa de Auditoria',
+      'LIDER',
+      'LIDER AUDITORIA',
+      'LIDER DE ALMACEN',
+      'LIDER DE AREA',
+      'LIMPIEZA',
+      'Líder de Líneas',
+      'Lider de calidad',
+      'Lider de paletizado',
+      'Lider de producción',
+      'MECANICO JR',
+      'MECANICO SR',
+      'MONTCARGUISTA',
+      'OPERADOR',
+      'OPERATIVO',
+      'Paletizador',
+      'PRACTICANTE',
+      'Practicante de Ingeniería',
+      'PROGRAMADOR',
+      'Proyecto',
+      'RECLUTADOR',
+      'SUP DE PRODUCCION',
+      'SUPERVISOR',
+      'SUPERVISOR DE ALMACEN',
+      'SUPERVISOR JR',
+      'SUPERVISOR PRODUCCION',
+      'SUPERVISOR SEGURIDAD E HIG',
+      'Supervisor de Produccion',
+      'TEAM LEADER',
+      'TECNICO',
+      'TECNICO EN INVESTIGACION',
+      'TECNICO FACILITIES',
+      'TECNICO MANTENIMIENTO',
+      'TESORERA',
+      'Técnico de Calidad'
+    ];
+
     function initAutocomplete() {
-      const inputs = document.querySelectorAll('.autocomplete-input[data-autocomplete="departamentos"]');
+      const inputs = document.querySelectorAll('.autocomplete-input[data-autocomplete]');
 
       inputs.forEach(input => {
         const dropdownId = input.id + '-dropdown';
@@ -2228,16 +2300,20 @@
     }
 
     function filterOptions(input, dropdown, searchTerm) {
-      const filtered = DEPARTAMENTOS.filter(dept =>
-        dept.toLowerCase().includes(searchTerm.toLowerCase())
+      // Determinar qué datos usar según el atributo data-autocomplete
+      const dataType = input.dataset.autocomplete;
+      const dataSource = dataType === 'puestos' ? PUESTOS : DEPARTAMENTOS;
+
+      const filtered = dataSource.filter(item =>
+        item.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
       if (filtered.length === 0) {
         dropdown.innerHTML = '<div class="autocomplete-no-results">No se encontraron resultados</div>';
       } else {
-        dropdown.innerHTML = filtered.map(dept => `
-          <div class="autocomplete-option" data-value="${dept}">
-            ${dept}
+        dropdown.innerHTML = filtered.map(item => `
+          <div class="autocomplete-option" data-value="${item}">
+            ${item}
           </div>
         `).join('');
 
