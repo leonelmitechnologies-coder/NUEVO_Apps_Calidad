@@ -236,6 +236,9 @@ async function handleLogin(event) {
       // Save session
       saveSession(result, rememberMe);
 
+      // Set currentUser global with complete user data
+      window.currentUser = result.user;
+
       // Small delay for UX
       await sleep(100);
 
