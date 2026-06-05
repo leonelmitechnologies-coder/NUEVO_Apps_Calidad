@@ -1718,37 +1718,22 @@
           <!-- Vista: Historial de Asistencia - Departamento Específico -->
           <div id="asistencia-historial-dept" style="display: none;">
             <h2 class="section-title" id="historial-dept-title">Departamento</h2>
-            <p class="section-subtitle" id="historial-dept-subtitle">Historial semanal</p>
+            <p class="section-subtitle" id="historial-dept-subtitle">Historial cronológico</p>
 
-            <!-- Navegador de semanas -->
-            <div class="semana-nav">
-              <button id="semana-prev" class="btn-semana-nav">← Anterior</button>
-              <span id="semana-label" class="semana-label">Semana actual</span>
-              <button id="semana-next" class="btn-semana-nav">Siguiente →</button>
+            <!-- Contenedor de meses -->
+            <div id="historial-meses-container">
+              <!-- Se llena dinámicamente con meses colapsables -->
             </div>
 
-            <!-- Tabla semanal -->
-            <div class="historial-table-wrapper">
-              <table class="historial-table" id="historial-tabla">
-                <thead>
-                  <tr>
-                    <th>Colaborador</th>
-                    <th>Lun</th>
-                    <th>Mar</th>
-                    <th>Mié</th>
-                    <th>Jue</th>
-                    <th>Vie</th>
-                    <th>Sáb</th>
-                  </tr>
-                </thead>
-                <tbody id="historial-tabla-body">
-                  <!-- Se llena dinámicamente -->
-                </tbody>
-              </table>
+            <!-- Mensaje cuando no hay registros -->
+            <div id="historial-empty" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 12px;">
+                <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/>
+                <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+              <p style="font-size: 14px; margin: 0;">No hay registros de asistencia en este departamento</p>
             </div>
-
-            <!-- Resumen semanal -->
-            <div class="historial-resumen" id="historial-resumen"></div>
           </div>
 
         </div>
@@ -3760,10 +3745,6 @@
     // Historial de Asistencia
     // ===================================
 
-    // Variable global para el offset de semana (0 = semana actual, -1 = semana pasada, +1 = semana siguiente)
-    let semanaOffset = 0;
-    let departamentoActualHistorial = '';
-
     function initHistorialAsistencia() {
       const linkHistorial = document.getElementById('link-historial-asistencia');
 
@@ -3776,27 +3757,7 @@
 
       // Función global para ver historial de un departamento
       window.verHistorialDepartamento = function(nombreDepartamento) {
-        semanaOffset = 0; // Resetear a semana actual
-        departamentoActualHistorial = nombreDepartamento;
         navigateToLocation('historial-asistencia-dept:' + nombreDepartamento);
-      }
-
-      // Event listeners para navegación de semanas
-      const btnPrev = document.getElementById('semana-prev');
-      const btnNext = document.getElementById('semana-next');
-
-      if (btnPrev) {
-        btnPrev.addEventListener('click', () => {
-          semanaOffset--;
-          cargarHistorialDepartamento(departamentoActualHistorial);
-        });
-      }
-
-      if (btnNext) {
-        btnNext.addEventListener('click', () => {
-          semanaOffset++;
-          cargarHistorialDepartamento(departamentoActualHistorial);
-        });
       }
     }
 
@@ -3832,174 +3793,151 @@
       }).join('');
     }
 
-    function obtenerRangoSemana(offset) {
-      const hoy = new Date();
-      const diaSemana = hoy.getDay(); // 0 = domingo, 1 = lunes, etc.
-
-      // Calcular el lunes de la semana actual
-      const diasDesdeMonday = diaSemana === 0 ? 6 : diaSemana - 1;
-      const lunes = new Date(hoy);
-      lunes.setDate(hoy.getDate() - diasDesdeMonday + (offset * 7));
-      lunes.setHours(0, 0, 0, 0);
-
-      // Calcular el sábado de la semana
-      const sabado = new Date(lunes);
-      sabado.setDate(lunes.getDate() + 5);
-      sabado.setHours(23, 59, 59, 999);
-
-      // Formatear label (ej: "2-7 Jun 2026")
-      const diaInicio = lunes.getDate();
-      const diaFin = sabado.getDate();
-      const mes = sabado.toLocaleDateString('es-MX', { month: 'short' });
-      const año = sabado.getFullYear();
-      const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '');
-
-      const label = `${diaInicio}-${diaFin} ${mesCapitalizado} ${año}`;
-
-      return { inicio: lunes, fin: sabado, label };
+    function formatearFechaDia(fecha) {
+      // fecha en formato "YYYY-MM-DD" -> "3 Jun 2026"
+      const [año, mes, dia] = fecha.split('-');
+      const date = new Date(parseInt(año), parseInt(mes) - 1, parseInt(dia));
+      const nombreMes = date.toLocaleDateString('es-MX', { month: 'short' });
+      const mesCapitalizado = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1).replace('.', '');
+      return `${parseInt(dia)} ${mesCapitalizado} ${año}`;
     }
 
-    function formatearFechaCorta(date) {
-      const año = date.getFullYear();
-      const mes = String(date.getMonth() + 1).padStart(2, '0');
-      const dia = String(date.getDate()).padStart(2, '0');
-      return `${año}-${mes}-${dia}`;
+    function toggleMes(mesKey) {
+      const contenido = document.getElementById('mes-contenido-' + mesKey);
+      const chevron = document.getElementById('mes-chevron-' + mesKey);
+
+      if (contenido.style.display === 'none') {
+        contenido.style.display = 'block';
+        chevron.style.transform = 'rotate(90deg)';
+      } else {
+        contenido.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+      }
     }
+
+    window.toggleMes = toggleMes;
 
     function cargarHistorialDepartamento(nombreDepartamento) {
-      departamentoActualHistorial = nombreDepartamento;
-
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
       const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
 
-      // Obtener rango de la semana
-      const rango = obtenerRangoSemana(semanaOffset);
-      const fechaInicio = formatearFechaCorta(rango.inicio);
-      const fechaFin = formatearFechaCorta(rango.fin);
+      // Filtrar registros del departamento
+      const registrosDept = historial.filter(r => r.departamento === nombreDepartamento);
 
-      // Actualizar título y label de semana
+      // Actualizar título
       document.getElementById('historial-dept-title').textContent = nombreDepartamento;
-      document.getElementById('semana-label').textContent = rango.label;
 
-      // Filtrar colaboradores activos del departamento
-      const colaboradoresDept = colaboradores.filter(c =>
-        c.departamento === nombreDepartamento &&
-        (c.estatus || 'Activo') === 'Activo'
-      );
+      const container = document.getElementById('historial-meses-container');
+      const emptyMessage = document.getElementById('historial-empty');
 
-      // Filtrar registros de historial del departamento en el rango de fechas
-      const registrosSemana = historial.filter(r =>
-        r.departamento === nombreDepartamento &&
-        r.fecha >= fechaInicio &&
-        r.fecha <= fechaFin
-      );
-
-      // Construir tabla
-      const tbody = document.getElementById('historial-tabla-body');
-
-      if (colaboradoresDept.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
-              No hay colaboradores activos en este departamento
-            </td>
-          </tr>
-        `;
-        document.getElementById('historial-dept-subtitle').textContent = '0 colaboradores';
-        document.getElementById('historial-resumen').innerHTML = '';
+      if (registrosDept.length === 0) {
+        container.innerHTML = '';
+        emptyMessage.style.display = 'block';
+        document.getElementById('historial-dept-subtitle').textContent = 'Sin registros';
         return;
       }
 
-      if (registrosSemana.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
-              Sin registros esta semana
-            </td>
-          </tr>
-        `;
-        document.getElementById('historial-dept-subtitle').textContent =
-          `${colaboradoresDept.length} colaborador${colaboradoresDept.length !== 1 ? 'es' : ''}`;
-        document.getElementById('historial-resumen').innerHTML = '';
-        return;
-      }
+      emptyMessage.style.display = 'none';
 
-      // Generar array de fechas de la semana (lunes a sábado)
-      const diasSemana = [];
-      for (let i = 0; i < 6; i++) {
-        const dia = new Date(rango.inicio);
-        dia.setDate(rango.inicio.getDate() + i);
-        diasSemana.push(formatearFechaCorta(dia));
-      }
+      // Agrupar por mes (formato: "2026-06")
+      const porMes = {};
+      registrosDept.forEach(registro => {
+        const [año, mes] = registro.fecha.split('-');
+        const mesKey = `${año}-${mes}`;
 
-      // Construir filas de la tabla
-      let totalPresentes = 0;
-      let totalAusentes = 0;
-      let totalRegistros = 0;
+        if (!porMes[mesKey]) {
+          porMes[mesKey] = {
+            año: parseInt(año),
+            mes: parseInt(mes),
+            registros: []
+          };
+        }
+        porMes[mesKey].registros.push(registro);
+      });
 
-      const filas = colaboradoresDept.map(colab => {
-        const celdas = diasSemana.map(fecha => {
-          const registro = registrosSemana.find(r =>
-            r.colaboradorId === colab.id && r.fecha === fecha
-          );
+      // Ordenar meses de más reciente a más antiguo
+      const mesesOrdenados = Object.keys(porMes).sort((a, b) => b.localeCompare(a));
 
-          if (!registro) {
-            return '<td class="cell-sin-registro">-</td>';
+      // Generar HTML para cada mes
+      const mesesHTML = mesesOrdenados.map((mesKey, index) => {
+        const mesData = porMes[mesKey];
+        const nombreMes = new Date(mesData.año, mesData.mes - 1).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+        const nombreMesCapitalizado = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
+
+        // Agrupar por día dentro del mes
+        const porDia = {};
+        mesData.registros.forEach(registro => {
+          if (!porDia[registro.fecha]) {
+            porDia[registro.fecha] = {
+              presentes: 0,
+              ausentes: 0
+            };
           }
-
-          totalRegistros++;
-
           if (registro.estado === 'presente') {
-            totalPresentes++;
-            return '<td class="cell-presente">✓</td>';
+            porDia[registro.fecha].presentes++;
           } else {
-            totalAusentes++;
-            const codigo = registro.tipoInasistencia
-              ? registro.tipoInasistencia.split(' ')[0]
-              : '✗';
-            return `<td class="cell-ausente">${codigo}</td>`;
+            porDia[registro.fecha].ausentes++;
           }
+        });
+
+        // Ordenar días de más reciente a más antiguo
+        const diasOrdenados = Object.keys(porDia).sort((a, b) => b.localeCompare(a));
+
+        // Calcular totales del mes
+        const totalDias = diasOrdenados.length;
+        let totalPresentes = 0;
+        let totalAusentes = 0;
+        diasOrdenados.forEach(dia => {
+          totalPresentes += porDia[dia].presentes;
+          totalAusentes += porDia[dia].ausentes;
+        });
+
+        // Generar HTML de los días
+        const diasHTML = diasOrdenados.map(fecha => {
+          const diaData = porDia[fecha];
+          return `
+            <div class="historial-dia-card">
+              <div class="historial-dia-fecha">${formatearFechaDia(fecha)}</div>
+              <div class="historial-dia-stats">
+                <span class="historial-stat-presente">${diaData.presentes} presentes</span>
+                <span class="historial-stat-separador">-</span>
+                <span class="historial-stat-ausente">${diaData.ausentes} ausentes</span>
+              </div>
+            </div>
+          `;
         }).join('');
 
+        // Expandir solo el primer mes (más reciente)
+        const expandido = index === 0;
+
         return `
-          <tr>
-            <td>${colab.nombre}</td>
-            ${celdas}
-          </tr>
+          <div class="historial-mes-grupo">
+            <div class="historial-mes-header" onclick="toggleMes('${mesKey}')">
+              <div class="historial-mes-info">
+                <div class="historial-mes-titulo">${nombreMesCapitalizado}</div>
+                <div class="historial-mes-resumen">
+                  ${totalDias} día${totalDias !== 1 ? 's' : ''} - ${totalPresentes} presentes - ${totalAusentes} ausentes
+                </div>
+              </div>
+              <svg id="mes-chevron-${mesKey}" class="historial-mes-chevron" style="transform: rotate(${expandido ? '90deg' : '0deg'})" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </div>
+            <div id="mes-contenido-${mesKey}" class="historial-mes-contenido" style="display: ${expandido ? 'block' : 'none'}">
+              ${diasHTML}
+            </div>
+          </div>
         `;
       }).join('');
 
-      tbody.innerHTML = filas;
+      container.innerHTML = mesesHTML;
 
-      // Actualizar subtítulo
+      // Calcular totales generales
+      const totalRegistros = registrosDept.length;
+      const totalPresentes = registrosDept.filter(r => r.estado === 'presente').length;
+      const totalAusentes = registrosDept.filter(r => r.estado === 'ausente').length;
+
       document.getElementById('historial-dept-subtitle').textContent =
-        `${colaboradoresDept.length} colaborador${colaboradoresDept.length !== 1 ? 'es' : ''}`;
-
-      // Calcular y mostrar resumen
-      const porcentajeAsistencia = totalRegistros > 0
-        ? Math.round((totalPresentes / totalRegistros) * 100)
-        : 0;
-
-      const resumenHTML = `
-        <div class="stat-item stat-total">
-          <span class="stat-label">Total Registros</span>
-          <span class="stat-value">${totalRegistros}</span>
-        </div>
-        <div class="stat-item stat-presente">
-          <span class="stat-label">Presentes</span>
-          <span class="stat-value">${totalPresentes}</span>
-        </div>
-        <div class="stat-item stat-ausente">
-          <span class="stat-label">Ausentes</span>
-          <span class="stat-value">${totalAusentes}</span>
-        </div>
-        <div class="stat-item" style="background: linear-gradient(135deg, #1E7CBA 0%, #155A8A 100%); color: white;">
-          <span class="stat-label">% Asistencia</span>
-          <span class="stat-value">${porcentajeAsistencia}%</span>
-        </div>
-      `;
-
-      document.getElementById('historial-resumen').innerHTML = resumenHTML;
+        `${totalRegistros} registro${totalRegistros !== 1 ? 's' : ''} total${totalRegistros !== 1 ? 'es' : ''}`;
     }
 
     // Inicializar módulo de historial
