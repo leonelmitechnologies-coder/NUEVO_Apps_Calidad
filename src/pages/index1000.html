@@ -1416,7 +1416,7 @@
             </a>
 
             <!-- Historial -->
-            <div class="module-card module-disabled">
+            <a href="#" id="link-historial-asistencia" class="module-card">
               <div class="module-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/>
@@ -1426,8 +1426,7 @@
               </div>
               <h3 class="module-title">Historial</h3>
               <p class="module-description">Registro de asistencias</p>
-              <span class="module-badge">Pronto</span>
-            </div>
+            </a>
 
             <!-- Inasistencia -->
             <div class="module-card module-disabled">
@@ -1707,6 +1706,49 @@
               </svg>
               <p style="font-size: 14px; margin: 0;">No hay colaboradores en este departamento</p>
             </div>
+          </div>
+
+          <!-- Vista: Historial de Asistencia - Lista de Departamentos -->
+          <div id="asistencia-historial-lista" style="display: none;">
+            <h2 class="section-title">Historial de Asistencia</h2>
+            <p class="section-subtitle">Selecciona un departamento para ver su historial</p>
+            <div id="historial-departamentos-container" class="modules-grid"></div>
+          </div>
+
+          <!-- Vista: Historial de Asistencia - Departamento Específico -->
+          <div id="asistencia-historial-dept" style="display: none;">
+            <h2 class="section-title" id="historial-dept-title">Departamento</h2>
+            <p class="section-subtitle" id="historial-dept-subtitle">Historial semanal</p>
+
+            <!-- Navegador de semanas -->
+            <div class="semana-nav">
+              <button id="semana-prev" class="btn-semana-nav">← Anterior</button>
+              <span id="semana-label" class="semana-label">Semana actual</span>
+              <button id="semana-next" class="btn-semana-nav">Siguiente →</button>
+            </div>
+
+            <!-- Tabla semanal -->
+            <div class="historial-table-wrapper">
+              <table class="historial-table" id="historial-tabla">
+                <thead>
+                  <tr>
+                    <th>Colaborador</th>
+                    <th>Lun</th>
+                    <th>Mar</th>
+                    <th>Mié</th>
+                    <th>Jue</th>
+                    <th>Vie</th>
+                    <th>Sáb</th>
+                  </tr>
+                </thead>
+                <tbody id="historial-tabla-body">
+                  <!-- Se llena dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Resumen semanal -->
+            <div class="historial-resumen" id="historial-resumen"></div>
           </div>
 
         </div>
@@ -2991,6 +3033,8 @@
       const asistenciaColabView = document.getElementById('asistencia-colaborador');
       const asistenciaPasarLista = document.getElementById('asistencia-pasar-lista');
       const asistenciaPasarDepartamento = document.getElementById('asistencia-pasar-departamento');
+      const historialListaView = document.getElementById('asistencia-historial-lista');
+      const historialDeptView = document.getElementById('asistencia-historial-dept');
 
       // Ocultar todas las vistas de asistencia
       const allViews = [
@@ -3000,7 +3044,9 @@
         colaboradorDetalleView,
         asistenciaColabView,
         asistenciaPasarLista,
-        asistenciaPasarDepartamento
+        asistenciaPasarDepartamento,
+        historialListaView,
+        historialDeptView
       ];
 
       allViews.forEach(view => {
@@ -3064,6 +3110,13 @@
           }
           break;
 
+        case 'historial-asistencia-lista':
+          if (historialListaView) {
+            historialListaView.style.display = 'block';
+            cargarDepartamentosHistorial();
+          }
+          break;
+
         default:
           // Para locations dinámicos (departamento específico, colaborador específico, etc.)
           if (location.startsWith('colaboradores-dept:')) {
@@ -3083,6 +3136,12 @@
             if (asistenciaPasarDepartamento) {
               asistenciaPasarDepartamento.style.display = 'block';
               cargarColaboradoresAsistencia(dept);
+            }
+          } else if (location.startsWith('historial-asistencia-dept:')) {
+            const dept = location.replace('historial-asistencia-dept:', '');
+            if (historialDeptView) {
+              historialDeptView.style.display = 'block';
+              cargarHistorialDepartamento(dept);
             }
           }
           break;
@@ -3695,6 +3754,259 @@
       document.addEventListener('DOMContentLoaded', initPasarAsistencia);
     } else {
       initPasarAsistencia();
+    }
+
+    // ===================================
+    // Historial de Asistencia
+    // ===================================
+
+    // Variable global para el offset de semana (0 = semana actual, -1 = semana pasada, +1 = semana siguiente)
+    let semanaOffset = 0;
+    let departamentoActualHistorial = '';
+
+    function initHistorialAsistencia() {
+      const linkHistorial = document.getElementById('link-historial-asistencia');
+
+      if (linkHistorial) {
+        linkHistorial.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigateToLocation('historial-asistencia-lista');
+        });
+      }
+
+      // Función global para ver historial de un departamento
+      window.verHistorialDepartamento = function(nombreDepartamento) {
+        semanaOffset = 0; // Resetear a semana actual
+        departamentoActualHistorial = nombreDepartamento;
+        navigateToLocation('historial-asistencia-dept:' + nombreDepartamento);
+      }
+
+      // Event listeners para navegación de semanas
+      const btnPrev = document.getElementById('semana-prev');
+      const btnNext = document.getElementById('semana-next');
+
+      if (btnPrev) {
+        btnPrev.addEventListener('click', () => {
+          semanaOffset--;
+          cargarHistorialDepartamento(departamentoActualHistorial);
+        });
+      }
+
+      if (btnNext) {
+        btnNext.addEventListener('click', () => {
+          semanaOffset++;
+          cargarHistorialDepartamento(departamentoActualHistorial);
+        });
+      }
+    }
+
+    function cargarDepartamentosHistorial() {
+      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+      const departamentosContainer = document.getElementById('historial-departamentos-container');
+
+      // Contar registros por departamento
+      const contadores = {};
+      historial.forEach(registro => {
+        const dept = registro.departamento || 'Sin Departamento';
+        contadores[dept] = (contadores[dept] || 0) + 1;
+      });
+
+      // Renderizar TODOS los departamentos
+      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+        const count = contadores[dept] || 0;
+        const badgeClass = count === 0 ? 'zero' : '';
+        const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];
+
+        return `
+          <div class="module-card" onclick="verHistorialDepartamento('${dept}')">
+            <span class="dept-count-badge ${badgeClass}">${count}</span>
+            <div class="module-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                ${icon}
+              </svg>
+            </div>
+            <h3 class="module-title">${dept}</h3>
+            <p class="module-description">${count} registro${count !== 1 ? 's' : ''}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function obtenerRangoSemana(offset) {
+      const hoy = new Date();
+      const diaSemana = hoy.getDay(); // 0 = domingo, 1 = lunes, etc.
+
+      // Calcular el lunes de la semana actual
+      const diasDesdeMonday = diaSemana === 0 ? 6 : diaSemana - 1;
+      const lunes = new Date(hoy);
+      lunes.setDate(hoy.getDate() - diasDesdeMonday + (offset * 7));
+      lunes.setHours(0, 0, 0, 0);
+
+      // Calcular el sábado de la semana
+      const sabado = new Date(lunes);
+      sabado.setDate(lunes.getDate() + 5);
+      sabado.setHours(23, 59, 59, 999);
+
+      // Formatear label (ej: "2-7 Jun 2026")
+      const diaInicio = lunes.getDate();
+      const diaFin = sabado.getDate();
+      const mes = sabado.toLocaleDateString('es-MX', { month: 'short' });
+      const año = sabado.getFullYear();
+      const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '');
+
+      const label = `${diaInicio}-${diaFin} ${mesCapitalizado} ${año}`;
+
+      return { inicio: lunes, fin: sabado, label };
+    }
+
+    function formatearFechaCorta(date) {
+      const año = date.getFullYear();
+      const mes = String(date.getMonth() + 1).padStart(2, '0');
+      const dia = String(date.getDate()).padStart(2, '0');
+      return `${año}-${mes}-${dia}`;
+    }
+
+    function cargarHistorialDepartamento(nombreDepartamento) {
+      departamentoActualHistorial = nombreDepartamento;
+
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+
+      // Obtener rango de la semana
+      const rango = obtenerRangoSemana(semanaOffset);
+      const fechaInicio = formatearFechaCorta(rango.inicio);
+      const fechaFin = formatearFechaCorta(rango.fin);
+
+      // Actualizar título y label de semana
+      document.getElementById('historial-dept-title').textContent = nombreDepartamento;
+      document.getElementById('semana-label').textContent = rango.label;
+
+      // Filtrar colaboradores activos del departamento
+      const colaboradoresDept = colaboradores.filter(c =>
+        c.departamento === nombreDepartamento &&
+        (c.estatus || 'Activo') === 'Activo'
+      );
+
+      // Filtrar registros de historial del departamento en el rango de fechas
+      const registrosSemana = historial.filter(r =>
+        r.departamento === nombreDepartamento &&
+        r.fecha >= fechaInicio &&
+        r.fecha <= fechaFin
+      );
+
+      // Construir tabla
+      const tbody = document.getElementById('historial-tabla-body');
+
+      if (colaboradoresDept.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+              No hay colaboradores activos en este departamento
+            </td>
+          </tr>
+        `;
+        document.getElementById('historial-dept-subtitle').textContent = '0 colaboradores';
+        document.getElementById('historial-resumen').innerHTML = '';
+        return;
+      }
+
+      if (registrosSemana.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+              Sin registros esta semana
+            </td>
+          </tr>
+        `;
+        document.getElementById('historial-dept-subtitle').textContent =
+          `${colaboradoresDept.length} colaborador${colaboradoresDept.length !== 1 ? 'es' : ''}`;
+        document.getElementById('historial-resumen').innerHTML = '';
+        return;
+      }
+
+      // Generar array de fechas de la semana (lunes a sábado)
+      const diasSemana = [];
+      for (let i = 0; i < 6; i++) {
+        const dia = new Date(rango.inicio);
+        dia.setDate(rango.inicio.getDate() + i);
+        diasSemana.push(formatearFechaCorta(dia));
+      }
+
+      // Construir filas de la tabla
+      let totalPresentes = 0;
+      let totalAusentes = 0;
+      let totalRegistros = 0;
+
+      const filas = colaboradoresDept.map(colab => {
+        const celdas = diasSemana.map(fecha => {
+          const registro = registrosSemana.find(r =>
+            r.colaboradorId === colab.id && r.fecha === fecha
+          );
+
+          if (!registro) {
+            return '<td class="cell-sin-registro">-</td>';
+          }
+
+          totalRegistros++;
+
+          if (registro.estado === 'presente') {
+            totalPresentes++;
+            return '<td class="cell-presente">✓</td>';
+          } else {
+            totalAusentes++;
+            const codigo = registro.tipoInasistencia
+              ? registro.tipoInasistencia.split(' ')[0]
+              : '✗';
+            return `<td class="cell-ausente">${codigo}</td>`;
+          }
+        }).join('');
+
+        return `
+          <tr>
+            <td>${colab.nombre}</td>
+            ${celdas}
+          </tr>
+        `;
+      }).join('');
+
+      tbody.innerHTML = filas;
+
+      // Actualizar subtítulo
+      document.getElementById('historial-dept-subtitle').textContent =
+        `${colaboradoresDept.length} colaborador${colaboradoresDept.length !== 1 ? 'es' : ''}`;
+
+      // Calcular y mostrar resumen
+      const porcentajeAsistencia = totalRegistros > 0
+        ? Math.round((totalPresentes / totalRegistros) * 100)
+        : 0;
+
+      const resumenHTML = `
+        <div class="stat-item stat-total">
+          <span class="stat-label">Total Registros</span>
+          <span class="stat-value">${totalRegistros}</span>
+        </div>
+        <div class="stat-item stat-presente">
+          <span class="stat-label">Presentes</span>
+          <span class="stat-value">${totalPresentes}</span>
+        </div>
+        <div class="stat-item stat-ausente">
+          <span class="stat-label">Ausentes</span>
+          <span class="stat-value">${totalAusentes}</span>
+        </div>
+        <div class="stat-item" style="background: linear-gradient(135deg, #1E7CBA 0%, #155A8A 100%); color: white;">
+          <span class="stat-label">% Asistencia</span>
+          <span class="stat-value">${porcentajeAsistencia}%</span>
+        </div>
+      `;
+
+      document.getElementById('historial-resumen').innerHTML = resumenHTML;
+    }
+
+    // Inicializar módulo de historial
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHistorialAsistencia);
+    } else {
+      initHistorialAsistencia();
     }
   </script>
 </body>
