@@ -1418,7 +1418,7 @@
                   </svg>
                 </div>
                 <div class="perfil-foto-actions">
-                  <input type="file" id="perfilFotoInput" accept="image/*" style="display: none;">
+                  <input type="file" id="perfilFotoInput" accept="image/*" capture="environment" style="display: none;">
                   <button type="button" class="btn-primary" onclick="document.getElementById('perfilFotoInput').click()">
                     Cambiar Foto
                   </button>
@@ -6221,8 +6221,8 @@
       const preview = document.getElementById('perfilFotoPreview');
       const btnEliminar = document.getElementById('btnEliminarFotoPerfil');
 
-      if (currentUser.foto) {
-        preview.innerHTML = `<img src="${currentUser.foto}" alt="${currentUser.name}">`;
+      if (currentUser.photo) {
+        preview.innerHTML = `<img src="${currentUser.photo}" alt="${currentUser.name}">`;
         if (btnEliminar) btnEliminar.style.display = 'block';
       } else {
         const iniciales = currentUser.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
@@ -6256,16 +6256,16 @@
       reader.onload = function(e) {
         const fotoBase64 = e.target.result;
 
-        // Actualizar usuario en localStorage
-        const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-        const userIndex = usuarios.findIndex(u => u.username === window.currentUser.username);
+        // Actualizar usuario en localStorage (appUsers)
+        const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
+        const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
 
         if (userIndex !== -1) {
-          usuarios[userIndex].foto = fotoBase64;
-          localStorage.setItem('usuarios', JSON.stringify(usuarios));
+          usuarios[userIndex].photo = fotoBase64;
+          localStorage.setItem('appUsers', JSON.stringify(usuarios));
 
           // Actualizar currentUser global
-          window.currentUser.foto = fotoBase64;
+          window.currentUser.photo = fotoBase64;
 
           // Actualizar preview
           const preview = document.getElementById('perfilFotoPreview');
@@ -6288,16 +6288,16 @@
     }
 
     function eliminarFotoPerfil() {
-      // Actualizar usuario en localStorage
-      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-      const userIndex = usuarios.findIndex(u => u.username === window.currentUser.username);
+      // Actualizar usuario en localStorage (appUsers)
+      const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
+      const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
 
       if (userIndex !== -1) {
-        delete usuarios[userIndex].foto;
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        delete usuarios[userIndex].photo;
+        localStorage.setItem('appUsers', JSON.stringify(usuarios));
 
         // Actualizar currentUser global
-        delete window.currentUser.foto;
+        delete window.currentUser.photo;
 
         // Actualizar preview
         cargarFotoPerfil();
@@ -6346,13 +6346,13 @@
         return;
       }
 
-      // Actualizar usuario en localStorage
-      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-      const userIndex = usuarios.findIndex(u => u.username === window.currentUser.username);
+      // Actualizar usuario en localStorage (appUsers)
+      const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
+      const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
 
       if (userIndex !== -1) {
         usuarios[userIndex].password = passwordNueva;
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        localStorage.setItem('appUsers', JSON.stringify(usuarios));
 
         // Actualizar currentUser global
         window.currentUser.password = passwordNueva;
@@ -6386,8 +6386,8 @@
       const userAvatar = document.getElementById('userAvatar');
       if (!userAvatar) return;
 
-      if (window.currentUser && window.currentUser.foto) {
-        userAvatar.style.backgroundImage = `url(${window.currentUser.foto})`;
+      if (window.currentUser && window.currentUser.photo) {
+        userAvatar.style.backgroundImage = `url(${window.currentUser.photo})`;
         userAvatar.style.backgroundSize = 'cover';
         userAvatar.style.backgroundPosition = 'center';
         userAvatar.textContent = '';
