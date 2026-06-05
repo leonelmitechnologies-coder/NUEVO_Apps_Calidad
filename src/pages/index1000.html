@@ -2590,18 +2590,6 @@
       currentView = viewName;
     }
 
-    /**
-     * Inicializa el botón de back en la navbar
-     */
-    function initBackButton() {
-      const backBtn = document.getElementById('backBtn');
-      if (backBtn) {
-        backBtn.addEventListener('click', () => {
-          navigateTo('dashboard');
-        });
-      }
-    }
-
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
       // Login - Setup password toggle
