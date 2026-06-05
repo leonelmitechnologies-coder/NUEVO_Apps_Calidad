@@ -1140,106 +1140,6 @@
   <script src="../assets/js/auth.js"></script>
   <script>
     // ============================================
-    // SISTEMA DE ROUTING CON HISTORY API
-    // ============================================
-
-    /**
-     * Mapa de rutas: path ↔ view
-     * Rutas relativas a /src/pages/ para funcionar con http-server
-     * Fase 1: Rutas simples
-     * Fase 2: Rutas anidadas (cuando se implementen submódulos)
-     */
-    const ROUTES = {
-      '/src/pages/': 'login',
-      '/src/pages/login': 'login',
-      '/src/pages/dashboard': 'dashboard',
-      '/src/pages/usuarios': 'usuarios',
-      '/src/pages/asistencia': 'asistencia',
-      // Rutas anidadas (futuro - cuando se implementen submódulos)
-      // '/src/pages/asistencia/pasar': 'asistencia-pasar',
-      // '/src/pages/asistencia/colaborador': 'asistencia-colaborador',
-      // '/src/pages/asistencia/historial': 'asistencia-historial',
-      // '/src/pages/asistencia/inasistencia': 'asistencia-inasistencia',
-      // '/src/pages/asistencia/colaboradores': 'asistencia-colaboradores',
-      // '/src/pages/asistencia/bajas': 'asistencia-bajas',
-      // '/src/pages/asistencia/tiempo-extra': 'asistencia-tiempo-extra',
-    };
-
-    /**
-     * Convierte un nombre de vista a path de URL
-     * @param {string} viewName - Nombre de la vista (login, dashboard, usuarios)
-     * @returns {string} - Path de la URL
-     */
-    function viewToPath(viewName) {
-      // Buscar el path que corresponde a esta vista
-      for (const [path, view] of Object.entries(ROUTES)) {
-        if (view === viewName) {
-          return path === '/src/pages/' ? '/src/pages/login' : path;
-        }
-      }
-      return '/src/pages/login'; // Default
-    }
-
-    /**
-     * Convierte un path de URL a nombre de vista
-     * @param {string} path - Path de la URL
-     * @returns {string} - Nombre de la vista
-     */
-    function pathToView(path) {
-      // Normalizar el path (remover trailing slash y index1000.html)
-      let normalizedPath = path.replace(/\/$/, '').replace(/\/index1000\.html$/, '');
-
-      // Si el path es /src/pages, normalizar a /src/pages/
-      if (normalizedPath === '/src/pages') {
-        normalizedPath = '/src/pages/';
-      }
-
-      // Buscar en el mapa de rutas
-      return ROUTES[normalizedPath] || 'login'; // Default a login si no existe
-    }
-
-    /**
-     * Inicializa el router al cargar la página
-     * Lee la URL actual y navega a la vista correspondiente
-     */
-    function initRouter() {
-      // Obtener el path actual
-      const currentPath = window.location.pathname;
-
-      // Si estamos en index1000.html directamente, navegar según autenticación
-      if (currentPath.includes('index1000.html')) {
-        // URL tipo: /src/pages/index1000.html
-        const defaultView = isAuthenticated() ? 'dashboard' : 'login';
-        navigateTo(defaultView);
-      } else {
-        // URL tipo: /src/pages/dashboard o /src/pages/usuarios
-        const view = pathToView(currentPath);
-
-        // Si la vista requiere autenticación y no está logueado, ir a login
-        if (view !== 'login' && !isAuthenticated()) {
-          navigateTo('login');
-        } else {
-          navigateTo(view, true); // skipHistory = true para no crear entrada duplicada
-        }
-      }
-    }
-
-    /**
-     * Maneja la navegación del navegador (back/forward)
-     */
-    window.addEventListener('popstate', (e) => {
-      const view = e.state?.view || pathToView(window.location.pathname);
-
-      // Validar autenticación
-      if (view !== 'login' && !isAuthenticated()) {
-        navigateTo('login', true);
-        return;
-      }
-
-      navigateTo(view, true); // skipHistory = true para no crear nueva entrada
-    });
-
-    // ============================================
     // NOTIFICACIONES Y UI
     // ============================================
 
@@ -1343,9 +1243,8 @@
     /**
      * Función central de navegación para el SPA
      * @param {string} viewName - Nombre de la vista (login, dashboard, usuarios)
-     * @param {boolean} skipHistory - Si es true, no actualiza el historial (para popstate)
      */
-    window.navigateTo = function navigateTo(viewName, skipHistory = false) {
+    window.navigateTo = function navigateTo(viewName) {
       const loginView = document.getElementById('view-login');
       const appShell = document.getElementById('app-shell');
       const backBtn = document.getElementById('backBtn');
@@ -1398,15 +1297,6 @@
 
       // Actualizar variable global currentView
       currentView = viewName;
-
-      // Actualizar URL del navegador (solo si no es navegación del historial)
-      if (!skipHistory) {
-        const path = viewToPath(viewName);
-        const state = { view: viewName };
-
-        // Usar pushState para actualizar la URL sin recargar la página
-        history.pushState(state, '', path);
-      }
     }
 
     // Initialize on page load
@@ -1464,8 +1354,8 @@
         });
       }
 
-      // Inicializar router - lee la URL actual y navega a la vista correspondiente
-      initRouter();
+      // Vista inicial según autenticación
+      navigateTo(isAuthenticated() ? 'dashboard' : 'login');
 
       // Usuarios Module - Initialize
       initUsuariosModule();
