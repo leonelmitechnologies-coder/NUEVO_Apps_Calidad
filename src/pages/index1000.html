@@ -3157,8 +3157,14 @@
 
     // Delete user
     window.deleteUser = async function(userId, userName) {
+      // Get existing users
+      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+
+      // Find the user to delete
+      const userToDelete = users.find(u => u.id === userId);
+
       // IMPORTANTE: No permitir eliminar el usuario actualmente logueado
-      if (window.currentUser && window.currentUser.id === userId) {
+      if (window.currentUser && userToDelete && userToDelete.usuario === window.currentUser.username) {
         showToast('No puedes eliminar tu propio usuario', 'error');
         return;
       }
@@ -3169,9 +3175,6 @@
       );
 
       if (!confirmed) return;
-
-      // Get existing users
-      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
 
       // Filter out the user to delete
       const updatedUsers = users.filter(u => u.id !== userId);
