@@ -2574,6 +2574,11 @@
           }
         }
 
+        // Si estamos navegando a asistencia, mostrar el grid
+        if (viewName === 'asistencia' && typeof window.navigateToLocation === 'function') {
+          window.navigateToLocation('asistencia-grid', false); // false = no agregar al historial (ya se agregó arriba)
+        }
+
         // Si estamos navegando a mi-perfil, cargar la foto actual
         if (viewName === 'mi-perfil') {
           setTimeout(() => cargarFotoPerfil(), 100);
