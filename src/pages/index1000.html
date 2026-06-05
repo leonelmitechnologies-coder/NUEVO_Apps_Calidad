@@ -3648,10 +3648,11 @@
       historial.push(registro);
       localStorage.setItem('historialAsistencia', JSON.stringify(historial));
 
-      showToast(`${nombres} ${apellidos} marcado como presente`, 'success');
-
-      // Recargar la vista
+      // Recargar la vista INMEDIATAMENTE (antes del toast)
       cargarColaboradoresAsistencia(departamento);
+
+      // Toast después de recargar para no bloquear
+      showToast(`${nombres} ${apellidos} marcado como presente`, 'success');
     }
 
     /**
@@ -3728,12 +3729,14 @@
       historial.push(registro);
       localStorage.setItem('historialAsistencia', JSON.stringify(historial));
 
-      showToast(`Inasistencia registrada: ${tipoInasistencia}`, 'success');
-
+      // Cerrar modal primero
       cerrarModalInasistencia();
 
-      // Recargar la vista
+      // Recargar la vista INMEDIATAMENTE
       cargarColaboradoresAsistencia(colaboradorSeleccionado.departamento);
+
+      // Toast después de recargar para no bloquear
+      showToast(`Inasistencia registrada: ${tipoInasistencia}`, 'success');
     });
 
     // ===================================
