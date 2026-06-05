@@ -5316,8 +5316,35 @@
         document.getElementById('te-registrar-title').textContent = 'Registrar Tiempo Extra';
         document.getElementById('te-registrar-subtitle').textContent = dept;
 
-        // Limpiar todo
-        limpiarSeleccionTE();
+        // IMPORTANTE: Resetear completamente el formulario primero
+        const form = document.getElementById('form-tiempo-extra');
+        if (form) form.reset();
+
+        // Limpiar todas las variables globales
+        window.currentTEColaboradorId = null;
+        window.currentTERegistroEditando = null;
+
+        // Mostrar buscador
+        const buscadorWrapper = document.querySelector('.te-buscador-wrapper');
+        if (buscadorWrapper) buscadorWrapper.style.display = 'block';
+
+        // Ocultar colaborador seleccionado
+        const seleccionadoDiv = document.getElementById('te-colaborador-seleccionado');
+        if (seleccionadoDiv) seleccionadoDiv.style.display = 'none';
+
+        // Ocultar formulario
+        if (form) form.style.display = 'none';
+
+        // Limpiar input de búsqueda
+        const inputBuscar = document.getElementById('te-buscar-colaborador');
+        if (inputBuscar) inputBuscar.value = '';
+
+        // Limpiar dropdown
+        const dropdown = document.getElementById('te-search-dropdown');
+        if (dropdown) {
+          dropdown.innerHTML = '';
+          dropdown.style.display = 'none';
+        }
 
         // Establecer fecha de hoy por defecto
         const fechaInput = document.getElementById('te-fecha');
