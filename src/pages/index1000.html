@@ -4275,15 +4275,6 @@
       const container = document.getElementById('inasistencia-colaboradores-lista');
       const emptyMessage = document.getElementById('inasistencia-empty');
 
-      if (colaboradoresDept.length === 0) {
-        container.innerHTML = '';
-        emptyMessage.style.display = 'block';
-        document.getElementById('inasistencia-dept-subtitle').textContent = '0 colaboradores activos';
-        return;
-      }
-
-      emptyMessage.style.display = 'none';
-
       // Contar inasistencias por colaborador en últimos 30 días
       const inasistenciasPorColab = {};
       historial.forEach(registro => {
@@ -4295,8 +4286,23 @@
         }
       });
 
+      // Filtrar solo colaboradores con al menos 1 inasistencia
+      const colaboradoresConInasistencias = colaboradoresDept.filter(c =>
+        (inasistenciasPorColab[c.id] || 0) > 0
+      );
+
+      // Verificar si hay colaboradores con inasistencias
+      if (colaboradoresConInasistencias.length === 0) {
+        container.innerHTML = '';
+        emptyMessage.style.display = 'block';
+        document.getElementById('inasistencia-dept-subtitle').textContent = 'Sin inasistencias en los últimos 30 días';
+        return;
+      }
+
+      emptyMessage.style.display = 'none';
+
       // Ordenar colaboradores por mayor cantidad de inasistencias
-      const colaboradoresOrdenados = colaboradoresDept.sort((a, b) => {
+      const colaboradoresOrdenados = colaboradoresConInasistencias.sort((a, b) => {
         const countA = inasistenciasPorColab[a.id] || 0;
         const countB = inasistenciasPorColab[b.id] || 0;
         return countB - countA;
@@ -4333,7 +4339,7 @@
 
       const totalInasistencias = Object.values(inasistenciasPorColab).reduce((sum, val) => sum + val, 0);
       document.getElementById('inasistencia-dept-subtitle').textContent =
-        `${colaboradoresDept.length} colaborador${colaboradoresDept.length !== 1 ? 'es' : ''} - ${totalInasistencias} inasistencia${totalInasistencias !== 1 ? 's' : ''} (últimos 30 días)`;
+        `${colaboradoresOrdenados.length} colaborador${colaboradoresOrdenados.length !== 1 ? 'es' : ''} con inasistencias - ${totalInasistencias} total (últimos 30 días)`;
     }
 
     function cargarHistorialColaborador(colaboradorId) {
