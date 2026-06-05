@@ -123,6 +123,60 @@
       color: #666;
     }
 
+    /* Autocomplete Dropdown */
+    .autocomplete-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 240px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: none;
+    }
+
+    .autocomplete-dropdown.show {
+      display: block;
+    }
+
+    .autocomplete-option {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+      transition: background-color 0.15s;
+    }
+
+    .autocomplete-option:hover {
+      background: #f5f5f5;
+    }
+
+    .autocomplete-option.selected {
+      background: #E8F4FA;
+      color: #1E7CBA;
+    }
+
+    .autocomplete-no-results {
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #999;
+      text-align: center;
+    }
+
+    .autocomplete-wrapper input:focus {
+      border-radius: 6px 6px 0 0;
+    }
+
     .checkbox-label {
       display: flex;
       align-items: center;
@@ -936,38 +990,10 @@
                 </div>
                 <div class="form-group">
                   <label for="departamento">Departamento *</label>
-                  <input type="text" id="departamento" list="departamentos-list-usuarios" required placeholder="Escribe para buscar..." autocomplete="off">
-                  <datalist id="departamentos-list-usuarios">
-                    <option value="ADMINISTRACION">
-                    <option value="Almacen">
-                    <option value="Auditoria">
-                    <option value="B2B (Shipping)">
-                    <option value="B2C (Shipping)">
-                    <option value="Calidad">
-                    <option value="COMPRAS">
-                    <option value="DESARROLLO DE SOFTWARE">
-                    <option value="DISEÑO">
-                    <option value="ENFERMERIA">
-                    <option value="FFT">
-                    <option value="Finance">
-                    <option value="HR">
-                    <option value="IMPORT EXPORT">
-                    <option value="Incoming">
-                    <option value="LOGISTICA">
-                    <option value="Maintenance">
-                    <option value="MARKETING">
-                    <option value="OPERACIONES">
-                    <option value="Open Cell">
-                    <option value="PATIO">
-                    <option value="RMA">
-                    <option value="SEGURIDAD E HIGIENE">
-                    <option value="SEGURIDAD PATRIMONIAL">
-                    <option value="SHIPPING">
-                    <option value="SISTEMAS">
-                    <option value="Sorting">
-                    <option value="Traffic">
-                    <option value="TRANSPORTE">
-                  </datalist>
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="departamento" class="autocomplete-input" required placeholder="Escribe para buscar..." autocomplete="off" data-autocomplete="departamentos">
+                    <div class="autocomplete-dropdown" id="departamento-dropdown"></div>
+                  </div>
                 </div>
               </div>
 
@@ -1058,38 +1084,10 @@
                 </div>
                 <div class="form-group">
                   <label for="departamentoEdit">Departamento *</label>
-                  <input type="text" id="departamentoEdit" list="departamentos-list-edit" required placeholder="Escribe para buscar..." autocomplete="off">
-                  <datalist id="departamentos-list-edit">
-                    <option value="ADMINISTRACION">
-                    <option value="Almacen">
-                    <option value="Auditoria">
-                    <option value="B2B (Shipping)">
-                    <option value="B2C (Shipping)">
-                    <option value="Calidad">
-                    <option value="COMPRAS">
-                    <option value="DESARROLLO DE SOFTWARE">
-                    <option value="DISEÑO">
-                    <option value="ENFERMERIA">
-                    <option value="FFT">
-                    <option value="Finance">
-                    <option value="HR">
-                    <option value="IMPORT EXPORT">
-                    <option value="Incoming">
-                    <option value="LOGISTICA">
-                    <option value="Maintenance">
-                    <option value="MARKETING">
-                    <option value="OPERACIONES">
-                    <option value="Open Cell">
-                    <option value="PATIO">
-                    <option value="RMA">
-                    <option value="SEGURIDAD E HIGIENE">
-                    <option value="SEGURIDAD PATRIMONIAL">
-                    <option value="SHIPPING">
-                    <option value="SISTEMAS">
-                    <option value="Sorting">
-                    <option value="Traffic">
-                    <option value="TRANSPORTE">
-                  </datalist>
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="departamentoEdit" class="autocomplete-input" required placeholder="Escribe para buscar..." autocomplete="off" data-autocomplete="departamentos">
+                    <div class="autocomplete-dropdown" id="departamentoEdit-dropdown"></div>
+                  </div>
                 </div>
               </div>
 
@@ -1266,38 +1264,10 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="departamentoColab">Departamento *</label>
-                  <input type="text" id="departamentoColab" list="departamentos-list" required placeholder="Escribe para buscar..." autocomplete="off">
-                  <datalist id="departamentos-list">
-                    <option value="ADMINISTRACION">
-                    <option value="Almacen">
-                    <option value="Auditoria">
-                    <option value="B2B (Shipping)">
-                    <option value="B2C (Shipping)">
-                    <option value="Calidad">
-                    <option value="COMPRAS">
-                    <option value="DESARROLLO DE SOFTWARE">
-                    <option value="DISEÑO">
-                    <option value="ENFERMERIA">
-                    <option value="FFT">
-                    <option value="Finance">
-                    <option value="HR">
-                    <option value="IMPORT EXPORT">
-                    <option value="Incoming">
-                    <option value="LOGISTICA">
-                    <option value="Maintenance">
-                    <option value="MARKETING">
-                    <option value="OPERACIONES">
-                    <option value="Open Cell">
-                    <option value="PATIO">
-                    <option value="RMA">
-                    <option value="SEGURIDAD E HIGIENE">
-                    <option value="SEGURIDAD PATRIMONIAL">
-                    <option value="SHIPPING">
-                    <option value="SISTEMAS">
-                    <option value="Sorting">
-                    <option value="Traffic">
-                    <option value="TRANSPORTE">
-                  </datalist>
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="departamentoColab" class="autocomplete-input" required placeholder="Escribe para buscar..." autocomplete="off" data-autocomplete="departamentos">
+                    <div class="autocomplete-dropdown" id="departamentoColab-dropdown"></div>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="puestoColab">Puesto *</label>
@@ -2167,6 +2137,138 @@
         // Volver al grid
         volverAGrid();
       });
+    }
+
+    // ===================================
+    // Autocomplete Departamentos
+    // ===================================
+
+    const DEPARTAMENTOS = [
+      'ADMINISTRACION',
+      'Almacen',
+      'Auditoria',
+      'B2B (Shipping)',
+      'B2C (Shipping)',
+      'Calidad',
+      'COMPRAS',
+      'DESARROLLO DE SOFTWARE',
+      'DISEÑO',
+      'ENFERMERIA',
+      'FFT',
+      'Finance',
+      'HR',
+      'IMPORT EXPORT',
+      'Incoming',
+      'LOGISTICA',
+      'Maintenance',
+      'MARKETING',
+      'OPERACIONES',
+      'Open Cell',
+      'PATIO',
+      'RMA',
+      'SEGURIDAD E HIGIENE',
+      'SEGURIDAD PATRIMONIAL',
+      'SHIPPING',
+      'SISTEMAS',
+      'Sorting',
+      'Traffic',
+      'TRANSPORTE'
+    ];
+
+    function initAutocomplete() {
+      const inputs = document.querySelectorAll('.autocomplete-input[data-autocomplete="departamentos"]');
+
+      inputs.forEach(input => {
+        const dropdownId = input.id + '-dropdown';
+        const dropdown = document.getElementById(dropdownId);
+
+        if (!dropdown) return;
+
+        let selectedIndex = -1;
+
+        // Mostrar dropdown al hacer focus
+        input.addEventListener('focus', () => {
+          filterOptions(input, dropdown, '');
+        });
+
+        // Filtrar mientras se escribe
+        input.addEventListener('input', (e) => {
+          const value = e.target.value;
+          selectedIndex = -1;
+          filterOptions(input, dropdown, value);
+        });
+
+        // Ocultar dropdown al perder focus (con delay para permitir clicks)
+        input.addEventListener('blur', () => {
+          setTimeout(() => {
+            dropdown.classList.remove('show');
+          }, 200);
+        });
+
+        // Navegación con teclado
+        input.addEventListener('keydown', (e) => {
+          const options = dropdown.querySelectorAll('.autocomplete-option');
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, options.length - 1);
+            updateSelectedOption(options, selectedIndex);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, 0);
+            updateSelectedOption(options, selectedIndex);
+          } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            e.preventDefault();
+            options[selectedIndex].click();
+          } else if (e.key === 'Escape') {
+            dropdown.classList.remove('show');
+          }
+        });
+      });
+    }
+
+    function filterOptions(input, dropdown, searchTerm) {
+      const filtered = DEPARTAMENTOS.filter(dept =>
+        dept.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        dropdown.innerHTML = '<div class="autocomplete-no-results">No se encontraron resultados</div>';
+      } else {
+        dropdown.innerHTML = filtered.map(dept => `
+          <div class="autocomplete-option" data-value="${dept}">
+            ${dept}
+          </div>
+        `).join('');
+
+        // Agregar event listeners a las opciones
+        dropdown.querySelectorAll('.autocomplete-option').forEach(option => {
+          option.addEventListener('click', () => {
+            input.value = option.dataset.value;
+            dropdown.classList.remove('show');
+          });
+        });
+      }
+
+      dropdown.classList.add('show');
+    }
+
+    function updateSelectedOption(options, index) {
+      options.forEach((opt, i) => {
+        if (i === index) {
+          opt.classList.add('selected');
+          opt.scrollIntoView({ block: 'nearest' });
+        } else {
+          opt.classList.remove('selected');
+        }
+      });
+    }
+
+    // Inicializar autocomplete cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAutocomplete);
+    } else {
+      initAutocomplete();
     }
   </script>
 </body>
