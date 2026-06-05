@@ -1736,6 +1736,43 @@
             </div>
           </div>
 
+          <!-- Vista: Detalle de Día - Lista de Colaboradores -->
+          <div id="asistencia-historial-dia" style="display: none;">
+            <h2 class="section-title" id="historial-dia-title">Fecha</h2>
+            <p class="section-subtitle" id="historial-dia-subtitle">Departamento</p>
+
+            <!-- Sección Presentes -->
+            <div id="historial-dia-presentes-section" style="display: none;">
+              <h3 class="detalle-dia-header detalle-presente">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                </svg>
+                <span id="historial-dia-presentes-count">0 Presentes</span>
+              </h3>
+              <div id="historial-dia-presentes-list" class="detalle-dia-list">
+                <!-- Se llena dinámicamente -->
+              </div>
+            </div>
+
+            <!-- Sección Ausentes -->
+            <div id="historial-dia-ausentes-section" style="display: none;">
+              <h3 class="detalle-dia-header detalle-ausente">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                </svg>
+                <span id="historial-dia-ausentes-count">0 Ausentes</span>
+              </h3>
+              <div id="historial-dia-ausentes-list" class="detalle-dia-list">
+                <!-- Se llena dinámicamente -->
+              </div>
+            </div>
+
+            <!-- Mensaje cuando no hay registros -->
+            <div id="historial-dia-empty" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
+              <p style="font-size: 14px; margin: 0;">No hay registros en esta fecha</p>
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
@@ -3020,6 +3057,7 @@
       const asistenciaPasarDepartamento = document.getElementById('asistencia-pasar-departamento');
       const historialListaView = document.getElementById('asistencia-historial-lista');
       const historialDeptView = document.getElementById('asistencia-historial-dept');
+      const historialDiaView = document.getElementById('asistencia-historial-dia');
 
       // Ocultar todas las vistas de asistencia
       const allViews = [
@@ -3031,7 +3069,8 @@
         asistenciaPasarLista,
         asistenciaPasarDepartamento,
         historialListaView,
-        historialDeptView
+        historialDeptView,
+        historialDiaView
       ];
 
       allViews.forEach(view => {
@@ -3127,6 +3166,15 @@
             if (historialDeptView) {
               historialDeptView.style.display = 'block';
               cargarHistorialDepartamento(dept);
+            }
+          } else if (location.startsWith('historial-dia-detalle:')) {
+            // Formato: "historial-dia-detalle:DEPARTAMENTO:FECHA"
+            const params = location.replace('historial-dia-detalle:', '').split(':');
+            const dept = params[0];
+            const fecha = params[1];
+            if (historialDiaView) {
+              historialDiaView.style.display = 'block';
+              cargarDetalleDia(dept, fecha);
             }
           }
           break;
@@ -3881,11 +3929,11 @@
           totalAusentes += porDia[dia].ausentes;
         });
 
-        // Generar HTML de los días
+        // Generar HTML de los días (clickeables)
         const diasHTML = diasOrdenados.map(fecha => {
           const diaData = porDia[fecha];
           return `
-            <div class="historial-dia-card">
+            <div class="historial-dia-card" onclick="verDetalleDia('${nombreDepartamento}', '${fecha}')">
               <div class="historial-dia-fecha">${formatearFechaDia(fecha)}</div>
               <div class="historial-dia-stats">
                 <span class="historial-stat-presente">${diaData.presentes} presentes</span>
@@ -3928,6 +3976,129 @@
 
       document.getElementById('historial-dept-subtitle').textContent =
         `${totalRegistros} registro${totalRegistros !== 1 ? 's' : ''} total${totalRegistros !== 1 ? 'es' : ''}`;
+    }
+
+    /**
+     * Navega al detalle de un día específico
+     */
+    window.verDetalleDia = function(departamento, fecha) {
+      navigateToLocation('historial-dia-detalle:' + departamento + ':' + fecha);
+    }
+
+    /**
+     * Carga el detalle de asistencia de un día específico
+     */
+    function cargarDetalleDia(departamento, fecha) {
+      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+
+      // Filtrar registros del departamento y fecha
+      const registrosDia = historial.filter(r =>
+        r.departamento === departamento && r.fecha === fecha
+      );
+
+      // Actualizar título y subtítulo
+      document.getElementById('historial-dia-title').textContent = formatearFechaDia(fecha);
+      document.getElementById('historial-dia-subtitle').textContent = departamento;
+
+      const presentesSection = document.getElementById('historial-dia-presentes-section');
+      const ausentesSection = document.getElementById('historial-dia-ausentes-section');
+      const emptyMessage = document.getElementById('historial-dia-empty');
+
+      if (registrosDia.length === 0) {
+        presentesSection.style.display = 'none';
+        ausentesSection.style.display = 'none';
+        emptyMessage.style.display = 'block';
+        return;
+      }
+
+      emptyMessage.style.display = 'none';
+
+      // Separar por estado
+      const presentes = registrosDia.filter(r => r.estado === 'presente');
+      const ausentes = registrosDia.filter(r => r.estado === 'ausente');
+
+      // Renderizar presentes
+      if (presentes.length > 0) {
+        presentesSection.style.display = 'block';
+        document.getElementById('historial-dia-presentes-count').textContent =
+          `${presentes.length} Presente${presentes.length !== 1 ? 's' : ''}`;
+
+        const presentesHTML = presentes.map(registro => {
+          const colab = colaboradores.find(c => c.id === registro.colaboradorId);
+          if (!colab) return '';
+
+          const initials = colab.nombres && colab.apellidos
+            ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+            : '??';
+
+          const photoHTML = colab.foto
+            ? `<img src="${colab.foto}" alt="${colab.nombres}">`
+            : initials;
+
+          return `
+            <div class="detalle-colab-card">
+              <div class="colab-photo-small">${photoHTML}</div>
+              <div class="detalle-colab-info">
+                <h4>${colab.nombres} ${colab.apellidos}</h4>
+                <p>${colab.puesto || 'Sin puesto'}</p>
+              </div>
+              <div class="detalle-estado-badge detalle-estado-presente">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                </svg>
+                Presente
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('historial-dia-presentes-list').innerHTML = presentesHTML;
+      } else {
+        presentesSection.style.display = 'none';
+      }
+
+      // Renderizar ausentes
+      if (ausentes.length > 0) {
+        ausentesSection.style.display = 'block';
+        document.getElementById('historial-dia-ausentes-count').textContent =
+          `${ausentes.length} Ausente${ausentes.length !== 1 ? 's' : ''}`;
+
+        const ausentesHTML = ausentes.map(registro => {
+          const colab = colaboradores.find(c => c.id === registro.colaboradorId);
+          if (!colab) return '';
+
+          const initials = colab.nombres && colab.apellidos
+            ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+            : '??';
+
+          const photoHTML = colab.foto
+            ? `<img src="${colab.foto}" alt="${colab.nombres}">`
+            : initials;
+
+          const tipoInasistencia = registro.tipoInasistencia || 'Ausente';
+
+          return `
+            <div class="detalle-colab-card">
+              <div class="colab-photo-small">${photoHTML}</div>
+              <div class="detalle-colab-info">
+                <h4>${colab.nombres} ${colab.apellidos}</h4>
+                <p>${colab.puesto || 'Sin puesto'}</p>
+              </div>
+              <div class="detalle-estado-badge detalle-estado-ausente">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                </svg>
+                ${tipoInasistencia}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('historial-dia-ausentes-list').innerHTML = ausentesHTML;
+      } else {
+        ausentesSection.style.display = 'none';
+      }
     }
 
     // Inicializar módulo de historial

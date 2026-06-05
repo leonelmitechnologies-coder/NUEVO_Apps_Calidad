@@ -1622,6 +1622,7 @@
 .historial-dia-card:hover {
   transform: translateX(4px);
   box-shadow: var(--shadow-sm);
+  cursor: pointer;
 }
 
 .historial-dia-fecha {
@@ -1682,5 +1683,127 @@
 
   .historial-dia-stats {
     font-size: 0.8rem;
+  }
+}
+
+/* ============================================
+   Detalle de Día - Vista de Colaboradores
+   ============================================ */
+
+/* Headers de secciones */
+.detalle-dia-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.detalle-dia-header svg {
+  flex-shrink: 0;
+}
+
+.detalle-presente {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+}
+
+.detalle-ausente {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  color: white;
+}
+
+/* Lista de colaboradores */
+.detalle-dia-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.detalle-colab-card {
+  background: white;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s;
+}
+
+.detalle-colab-card:hover {
+  transform: translateX(4px);
+}
+
+.detalle-colab-info {
+  flex: 1;
+}
+
+.detalle-colab-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.detalle-colab-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Badge de estado */
+.detalle-estado-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.detalle-estado-badge svg {
+  flex-shrink: 0;
+}
+
+.detalle-estado-presente {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+}
+
+.detalle-estado-ausente {
+  background: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .detalle-dia-header {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .detalle-colab-card {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .detalle-colab-info h4 {
+    font-size: 0.85rem;
+  }
+
+  .detalle-colab-info p {
+    font-size: 0.75rem;
+  }
+
+  .detalle-estado-badge {
+    font-size: 0.75rem;
+    padding: 5px 10px;
   }
 }
