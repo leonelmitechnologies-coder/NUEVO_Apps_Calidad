@@ -2335,78 +2335,133 @@
   cursor: not-allowed;
 }
 
-/* Inputs personalizados de fecha y hora */
+/* Inputs personalizados de fecha y hora - Diseño moderno */
 .te-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.te-input-wrapper:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
+}
+
+.te-input-wrapper:focus-within {
+  border-color: var(--color-primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(30, 124, 186, 0.1), 0 4px 12px rgba(30, 124, 186, 0.15);
+  transform: translateY(-2px);
 }
 
 .te-input-icon {
   position: absolute;
-  left: 12px;
-  width: 18px;
-  height: 18px;
-  color: var(--color-text-muted);
+  left: 16px;
+  width: 22px;
+  height: 22px;
+  color: #64748b;
   pointer-events: none;
   z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.te-input-wrapper:focus-within .te-input-icon {
+  color: var(--color-primary);
+  transform: scale(1.1);
 }
 
 .te-date-input,
 .te-time-input {
   width: 100%;
-  padding: 10px 12px 10px 40px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
+  padding: 14px 16px 14px 48px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
   font-family: var(--font-base);
-  transition: all var(--transition-fast);
-  background: white;
-  color: var(--color-text);
+  color: #0f172a;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.te-date-input:hover,
-.te-time-input:hover {
-  border-color: var(--color-primary-light);
-  background: var(--color-bg);
+.te-date-input::placeholder,
+.te-time-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 .te-date-input:focus,
 .te-time-input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(30, 124, 186, 0.1);
-}
-
-.te-date-input:focus + .te-input-icon,
-.te-time-input:focus + .te-input-icon {
-  color: var(--color-primary);
 }
 
 /* Personalizar el icono del calendario/reloj nativo */
 .te-date-input::-webkit-calendar-picker-indicator,
 .te-time-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 12px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
+  opacity: 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="%231e7cba"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 4v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V4H2z"/></svg>') center/contain no-repeat;
+  transition: all 0.2s ease;
+}
+
+.te-time-input::-webkit-calendar-picker-indicator {
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="%231e7cba"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>') center/contain no-repeat;
+}
+
+.te-input-wrapper:hover .te-date-input::-webkit-calendar-picker-indicator,
+.te-input-wrapper:hover .te-time-input::-webkit-calendar-picker-indicator {
   opacity: 0.6;
-  transition: opacity var(--transition-fast);
 }
 
 .te-date-input::-webkit-calendar-picker-indicator:hover,
 .te-time-input::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
+  opacity: 1 !important;
+  transform: scale(1.1);
 }
 
 /* Firefox */
 .te-date-input::-moz-calendar-picker-indicator,
 .te-time-input::-moz-calendar-picker-indicator {
   cursor: pointer;
+  opacity: 0.6;
 }
 
-/* Placeholder personalizado cuando está vacío */
-.te-date-input:invalid,
-.te-time-input:invalid {
-  color: var(--color-text-muted);
+/* Estilos cuando el input tiene valor */
+.te-date-input:not(:placeholder-shown),
+.te-time-input:not(:placeholder-shown) {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Estado disabled */
+.te-date-input:disabled,
+.te-time-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.te-input-wrapper:has(.te-date-input:disabled),
+.te-input-wrapper:has(.te-time-input:disabled) {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.te-input-wrapper:has(.te-date-input:disabled):hover,
+.te-input-wrapper:has(.te-time-input:disabled):hover {
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .btn-primary-te {
@@ -2638,16 +2693,27 @@
     font-size: 0.8rem;
   }
 
+  .te-input-wrapper {
+    border-radius: 10px;
+  }
+
   .te-input-icon {
-    left: 10px;
-    width: 16px;
-    height: 16px;
+    left: 14px;
+    width: 20px;
+    height: 20px;
   }
 
   .te-date-input,
   .te-time-input {
-    padding: 8px 10px 8px 36px;
-    font-size: 0.8rem;
+    padding: 12px 14px 12px 44px;
+    font-size: 0.9rem;
+  }
+
+  .te-date-input::-webkit-calendar-picker-indicator,
+  .te-time-input::-webkit-calendar-picker-indicator {
+    right: 10px;
+    width: 22px;
+    height: 22px;
   }
 
   .btn-primary-te {
