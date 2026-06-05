@@ -46,14 +46,33 @@ async function login(username, password) {
   // Mock implementation with credential validation
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      // Validate credentials against TEST_CREDENTIALS
-      if (username === TEST_CREDENTIALS.username && password === TEST_CREDENTIALS.password) {
+      // First, check against users created in the system (appUsers)
+      const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
+      const foundUser = appUsers.find(u => u.usuario === username && u.password === password);
+
+      if (foundUser) {
+        // User found in appUsers
+        resolve({
+          success: true,
+          token: 'mock-token-' + Date.now(),
+          user: {
+            id: foundUser.id,
+            username: foundUser.usuario,
+            name: `${foundUser.nombre} ${foundUser.apellido}`,
+            photo: foundUser.photo || null,
+            password: foundUser.password
+          }
+        });
+      } else if (username === TEST_CREDENTIALS.username && password === TEST_CREDENTIALS.password) {
+        // Fallback to test credentials (admin/admin123)
         resolve({
           success: true,
           token: 'mock-token-' + Date.now(),
           user: {
             id: 1,
-            username: username
+            username: username,
+            name: 'Administrador',
+            password: password
           }
         });
       } else {
