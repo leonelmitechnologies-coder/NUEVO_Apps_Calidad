@@ -470,69 +470,98 @@
     }
 
     /* Departamentos y Colaboradores */
-    .dept-card {
+    .dept-module-card {
+      position: relative;
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 24px;
+      padding: 24px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
     }
 
-    .dept-header {
+    .dept-module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .dept-module-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #1E7CBA, #2C9FD9);
+      border-radius: 12px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #1E7CBA;
+      justify-content: center;
+      color: white;
     }
 
-    .dept-name {
-      font-size: 18px;
+    .dept-module-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .dept-module-name {
+      font-size: 16px;
       font-weight: 700;
-      color: #1E7CBA;
+      color: #1a1a1a;
       margin: 0;
     }
 
-    .dept-count {
+    .dept-module-count {
+      font-size: 13px;
+      color: #666;
+      margin: 0;
+    }
+
+    .dept-module-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
       background: #1E7CBA;
       color: white;
-      padding: 4px 12px;
+      padding: 4px 10px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
     }
 
-    .colab-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
+    .dept-module-badge.zero {
+      background: #ccc;
     }
 
-    .colab-card {
-      background: #fafafa;
+    /* Colaboradores compactos */
+    .colab-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .colab-card-compact {
+      background: white;
       border: 1px solid #e0e0e0;
       border-radius: 6px;
-      padding: 16px;
-      transition: all 0.2s;
-    }
-
-    .colab-card:hover {
-      background: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transform: translateY(-2px);
-    }
-
-    .colab-header {
+      padding: 12px;
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 12px;
+      transition: all 0.2s;
     }
 
-    .colab-photo {
-      width: 48px;
-      height: 48px;
+    .colab-card-compact:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-color: #1E7CBA;
+    }
+
+    .colab-photo-small {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: linear-gradient(135deg, #1E7CBA, #2C9FD9);
       color: white;
@@ -540,81 +569,59 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 14px;
       overflow: hidden;
       flex-shrink: 0;
     }
 
-    .colab-photo img {
+    .colab-photo-small img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .colab-info h4 {
+    .colab-info-compact {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .colab-info-compact h4 {
       margin: 0;
-      font-size: 15px;
+      font-size: 14px;
       color: #333;
       font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .colab-info p {
-      margin: 4px 0 0;
-      font-size: 13px;
-      color: #666;
-    }
-
-    .colab-details {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .colab-info-compact p {
+      margin: 2px 0 0;
       font-size: 12px;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .colab-detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .colab-status-compact {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
-    .colab-detail-label {
-      color: #999;
+    .colab-status-compact.activo {
+      background: #4caf50;
     }
 
-    .colab-detail-value {
-      color: #333;
-      font-weight: 500;
-    }
-
-    .colab-status {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .colab-status.activo {
-      background: #c8e6c9;
-      color: #2e7d32;
-    }
-
-    .colab-status.inactivo {
-      background: #ffccbc;
-      color: #d84315;
+    .colab-status-compact.inactivo {
+      background: #f44336;
     }
 
     @media (max-width: 768px) {
-      .colab-grid {
+      .colab-list {
         grid-template-columns: 1fr;
-      }
-
-      .dept-card {
-        padding: 16px;
-      }
-
-      .dept-name {
-        font-size: 16px;
       }
     }
 
@@ -1457,21 +1464,30 @@
             </form>
           </div>
 
-          <!-- Vista: Lista de Colaboradores por Departamento -->
+          <!-- Vista: Lista de Departamentos -->
           <div id="asistencia-colaboradores-lista" style="display: none;">
-            <h2 class="section-title">Colaboradores por Departamento</h2>
-            <p class="section-subtitle">Personal activo organizado por área</p>
+            <h2 class="section-title">Departamentos</h2>
+            <p class="section-subtitle">Selecciona un departamento para ver su personal</p>
 
-            <div id="departamentos-container">
-              <!-- Los departamentos con sus colaboradores se cargarán aquí -->
+            <div id="departamentos-container" class="modules-grid">
+              <!-- Los departamentos se cargarán aquí -->
+            </div>
+          </div>
+
+          <!-- Vista: Colaboradores de un Departamento -->
+          <div id="asistencia-departamento-detalle" style="display: none;">
+            <h2 class="section-title" id="dept-detalle-title">Departamento</h2>
+            <p class="section-subtitle" id="dept-detalle-subtitle">0 colaboradores</p>
+
+            <div id="colaboradores-dept-container">
+              <!-- Los colaboradores del departamento se cargarán aquí -->
             </div>
 
-            <div id="empty-colaboradores" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 16px;">
+            <div id="empty-dept-colaboradores" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 12px;">
                 <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
               </svg>
-              <p style="font-size: 16px; margin: 0;">No hay colaboradores registrados</p>
-              <p style="font-size: 14px; margin-top: 8px;">Agrega colaboradores desde el módulo "Agregar Colaborador"</p>
+              <p style="font-size: 14px; margin: 0;">No hay colaboradores en este departamento</p>
             </div>
           </div>
 
@@ -2521,106 +2537,117 @@
       const linkColabLista = document.getElementById('link-colaboradores-lista');
       const asistenciaMain = document.getElementById('asistencia-main');
       const colaboradoresListaView = document.getElementById('asistencia-colaboradores-lista');
+      const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
 
       if (linkColabLista) {
         linkColabLista.addEventListener('click', (e) => {
           e.preventDefault();
           asistenciaMain.style.display = 'none';
           colaboradoresListaView.style.display = 'block';
-          cargarColaboradoresPorDepartamento();
+          departamentoDetalleView.style.display = 'none';
+          cargarDepartamentos();
         });
       }
 
-      // Función global para volver al grid desde lista de colaboradores
+      // Función global para volver al grid desde lista de departamentos
       window.volverAGridDesdeColaboradores = function() {
         asistenciaMain.style.display = 'grid';
         colaboradoresListaView.style.display = 'none';
+        departamentoDetalleView.style.display = 'none';
+      }
+
+      // Función global para volver a lista de departamentos desde detalle
+      window.volverAListaDepartamentos = function() {
+        colaboradoresListaView.style.display = 'block';
+        departamentoDetalleView.style.display = 'none';
+      }
+
+      // Función global para ver detalle de departamento
+      window.verDepartamentoDetalle = function(nombreDepartamento) {
+        colaboradoresListaView.style.display = 'none';
+        departamentoDetalleView.style.display = 'block';
+        cargarColaboradoresDepartamento(nombreDepartamento);
       }
     }
 
-    function cargarColaboradoresPorDepartamento() {
+    function cargarDepartamentos() {
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
       const departamentosContainer = document.getElementById('departamentos-container');
-      const emptyMessage = document.getElementById('empty-colaboradores');
 
-      if (colaboradores.length === 0) {
-        departamentosContainer.innerHTML = '';
+      // Contar colaboradores por departamento
+      const contadores = {};
+      colaboradores.forEach(colab => {
+        const dept = colab.departamento || 'Sin Departamento';
+        contadores[dept] = (contadores[dept] || 0) + 1;
+      });
+
+      // Renderizar TODOS los departamentos (incluso con 0)
+      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+        const count = contadores[dept] || 0;
+        const badgeClass = count === 0 ? 'zero' : '';
+
+        return `
+          <div class="dept-module-card" onclick="verDepartamentoDetalle('${dept}')">
+            <span class="dept-module-badge ${badgeClass}">${count}</span>
+            <div class="dept-module-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+              </svg>
+            </div>
+            <h3 class="dept-module-name">${dept}</h3>
+            <p class="dept-module-count">${count} ${count === 1 ? 'colaborador' : 'colaboradores'}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function cargarColaboradoresDepartamento(nombreDepartamento) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colaboradoresDept = colaboradores.filter(c => c.departamento === nombreDepartamento);
+
+      // Actualizar título
+      document.getElementById('dept-detalle-title').textContent = nombreDepartamento;
+      document.getElementById('dept-detalle-subtitle').textContent =
+        `${colaboradoresDept.length} ${colaboradoresDept.length === 1 ? 'colaborador' : 'colaboradores'}`;
+
+      const container = document.getElementById('colaboradores-dept-container');
+      const emptyMessage = document.getElementById('empty-dept-colaboradores');
+
+      if (colaboradoresDept.length === 0) {
+        container.innerHTML = '';
         emptyMessage.style.display = 'block';
         return;
       }
 
       emptyMessage.style.display = 'none';
 
-      // Agrupar colaboradores por departamento
-      const porDepartamento = {};
-      colaboradores.forEach(colab => {
-        const dept = colab.departamento || 'Sin Departamento';
-        if (!porDepartamento[dept]) {
-          porDepartamento[dept] = [];
-        }
-        porDepartamento[dept].push(colab);
-      });
+      // Renderizar colaboradores compactos
+      container.innerHTML = `
+        <div class="colab-list">
+          ${colaboradoresDept.map(colab => {
+            const initials = colab.nombres && colab.apellidos
+              ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+              : '??';
 
-      // Ordenar departamentos alfabéticamente
-      const departamentosOrdenados = Object.keys(porDepartamento).sort();
+            const photoHTML = colab.foto
+              ? `<img src="${colab.foto}" alt="${colab.nombres}">`
+              : initials;
 
-      // Renderizar cada departamento con sus colaboradores
-      departamentosContainer.innerHTML = departamentosOrdenados.map(dept => {
-        const colabs = porDepartamento[dept];
-        const colabsHTML = colabs.map(colab => {
-          const initials = colab.nombres && colab.apellidos
-            ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
-            : '??';
+            const estatusClass = (colab.estatus || 'Activo').toLowerCase();
 
-          const photoHTML = colab.foto
-            ? `<img src="${colab.foto}" alt="${colab.nombres}">`
-            : initials;
-
-          const estatusClass = (colab.estatus || 'Activo').toLowerCase();
-
-          return `
-            <div class="colab-card">
-              <div class="colab-header">
-                <div class="colab-photo">${photoHTML}</div>
-                <div class="colab-info">
+            return `
+              <div class="colab-card-compact">
+                <div class="colab-photo-small">${photoHTML}</div>
+                <div class="colab-info-compact">
                   <h4>${colab.nombres} ${colab.apellidos}</h4>
-                  <p>${colab.puesto || 'Sin puesto'}</p>
+                  <p>${colab.puesto || 'Sin puesto'} • ${colab.numeroEmpleado || 'N/A'}</p>
                 </div>
+                <div class="colab-status-compact ${estatusClass}" title="${colab.estatus || 'Activo'}"></div>
               </div>
-              <div class="colab-details">
-                <div class="colab-detail-row">
-                  <span class="colab-detail-label">Turno:</span>
-                  <span class="colab-detail-value">${colab.turno || 'N/A'}</span>
-                </div>
-                <div class="colab-detail-row">
-                  <span class="colab-detail-label">No. Empleado:</span>
-                  <span class="colab-detail-value">${colab.numeroEmpleado || 'N/A'}</span>
-                </div>
-                <div class="colab-detail-row">
-                  <span class="colab-detail-label">Ingreso:</span>
-                  <span class="colab-detail-value">${colab.fechaIngreso ? new Date(colab.fechaIngreso).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}</span>
-                </div>
-                <div class="colab-detail-row">
-                  <span class="colab-detail-label">Estatus:</span>
-                  <span class="colab-status ${estatusClass}">${colab.estatus || 'Activo'}</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        return `
-          <div class="dept-card">
-            <div class="dept-header">
-              <h3 class="dept-name">${dept}</h3>
-              <span class="dept-count">${colabs.length} ${colabs.length === 1 ? 'colaborador' : 'colaboradores'}</span>
-            </div>
-            <div class="colab-grid">
-              ${colabsHTML}
-            </div>
-          </div>
-        `;
-      }).join('');
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     // Inicializar módulo de colaboradores lista

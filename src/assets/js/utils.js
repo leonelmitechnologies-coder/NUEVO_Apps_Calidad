@@ -191,6 +191,7 @@ function safeGoBack() {
   if (currentView === 'asistencia') {
     const asistenciaColabView = document.getElementById('asistencia-colaborador');
     const asistenciaListaView = document.getElementById('asistencia-colaboradores-lista');
+    const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
 
     // Si el formulario de agregar colaborador está visible, volver al grid
     if (asistenciaColabView && asistenciaColabView.style.display === 'block') {
@@ -200,7 +201,15 @@ function safeGoBack() {
       }
     }
 
-    // Si la lista de colaboradores está visible, volver al grid
+    // Si el detalle de departamento está visible, volver a lista de departamentos
+    if (departamentoDetalleView && departamentoDetalleView.style.display === 'block') {
+      if (typeof window.volverAListaDepartamentos === 'function') {
+        window.volverAListaDepartamentos();
+        return;
+      }
+    }
+
+    // Si la lista de departamentos está visible, volver al grid
     if (asistenciaListaView && asistenciaListaView.style.display === 'block') {
       if (typeof window.volverAGridDesdeColaboradores === 'function') {
         window.volverAGridDesdeColaboradores();
