@@ -2570,9 +2570,17 @@
           window.pushNavigation('asistencia-grid');
         }
 
-        // Si estamos navegando a mi-perfil, cargar la foto actual
+        // Si estamos navegando a mi-perfil, agregar al historial y cargar la foto actual
         if (viewName === 'mi-perfil') {
+          if (typeof window.pushNavigation === 'function') {
+            window.pushNavigation('mi-perfil');
+          }
           setTimeout(() => cargarFotoPerfil(), 100);
+        }
+
+        // Si estamos navegando a usuarios, agregar al historial
+        if (viewName === 'usuarios' && typeof window.pushNavigation === 'function') {
+          window.pushNavigation('usuarios');
         }
       }
 

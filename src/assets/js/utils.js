@@ -230,21 +230,34 @@ function safeGoBack() {
   const previousLocation = popNavigation();
 
   if (!previousLocation) {
-    // No history, go to default based on current view
-    const routes = {
-      'usuarios': 'dashboard',
-      'asistencia': 'dashboard',
-    };
-    const backDestination = routes[currentView];
-    if (backDestination) {
-      navigateTo(backDestination);
+    // No history, go to dashboard as fallback
+    if (typeof window.navigateTo === 'function') {
+      window.navigateTo('dashboard');
     }
     return;
   }
 
-  // Navigate to previous location using the custom navigation function
-  if (typeof window.navigateToLocation === 'function') {
-    window.navigateToLocation(previousLocation, false); // false = don't push to history
+  // Determine if it's a top-level view or a sub-view
+  const topLevelViews = ['dashboard', 'usuarios', 'asistencia', 'mi-perfil'];
+  const isTopLevel = topLevelViews.includes(previousLocation) || previousLocation === 'asistencia-grid';
+
+  if (isTopLevel) {
+    // Navigate to top-level view
+    if (previousLocation === 'asistencia-grid') {
+      // Special case: asistencia-grid is actually shown via navigateTo('asistencia')
+      if (typeof window.navigateTo === 'function') {
+        window.navigateTo('asistencia');
+      }
+    } else {
+      if (typeof window.navigateTo === 'function') {
+        window.navigateTo(previousLocation);
+      }
+    }
+  } else {
+    // Navigate to sub-view (asistencia internal views)
+    if (typeof window.navigateToLocation === 'function') {
+      window.navigateToLocation(previousLocation, false); // false = don't push to history
+    }
   }
 }
 
