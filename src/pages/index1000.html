@@ -3001,6 +3001,18 @@
       localStorage.setItem('appUsers', JSON.stringify(users));
       showToast('Usuario actualizado exitosamente', 'success');
 
+      // Si el usuario editado es el usuario logueado, actualizar currentUser
+      if (window.currentUser && window.currentUser.username === usuario) {
+        window.currentUser.name = `${nombre} ${apellido}`;
+        window.currentUser.photo = photo || null;
+        window.currentUser.password = password;
+
+        // Actualizar avatar en navbar
+        if (typeof updateUserAvatar === 'function') {
+          updateUserAvatar();
+        }
+      }
+
       // Reset edit mode
       cancelEditMode();
 
