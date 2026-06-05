@@ -59,7 +59,7 @@ async function login(username, password) {
       } else {
         reject(new Error('Usuario o contraseña incorrectos'));
       }
-    }, 800); // Simulate network delay
+    }, 200); // Simulate network delay
   });
 }
 
@@ -210,7 +210,7 @@ async function handleLogin(event) {
       saveSession(result, rememberMe);
 
       // Small delay for UX
-      await sleep(300);
+      await sleep(100);
 
       // Redirect to dashboard
       navigateTo('dashboard');
@@ -301,10 +301,10 @@ function handleForgotPassword(event) {
   const passwordInput = document.getElementById('password');
   showError(passwordInput, 'Funcionalidad en desarrollo. Contacta al administrador del sistema.');
 
-  // Auto-hide message after 4 seconds
+  // Auto-hide message after 3 seconds
   setTimeout(() => {
     clearError(passwordInput);
-  }, 4000);
+  }, 3000);
 
   // TODO: Implement forgot password flow
   // navigateTo('recover-password');
