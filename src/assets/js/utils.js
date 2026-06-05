@@ -189,13 +189,13 @@ function redirect(url) {
 function safeGoBack() {
   // Check if we're in a subview within Asistencia
   if (currentView === 'asistencia') {
-    const asistenciaColabView = document.getElementById('asistencia-colaboradores-view');
+    const asistenciaColabView = document.getElementById('asistencia-colaborador');
 
     // Si el formulario de colaboradores está visible, volver al grid
     if (asistenciaColabView && asistenciaColabView.style.display === 'block') {
       // Call the volverAGrid function if it exists
-      if (typeof volverAGrid === 'function') {
-        volverAGrid();
+      if (typeof window.volverAGrid === 'function') {
+        window.volverAGrid();
         return;
       }
     }
