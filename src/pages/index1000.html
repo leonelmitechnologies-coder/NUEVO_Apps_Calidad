@@ -2450,13 +2450,13 @@
 
       container.appendChild(toast);
 
-      // Auto-remove after 4 seconds
+      // Auto-remove after 2 seconds
       setTimeout(() => {
         toast.classList.add('removing');
         setTimeout(() => {
           toast.remove();
         }, 300);
-      }, 4000);
+      }, 2000);
     }
 
     /**
