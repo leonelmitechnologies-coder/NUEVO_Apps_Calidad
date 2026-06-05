@@ -1418,7 +1418,7 @@
           <!-- Vista Principal: Grid de Módulos -->
           <div id="asistencia-main" class="modules-grid">
             <!-- Pasar Asistencia -->
-            <div class="module-card module-disabled">
+            <a href="#" id="link-pasar-asistencia" class="module-card">
               <div class="module-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
@@ -1427,8 +1427,7 @@
               </div>
               <h3 class="module-title">Pasar Asistencia</h3>
               <p class="module-description">Control diario de asistencia</p>
-              <span class="module-badge">Pronto</span>
-            </div>
+            </a>
 
             <!-- Agregar Colaborador -->
             <a href="#" id="link-agregar-colaborador" class="module-card">
@@ -1673,6 +1672,33 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Vista: Pasar Asistencia - Lista de Departamentos -->
+          <div id="asistencia-pasar-lista" style="display: none;">
+            <h2 class="section-title">Pasar Asistencia</h2>
+            <p class="section-subtitle">Selecciona un departamento para marcar asistencia</p>
+
+            <div id="asistencia-departamentos-container" class="modules-grid">
+              <!-- Los departamentos se cargarán aquí -->
+            </div>
+          </div>
+
+          <!-- Vista: Pasar Asistencia - Colaboradores del Departamento -->
+          <div id="asistencia-pasar-departamento" style="display: none;">
+            <h2 class="section-title" id="asistencia-dept-title">Departamento</h2>
+            <p class="section-subtitle" id="asistencia-dept-subtitle">0 colaboradores</p>
+
+            <div id="asistencia-colaboradores-container">
+              <!-- Los colaboradores del departamento se cargarán aquí -->
+            </div>
+
+            <div id="empty-asistencia-colaboradores" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 12px;">
+                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+              </svg>
+              <p style="font-size: 14px; margin: 0;">No hay colaboradores en este departamento</p>
             </div>
           </div>
 
@@ -2933,6 +2959,135 @@
       document.addEventListener('DOMContentLoaded', initColaboradoresLista);
     } else {
       initColaboradoresLista();
+    }
+
+    // ===================================
+    // Pasar Asistencia
+    // ===================================
+
+    function initPasarAsistencia() {
+      const linkPasarAsistencia = document.getElementById('link-pasar-asistencia');
+      const asistenciaMain = document.getElementById('asistencia-main');
+      const asistenciaPasarLista = document.getElementById('asistencia-pasar-lista');
+      const asistenciaPasarDepartamento = document.getElementById('asistencia-pasar-departamento');
+
+      if (linkPasarAsistencia) {
+        linkPasarAsistencia.addEventListener('click', (e) => {
+          e.preventDefault();
+          asistenciaMain.style.display = 'none';
+          asistenciaPasarLista.style.display = 'block';
+          asistenciaPasarDepartamento.style.display = 'none';
+          cargarDepartamentosAsistencia();
+        });
+      }
+
+      // Función global para volver al grid desde pasar asistencia
+      window.volverAGridDesdePasarAsistencia = function() {
+        asistenciaMain.style.display = 'grid';
+        asistenciaPasarLista.style.display = 'none';
+        asistenciaPasarDepartamento.style.display = 'none';
+      }
+
+      // Función global para volver a lista de departamentos desde asistencia departamento
+      window.volverAListaDepartamentosAsistencia = function() {
+        asistenciaPasarLista.style.display = 'block';
+        asistenciaPasarDepartamento.style.display = 'none';
+      }
+
+      // Función global para ver departamento de asistencia
+      window.verDepartamentoAsistencia = function(nombreDepartamento) {
+        asistenciaPasarLista.style.display = 'none';
+        asistenciaPasarDepartamento.style.display = 'block';
+        cargarColaboradoresAsistencia(nombreDepartamento);
+      }
+    }
+
+    function cargarDepartamentosAsistencia() {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const departamentosContainer = document.getElementById('asistencia-departamentos-container');
+
+      // Contar colaboradores activos por departamento
+      const contadores = {};
+      colaboradores.filter(c => (c.estatus || 'Activo') === 'Activo').forEach(colab => {
+        const dept = colab.departamento || 'Sin Departamento';
+        contadores[dept] = (contadores[dept] || 0) + 1;
+      });
+
+      // Renderizar TODOS los departamentos
+      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+        const count = contadores[dept] || 0;
+        const badgeClass = count === 0 ? 'zero' : '';
+        const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];
+
+        return `
+          <div class="dept-module-card" onclick="verDepartamentoAsistencia('${dept}')">
+            <span class="dept-module-badge ${badgeClass}">${count}</span>
+            <div class="dept-module-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                ${icon}
+              </svg>
+            </div>
+            <h3 class="dept-module-name">${dept}</h3>
+            <p class="dept-module-count">${count} activo${count !== 1 ? 's' : ''}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function cargarColaboradoresAsistencia(nombreDepartamento) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colaboradoresDept = colaboradores.filter(c =>
+        c.departamento === nombreDepartamento && (c.estatus || 'Activo') === 'Activo'
+      );
+
+      // Actualizar título
+      document.getElementById('asistencia-dept-title').textContent = nombreDepartamento;
+      document.getElementById('asistencia-dept-subtitle').textContent =
+        `${colaboradoresDept.length} colaborador${colaboradoresDept.length !== 1 ? 'es' : ''} activo${colaboradoresDept.length !== 1 ? 's' : ''}`;
+
+      const container = document.getElementById('asistencia-colaboradores-container');
+      const emptyMessage = document.getElementById('empty-asistencia-colaboradores');
+
+      if (colaboradoresDept.length === 0) {
+        container.innerHTML = '';
+        emptyMessage.style.display = 'block';
+        return;
+      }
+
+      emptyMessage.style.display = 'none';
+
+      // Renderizar colaboradores compactos (igual que en lista de colaboradores)
+      container.innerHTML = `
+        <div class="colab-list">
+          ${colaboradoresDept.map(colab => {
+            const initials = colab.nombres && colab.apellidos
+              ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+              : '??';
+
+            const photoHTML = colab.foto
+              ? `<img src="${colab.foto}" alt="${colab.nombres}">`
+              : initials;
+
+            return `
+              <div class="colab-card-compact">
+                <div class="colab-photo-small">${photoHTML}</div>
+                <div class="colab-info-compact">
+                  <h4>${colab.nombres} ${colab.apellidos}</h4>
+                  <p>${colab.puesto || 'Sin puesto'} • ${colab.numeroEmpleado || 'N/A'}</p>
+                </div>
+                <div class="colab-status-compact activo" title="Activo"></div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // Inicializar módulo de pasar asistencia
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPasarAsistencia);
+    } else {
+      initPasarAsistencia();
     }
   </script>
 </body>

@@ -193,6 +193,8 @@ function safeGoBack() {
     const asistenciaListaView = document.getElementById('asistencia-colaboradores-lista');
     const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
     const colaboradorDetalleView = document.getElementById('asistencia-colaborador-detalle');
+    const asistenciaPasarLista = document.getElementById('asistencia-pasar-lista');
+    const asistenciaPasarDepartamento = document.getElementById('asistencia-pasar-departamento');
 
     // Si el formulario de agregar colaborador está visible, volver al grid
     if (asistenciaColabView && asistenciaColabView.style.display === 'block') {
@@ -218,10 +220,26 @@ function safeGoBack() {
       }
     }
 
-    // Si la lista de departamentos está visible, volver al grid
+    // Si la lista de departamentos (colaboradores) está visible, volver al grid
     if (asistenciaListaView && asistenciaListaView.style.display === 'block') {
       if (typeof window.volverAGridDesdeColaboradores === 'function') {
         window.volverAGridDesdeColaboradores();
+        return;
+      }
+    }
+
+    // Si los colaboradores de pasar asistencia están visibles, volver a lista de departamentos
+    if (asistenciaPasarDepartamento && asistenciaPasarDepartamento.style.display === 'block') {
+      if (typeof window.volverAListaDepartamentosAsistencia === 'function') {
+        window.volverAListaDepartamentosAsistencia();
+        return;
+      }
+    }
+
+    // Si la lista de departamentos de pasar asistencia está visible, volver al grid
+    if (asistenciaPasarLista && asistenciaPasarLista.style.display === 'block') {
+      if (typeof window.volverAGridDesdePasarAsistencia === 'function') {
+        window.volverAGridDesdePasarAsistencia();
         return;
       }
     }
