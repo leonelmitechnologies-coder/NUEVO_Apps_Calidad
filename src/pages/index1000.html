@@ -241,6 +241,41 @@
       background: #e0e0e0;
     }
 
+    .btn-back-asistencia {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+
+    .btn-back-asistencia:hover {
+      background: #f5f5f5;
+      border-color: #1E7CBA;
+      color: #1E7CBA;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 8px 0;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: #666;
+      margin: 0 0 32px 0;
+    }
+
     .users-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1040,8 +1075,8 @@
           <h1 class="dashboard-title">Asistencia</h1>
           <p class="dashboard-subtitle">Selecciona un módulo para comenzar</p>
 
-          <!-- Módulos Grid Asistencia -->
-          <div class="modules-grid">
+          <!-- Vista Principal: Grid de Módulos -->
+          <div id="asistencia-main" class="modules-grid">
             <!-- Pasar Asistencia -->
             <div class="module-card module-disabled">
               <div class="module-icon">
@@ -1056,7 +1091,7 @@
             </div>
 
             <!-- Agregar Colaborador -->
-            <div class="module-card module-disabled">
+            <a href="#" id="link-agregar-colaborador" class="module-card">
               <div class="module-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
@@ -1064,8 +1099,7 @@
               </div>
               <h3 class="module-title">Agregar Colaborador</h3>
               <p class="module-description">Alta de nuevo personal</p>
-              <span class="module-badge">Pronto</span>
-            </div>
+            </a>
 
             <!-- Historial -->
             <div class="module-card module-disabled">
@@ -1128,6 +1162,122 @@
               <p class="module-description">Control de horas extras</p>
               <span class="module-badge">Pronto</span>
             </div>
+          </div>
+
+          <!-- Vista: Agregar Colaborador -->
+          <div id="asistencia-colaborador" style="display: none;">
+            <button class="btn-back-asistencia" id="btnBackAsistencia">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+              </svg>
+              Volver
+            </button>
+
+            <h2 class="section-title">Agregar Colaborador</h2>
+            <p class="section-subtitle">Alta de nuevo personal</p>
+
+            <form class="user-form" id="colaboradorForm">
+              <!-- Foto de Perfil -->
+              <div class="form-group">
+                <label>Fotografía del Colaborador *</label>
+                <div class="photo-upload">
+                  <div class="photo-preview" id="photoPreviewColab">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                      <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                    </svg>
+                  </div>
+                  <div class="photo-actions">
+                    <input type="file" id="photoInputColab" accept="image/*" style="display: none">
+                    <button type="button" class="btn-photo" id="btnGalleryColab">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
+                      </svg>
+                      Galería
+                    </button>
+                    <button type="button" class="btn-photo" id="btnCameraColab">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1v6zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2z"/>
+                        <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+                      </svg>
+                      Cámara
+                    </button>
+                    <button type="button" class="btn-photo btn-photo-remove" id="btnRemovePhotoColab" style="display: none">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="nombresColab">Nombres *</label>
+                  <input type="text" id="nombresColab" required>
+                </div>
+                <div class="form-group">
+                  <label for="apellidosColab">Apellidos *</label>
+                  <input type="text" id="apellidosColab" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="departamentoColab">Departamento *</label>
+                  <select id="departamentoColab" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="Calidad">Calidad</option>
+                    <option value="Producción">Producción</option>
+                    <option value="Administración">Administración</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                    <option value="Logística">Logística</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="puestoColab">Puesto *</label>
+                  <input type="text" id="puestoColab" required placeholder="ej. Operador, Supervisor, etc.">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="turnoColab">Turno *</label>
+                  <select id="turnoColab" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="Turno 1">Turno 1</option>
+                    <option value="Turno 2">Turno 2</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="numeroEmpleadoColab">Número de Empleado *</label>
+                  <input type="text" id="numeroEmpleadoColab" required placeholder="ej. EMP-001">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="fechaIngresoColab">Fecha de Ingreso *</label>
+                  <input type="date" id="fechaIngresoColab" required>
+                </div>
+                <div class="form-group">
+                  <label for="estatusColab">Estatus</label>
+                  <select id="estatusColab">
+                    <option value="Activo" selected>Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                    <option value="Suspendido">Suspendido</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">Registrar Colaborador</button>
+                <button type="button" class="btn-secondary" id="btnCancelColab">Cancelar</button>
+              </div>
+            </form>
           </div>
 
         </div>
@@ -1359,6 +1509,9 @@
 
       // Usuarios Module - Initialize
       initUsuariosModule();
+
+      // Colaborador Module - Initialize
+      initColaboradorModule();
     });
 
     // ============================================
@@ -1827,6 +1980,126 @@
       // Reload users list
       loadUsers();
     };
+
+    // ============================================
+    // MÓDULO DE COLABORADOR
+    // ============================================
+
+    function initColaboradorModule() {
+      const linkAgregarColab = document.getElementById('link-agregar-colaborador');
+      const asistenciaMain = document.getElementById('asistencia-main');
+      const asistenciaColabView = document.getElementById('asistencia-colaborador');
+      const btnBackAsistencia = document.getElementById('btnBackAsistencia');
+      const btnCancelColab = document.getElementById('btnCancelColab');
+      const colaboradorForm = document.getElementById('colaboradorForm');
+
+      // Navegar a formulario de colaborador
+      if (linkAgregarColab) {
+        linkAgregarColab.addEventListener('click', (e) => {
+          e.preventDefault();
+          asistenciaMain.style.display = 'none';
+          asistenciaColabView.style.display = 'block';
+        });
+      }
+
+      // Volver al grid de asistencia
+      function volverAGrid() {
+        asistenciaMain.style.display = 'grid';
+        asistenciaColabView.style.display = 'none';
+        colaboradorForm.reset();
+        currentPhotoColab = null;
+        updatePhotoPreviewColab(null);
+      }
+
+      if (btnBackAsistencia) {
+        btnBackAsistencia.addEventListener('click', volverAGrid);
+      }
+
+      if (btnCancelColab) {
+        btnCancelColab.addEventListener('click', volverAGrid);
+      }
+
+      // Manejo de fotos
+      let currentPhotoColab = null;
+      const photoInputColab = document.getElementById('photoInputColab');
+      const photoPreviewColab = document.getElementById('photoPreviewColab');
+      const btnGalleryColab = document.getElementById('btnGalleryColab');
+      const btnCameraColab = document.getElementById('btnCameraColab');
+      const btnRemovePhotoColab = document.getElementById('btnRemovePhotoColab');
+
+      btnGalleryColab.addEventListener('click', () => {
+        photoInputColab.removeAttribute('capture');
+        photoInputColab.click();
+      });
+
+      btnCameraColab.addEventListener('click', () => {
+        photoInputColab.setAttribute('capture', 'environment');
+        photoInputColab.click();
+      });
+
+      photoInputColab.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            currentPhotoColab = event.target.result;
+            updatePhotoPreviewColab(currentPhotoColab);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      btnRemovePhotoColab.addEventListener('click', () => {
+        currentPhotoColab = null;
+        photoInputColab.value = '';
+        updatePhotoPreviewColab(null);
+      });
+
+      function updatePhotoPreviewColab(photoData) {
+        if (photoData) {
+          photoPreviewColab.innerHTML = `<img src="${photoData}" alt="Preview">`;
+          btnRemovePhotoColab.style.display = 'flex';
+        } else {
+          photoPreviewColab.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+              <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+            </svg>
+          `;
+          btnRemovePhotoColab.style.display = 'none';
+        }
+      }
+
+      // Submit del formulario
+      colaboradorForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const colaborador = {
+          id: Date.now(),
+          foto: currentPhotoColab,
+          nombres: document.getElementById('nombresColab').value,
+          apellidos: document.getElementById('apellidosColab').value,
+          departamento: document.getElementById('departamentoColab').value,
+          puesto: document.getElementById('puestoColab').value,
+          turno: document.getElementById('turnoColab').value,
+          numeroEmpleado: document.getElementById('numeroEmpleadoColab').value,
+          fechaIngreso: document.getElementById('fechaIngresoColab').value,
+          estatus: document.getElementById('estatusColab').value,
+          fechaRegistro: new Date().toISOString()
+        };
+
+        // Guardar en localStorage
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+        colaboradores.push(colaborador);
+        localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+
+        // Mostrar notificación
+        showToast(`Colaborador ${colaborador.nombres} ${colaborador.apellidos} registrado exitosamente`, 'success');
+
+        // Volver al grid
+        volverAGrid();
+      });
+    }
   </script>
 </body>
 </html>
