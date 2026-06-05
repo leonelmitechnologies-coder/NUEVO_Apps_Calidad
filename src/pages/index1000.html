@@ -2006,10 +2006,10 @@
 
         modalTitle.textContent = title;
         modalMessage.textContent = message;
-        modal.classList.add('active');
+        modal.style.display = 'flex';
 
         function closeModal(result) {
-          modal.classList.remove('active');
+          modal.style.display = 'none';
           confirmBtn.removeEventListener('click', onConfirm);
           cancelBtn.removeEventListener('click', onCancel);
           modal.removeEventListener('click', onOverlayClick);
