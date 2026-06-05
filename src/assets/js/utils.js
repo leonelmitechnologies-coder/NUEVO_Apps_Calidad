@@ -192,11 +192,20 @@ function safeGoBack() {
     const asistenciaColabView = document.getElementById('asistencia-colaborador');
     const asistenciaListaView = document.getElementById('asistencia-colaboradores-lista');
     const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
+    const colaboradorDetalleView = document.getElementById('asistencia-colaborador-detalle');
 
     // Si el formulario de agregar colaborador está visible, volver al grid
     if (asistenciaColabView && asistenciaColabView.style.display === 'block') {
       if (typeof window.volverAGrid === 'function') {
         window.volverAGrid();
+        return;
+      }
+    }
+
+    // Si el detalle de colaborador está visible, volver a detalle de departamento
+    if (colaboradorDetalleView && colaboradorDetalleView.style.display === 'block') {
+      if (typeof window.volverADepartamento === 'function') {
+        window.volverADepartamento();
         return;
       }
     }

@@ -625,6 +625,151 @@
       }
     }
 
+    /* Detalle de Colaborador */
+    .colab-detalle-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .colab-detalle-header {
+      background: linear-gradient(135deg, #1E7CBA, #2C9FD9);
+      padding: 32px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: white;
+    }
+
+    .colab-detalle-photo {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 32px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 4px solid rgba(255,255,255,0.3);
+    }
+
+    .colab-detalle-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .colab-detalle-info h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .colab-detalle-info p {
+      margin: 4px 0 12px;
+      font-size: 16px;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .colab-detalle-info .colab-status {
+      background: white;
+      color: #1E7CBA;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .colab-detalle-info .colab-status.activo {
+      background: #4caf50;
+      color: white;
+    }
+
+    .colab-detalle-info .colab-status.inactivo {
+      background: #f44336;
+      color: white;
+    }
+
+    .colab-detalle-body {
+      padding: 24px;
+    }
+
+    .detalle-section {
+      margin-bottom: 24px;
+    }
+
+    .detalle-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .detalle-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin: 0 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .detalle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .detalle-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detalle-label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .detalle-value {
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .colab-detalle-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 16px;
+      }
+
+      .colab-detalle-photo {
+        width: 80px;
+        height: 80px;
+        font-size: 28px;
+      }
+
+      .colab-detalle-info h2 {
+        font-size: 20px;
+      }
+
+      .colab-detalle-body {
+        padding: 16px;
+      }
+
+      .detalle-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -1488,6 +1633,46 @@
                 <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
               </svg>
               <p style="font-size: 14px; margin: 0;">No hay colaboradores en este departamento</p>
+            </div>
+          </div>
+
+          <!-- Vista: Detalle de Colaborador -->
+          <div id="asistencia-colaborador-detalle" style="display: none;">
+            <div class="colab-detalle-card">
+              <div class="colab-detalle-header">
+                <div class="colab-detalle-photo" id="colab-detalle-photo">
+                  <!-- Foto se cargará aquí -->
+                </div>
+                <div class="colab-detalle-info">
+                  <h2 id="colab-detalle-nombre">Nombre Colaborador</h2>
+                  <p id="colab-detalle-puesto">Puesto</p>
+                  <span class="colab-status" id="colab-detalle-estatus">Activo</span>
+                </div>
+              </div>
+
+              <div class="colab-detalle-body">
+                <div class="detalle-section">
+                  <h3 class="detalle-section-title">Información General</h3>
+                  <div class="detalle-grid">
+                    <div class="detalle-item">
+                      <span class="detalle-label">Departamento</span>
+                      <span class="detalle-value" id="colab-detalle-departamento">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Número de Empleado</span>
+                      <span class="detalle-value" id="colab-detalle-numero">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Turno</span>
+                      <span class="detalle-value" id="colab-detalle-turno">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Fecha de Ingreso</span>
+                      <span class="detalle-value" id="colab-detalle-fecha">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2571,6 +2756,7 @@
       const asistenciaMain = document.getElementById('asistencia-main');
       const colaboradoresListaView = document.getElementById('asistencia-colaboradores-lista');
       const departamentoDetalleView = document.getElementById('asistencia-departamento-detalle');
+      const colaboradorDetalleView = document.getElementById('asistencia-colaborador-detalle');
 
       if (linkColabLista) {
         linkColabLista.addEventListener('click', (e) => {
@@ -2578,6 +2764,7 @@
           asistenciaMain.style.display = 'none';
           colaboradoresListaView.style.display = 'block';
           departamentoDetalleView.style.display = 'none';
+          colaboradorDetalleView.style.display = 'none';
           cargarDepartamentos();
         });
       }
@@ -2587,19 +2774,35 @@
         asistenciaMain.style.display = 'grid';
         colaboradoresListaView.style.display = 'none';
         departamentoDetalleView.style.display = 'none';
+        colaboradorDetalleView.style.display = 'none';
       }
 
-      // Función global para volver a lista de departamentos desde detalle
+      // Función global para volver a lista de departamentos desde detalle de departamento
       window.volverAListaDepartamentos = function() {
         colaboradoresListaView.style.display = 'block';
         departamentoDetalleView.style.display = 'none';
+        colaboradorDetalleView.style.display = 'none';
+      }
+
+      // Función global para volver a detalle de departamento desde detalle de colaborador
+      window.volverADepartamento = function() {
+        departamentoDetalleView.style.display = 'block';
+        colaboradorDetalleView.style.display = 'none';
       }
 
       // Función global para ver detalle de departamento
       window.verDepartamentoDetalle = function(nombreDepartamento) {
         colaboradoresListaView.style.display = 'none';
         departamentoDetalleView.style.display = 'block';
+        colaboradorDetalleView.style.display = 'none';
         cargarColaboradoresDepartamento(nombreDepartamento);
+      }
+
+      // Función global para ver detalle de colaborador
+      window.verColaboradorDetalle = function(colaboradorId) {
+        departamentoDetalleView.style.display = 'none';
+        colaboradorDetalleView.style.display = 'block';
+        cargarDetalleColaborador(colaboradorId);
       }
     }
 
@@ -2670,7 +2873,7 @@
             const estatusClass = (colab.estatus || 'Activo').toLowerCase();
 
             return `
-              <div class="colab-card-compact">
+              <div class="colab-card-compact" onclick="verColaboradorDetalle(${colab.id})" style="cursor: pointer;">
                 <div class="colab-photo-small">${photoHTML}</div>
                 <div class="colab-info-compact">
                   <h4>${colab.nombres} ${colab.apellidos}</h4>
@@ -2682,6 +2885,47 @@
           }).join('')}
         </div>
       `;
+    }
+
+    function cargarDetalleColaborador(colaboradorId) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colab = colaboradores.find(c => c.id === colaboradorId);
+
+      if (!colab) {
+        showToast('Colaborador no encontrado', 'error');
+        return;
+      }
+
+      // Actualizar foto
+      const photoContainer = document.getElementById('colab-detalle-photo');
+      const initials = colab.nombres && colab.apellidos
+        ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+        : '??';
+
+      if (colab.foto) {
+        photoContainer.innerHTML = `<img src="${colab.foto}" alt="${colab.nombres}">`;
+      } else {
+        photoContainer.textContent = initials;
+      }
+
+      // Actualizar información básica
+      document.getElementById('colab-detalle-nombre').textContent = `${colab.nombres} ${colab.apellidos}`;
+      document.getElementById('colab-detalle-puesto').textContent = colab.puesto || 'Sin puesto';
+
+      const estatusElement = document.getElementById('colab-detalle-estatus');
+      const estatus = colab.estatus || 'Activo';
+      estatusElement.textContent = estatus;
+      estatusElement.className = `colab-status ${estatus.toLowerCase()}`;
+
+      // Actualizar detalles
+      document.getElementById('colab-detalle-departamento').textContent = colab.departamento || '-';
+      document.getElementById('colab-detalle-numero').textContent = colab.numeroEmpleado || '-';
+      document.getElementById('colab-detalle-turno').textContent = colab.turno || '-';
+
+      const fechaIngreso = colab.fechaIngreso
+        ? new Date(colab.fechaIngreso).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+        : '-';
+      document.getElementById('colab-detalle-fecha').textContent = fechaIngreso;
     }
 
     // Inicializar módulo de colaboradores lista
