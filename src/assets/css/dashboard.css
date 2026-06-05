@@ -2001,3 +2001,167 @@
     padding: 3px 8px;
   }
 }
+
+/* ============================================
+   MÓDULO DE BAJAS
+   ============================================ */
+
+/* Botón Dar de Baja */
+.colab-detalle-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.btn-dar-baja {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-dar-baja:hover {
+  background: #FEE2E2;
+  border-color: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+}
+
+.btn-dar-baja:active {
+  transform: translateY(0);
+}
+
+.btn-dar-baja svg {
+  flex-shrink: 0;
+}
+
+/* Modal de Baja */
+.modal-baja-box {
+  max-width: 480px;
+}
+
+.modal-baja-nombre {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  text-align: center;
+  color: var(--color-text);
+}
+
+/* Opciones de motivo de baja */
+.baja-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: var(--spacing-sm);
+}
+
+.baja-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.baja-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.baja-option-content {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  background: white;
+  min-height: 45px;
+  justify-content: center;
+}
+
+.baja-option:hover .baja-option-content {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-color: #FCA5A5;
+}
+
+.baja-option input[type="radio"]:checked + .baja-option-content {
+  border-width: 2px;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.08), rgba(220, 38, 38, 0.04));
+  border-color: #DC2626;
+}
+
+.baja-option-label {
+  font-size: 0.8rem;
+  color: var(--color-text);
+  line-height: 1.3;
+  font-weight: 500;
+  text-align: center;
+}
+
+.baja-option input[type="radio"]:checked + .baja-option-content .baja-option-label {
+  font-weight: 600;
+  color: #DC2626;
+}
+
+/* Estatus badge "Baja" */
+.colab-status.baja {
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+}
+
+/* Detalle item full width para comentarios */
+.detalle-item-full {
+  grid-column: 1 / -1;
+}
+
+.detalle-item-full .detalle-value {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .colab-detalle-footer {
+    padding: 12px 16px;
+  }
+
+  .btn-dar-baja {
+    padding: 10px;
+    font-size: 0.8rem;
+  }
+
+  .modal-baja-box {
+    max-width: 95%;
+  }
+
+  .modal-baja-nombre {
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+  }
+
+  .baja-options {
+    gap: 6px;
+  }
+
+  .baja-option-content {
+    padding: 8px 10px;
+    min-height: 40px;
+  }
+
+  .baja-option-label {
+    font-size: 0.75rem;
+  }
+}

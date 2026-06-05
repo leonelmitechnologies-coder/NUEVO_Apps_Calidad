@@ -1452,7 +1452,7 @@
             </a>
 
             <!-- Bajas -->
-            <div class="module-card module-disabled">
+            <a href="#" id="link-bajas" class="module-card">
               <div class="module-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
@@ -1460,8 +1460,7 @@
               </div>
               <h3 class="module-title">Bajas</h3>
               <p class="module-description">Personal dado de baja</p>
-              <span class="module-badge">Pronto</span>
-            </div>
+            </a>
 
             <!-- Tiempo Extra -->
             <div class="module-card module-disabled">
@@ -1652,6 +1651,15 @@
                   </div>
                 </div>
               </div>
+              <!-- Footer con botón de baja -->
+              <div class="colab-detalle-footer" id="colab-detalle-footer" style="display: none;">
+                <button class="btn-dar-baja" id="btn-dar-baja" onclick="abrirModalBaja()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                  </svg>
+                  Dar de Baja
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1822,6 +1830,86 @@
             </div>
           </div>
 
+          <!-- Vista: Bajas - Lista de Departamentos -->
+          <div id="bajas-lista" style="display: none;">
+            <h2 class="section-title">Bajas</h2>
+            <p class="section-subtitle">Selecciona un departamento para ver colaboradores dados de baja</p>
+            <div id="bajas-departamentos-container" class="modules-grid">
+              <!-- Los departamentos se cargarán aquí -->
+            </div>
+          </div>
+
+          <!-- Vista: Bajas - Colaboradores del Departamento -->
+          <div id="bajas-dept" style="display: none;">
+            <h2 class="section-title" id="bajas-dept-title">Departamento</h2>
+            <p class="section-subtitle" id="bajas-dept-subtitle">Colaboradores dados de baja</p>
+            <div id="bajas-colaboradores-lista">
+              <!-- Lista de colaboradores dados de baja -->
+            </div>
+            <div id="bajas-empty" style="display: none; text-align: center; padding: 60px 20px; color: #999;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 12px;">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+              </svg>
+              <p style="font-size: 14px; margin: 0;">No hay colaboradores dados de baja en este departamento</p>
+            </div>
+          </div>
+
+          <!-- Vista: Bajas - Detalle del Colaborador -->
+          <div id="bajas-colaborador-detalle" style="display: none;">
+            <div class="colab-detalle-card">
+              <div class="colab-detalle-header">
+                <div class="colab-detalle-photo" id="baja-detalle-photo"></div>
+                <div class="colab-detalle-info">
+                  <h2 id="baja-detalle-nombre">Nombre</h2>
+                  <p id="baja-detalle-puesto">Puesto</p>
+                  <span class="colab-status baja" id="baja-detalle-estatus">Baja</span>
+                </div>
+              </div>
+              <div class="colab-detalle-body">
+                <!-- Sección: Información General -->
+                <div class="detalle-section">
+                  <h3 class="detalle-section-title">Información General</h3>
+                  <div class="detalle-grid">
+                    <div class="detalle-item">
+                      <span class="detalle-label">Departamento</span>
+                      <span class="detalle-value" id="baja-detalle-departamento">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Número de Empleado</span>
+                      <span class="detalle-value" id="baja-detalle-numero">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Turno</span>
+                      <span class="detalle-value" id="baja-detalle-turno">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Fecha de Ingreso</span>
+                      <span class="detalle-value" id="baja-detalle-fecha-ingreso">-</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Sección: Información de Baja -->
+                <div class="detalle-section">
+                  <h3 class="detalle-section-title">Información de Baja</h3>
+                  <div class="detalle-grid">
+                    <div class="detalle-item">
+                      <span class="detalle-label">Motivo de Baja</span>
+                      <span class="detalle-value" id="baja-detalle-motivo">-</span>
+                    </div>
+                    <div class="detalle-item">
+                      <span class="detalle-label">Fecha de Baja</span>
+                      <span class="detalle-value" id="baja-detalle-fecha-baja">-</span>
+                    </div>
+                    <div class="detalle-item detalle-item-full">
+                      <span class="detalle-label">Comentarios</span>
+                      <span class="detalle-value" id="baja-detalle-comentarios">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
@@ -1934,6 +2022,81 @@
             </div>
           </form>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal de Baja -->
+    <div id="modal-baja" class="modal-overlay" style="display: none;">
+      <div class="modal-container modal-baja-box">
+        <div class="modal-header">
+          <h3 class="modal-title">Dar de Baja Colaborador</h3>
+          <button class="modal-close" onclick="cerrarModalBaja()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+            </svg>
+          </button>
+        </div>
+        <form id="form-baja" onsubmit="confirmarBaja(event)">
+          <div class="modal-body">
+            <p id="modal-baja-nombre" class="modal-baja-nombre"></p>
+
+            <div class="form-group">
+              <label>Motivo de Baja *</label>
+              <div class="baja-options">
+                <label class="baja-option">
+                  <input type="radio" name="motivo-baja" value="Renuncia Voluntaria" required>
+                  <div class="baja-option-content" data-tipo="renuncia">
+                    <span class="baja-option-label">Renuncia Voluntaria</span>
+                  </div>
+                </label>
+
+                <label class="baja-option">
+                  <input type="radio" name="motivo-baja" value="Despido Justificado" required>
+                  <div class="baja-option-content" data-tipo="despido">
+                    <span class="baja-option-label">Despido Justificado</span>
+                  </div>
+                </label>
+
+                <label class="baja-option">
+                  <input type="radio" name="motivo-baja" value="Abandono de Trabajo" required>
+                  <div class="baja-option-content" data-tipo="abandono">
+                    <span class="baja-option-label">Abandono de Trabajo</span>
+                  </div>
+                </label>
+
+                <label class="baja-option">
+                  <input type="radio" name="motivo-baja" value="Terminación de Contrato" required>
+                  <div class="baja-option-content" data-tipo="terminacion">
+                    <span class="baja-option-label">Terminación de Contrato</span>
+                  </div>
+                </label>
+
+                <label class="baja-option">
+                  <input type="radio" name="motivo-baja" value="Jubilación" required>
+                  <div class="baja-option-content" data-tipo="jubilacion">
+                    <span class="baja-option-label">Jubilación</span>
+                  </div>
+                </label>
+
+                <label class="baja-option">
+                  <input type="radio" name="motivo-baja" value="Otro" required>
+                  <div class="baja-option-content" data-tipo="otro">
+                    <span class="baja-option-label">Otro</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="comentarios-baja">Comentarios (opcional)</label>
+              <textarea id="comentarios-baja" rows="3" placeholder="Agregar comentarios..." style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-base); font-size: 0.85rem; resize: vertical;"></textarea>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" onclick="cerrarModalBaja()">Cancelar</button>
+            <button type="submit" class="btn-danger">Confirmar Baja</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -3110,6 +3273,9 @@
       const inasistenciaListaView = document.getElementById('inasistencia-lista');
       const inasistenciaDeptView = document.getElementById('inasistencia-dept');
       const inasistenciaColabView = document.getElementById('inasistencia-colaborador');
+      const bajasListaView = document.getElementById('bajas-lista');
+      const bajasDeptView = document.getElementById('bajas-dept');
+      const bajasDetalleView = document.getElementById('bajas-colaborador-detalle');
 
       // Ocultar todas las vistas de asistencia
       const allViews = [
@@ -3125,7 +3291,10 @@
         historialDiaView,
         inasistenciaListaView,
         inasistenciaDeptView,
-        inasistenciaColabView
+        inasistenciaColabView,
+        bajasListaView,
+        bajasDeptView,
+        bajasDetalleView
       ];
 
       allViews.forEach(view => {
@@ -3203,6 +3372,13 @@
           }
           break;
 
+        case 'bajas-lista':
+          if (bajasListaView) {
+            bajasListaView.style.display = 'block';
+            cargarDepartamentosBajas();
+          }
+          break;
+
         default:
           // Para locations dinámicos (departamento específico, colaborador específico, etc.)
           if (location.startsWith('colaboradores-dept:')) {
@@ -3250,6 +3426,18 @@
             if (inasistenciaColabView) {
               inasistenciaColabView.style.display = 'block';
               cargarHistorialColaborador(colaboradorId);
+            }
+          } else if (location.startsWith('bajas-dept:')) {
+            const dept = location.replace('bajas-dept:', '');
+            if (bajasDeptView) {
+              bajasDeptView.style.display = 'block';
+              cargarColaboradoresBaja(dept);
+            }
+          } else if (location.startsWith('baja-detalle:')) {
+            const id = parseInt(location.replace('baja-detalle:', ''));
+            if (bajasDetalleView) {
+              bajasDetalleView.style.display = 'block';
+              cargarDetalleBaja(id);
             }
           }
           break;
@@ -3438,6 +3626,16 @@
         ? new Date(colab.fechaIngreso).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
         : '-';
       document.getElementById('colab-detalle-fecha').textContent = fechaIngreso;
+
+      // Mostrar/ocultar botón de baja según el estatus
+      const footerBaja = document.getElementById('colab-detalle-footer');
+      if (footerBaja) {
+        if (estatus === 'Activo') {
+          footerBaja.style.display = 'block';
+        } else {
+          footerBaja.style.display = 'none';
+        }
+      }
     }
 
     // Inicializar módulo de colaboradores lista
@@ -4412,6 +4610,279 @@
       document.addEventListener('DOMContentLoaded', initHistorialAsistencia);
     } else {
       initHistorialAsistencia();
+    }
+
+    // ===================================
+    // Módulo de Bajas
+    // ===================================
+
+    function initBajas() {
+      const linkBajas = document.getElementById('link-bajas');
+
+      if (linkBajas) {
+        linkBajas.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigateToLocation('bajas-lista');
+        });
+      }
+
+      // Funciones globales para navegación
+      window.verBajasDepartamento = function(nombreDepartamento) {
+        navigateToLocation('bajas-dept:' + nombreDepartamento);
+      }
+
+      window.verDetalleBaja = function(colaboradorId) {
+        navigateToLocation('baja-detalle:' + colaboradorId);
+      }
+    }
+
+    /**
+     * Abrir modal de baja
+     */
+    window.abrirModalBaja = function() {
+      const colaboradorId = window.currentColaboradorDetalleId;
+      if (!colaboradorId) {
+        showToast('No se pudo obtener el ID del colaborador', 'error');
+        return;
+      }
+
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colab = colaboradores.find(c => c.id === colaboradorId);
+
+      if (!colab) {
+        showToast('Colaborador no encontrado', 'error');
+        return;
+      }
+
+      // Mostrar nombre en el modal
+      const modalNombre = document.getElementById('modal-baja-nombre');
+      if (modalNombre) {
+        modalNombre.textContent = `¿Está seguro de dar de baja a ${colab.nombres} ${colab.apellidos}?`;
+      }
+
+      // Mostrar modal
+      const modal = document.getElementById('modal-baja');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+
+    /**
+     * Cerrar modal de baja
+     */
+    window.cerrarModalBaja = function() {
+      const modal = document.getElementById('modal-baja');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+
+      // Resetear formulario
+      const form = document.getElementById('form-baja');
+      if (form) {
+        form.reset();
+      }
+    }
+
+    /**
+     * Confirmar baja
+     */
+    window.confirmarBaja = function(event) {
+      event.preventDefault();
+
+      const colaboradorId = window.currentColaboradorDetalleId;
+      if (!colaboradorId) {
+        showToast('No se pudo obtener el ID del colaborador', 'error');
+        return;
+      }
+
+      const motivoRadio = document.querySelector('input[name="motivo-baja"]:checked');
+      const motivo = motivoRadio ? motivoRadio.value : '';
+      const comentarios = document.getElementById('comentarios-baja').value;
+
+      if (!motivo) {
+        showToast('Debe seleccionar un motivo de baja', 'error');
+        return;
+      }
+
+      // Actualizar colaborador en localStorage
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const index = colaboradores.findIndex(c => c.id === colaboradorId);
+
+      if (index === -1) {
+        showToast('Colaborador no encontrado', 'error');
+        return;
+      }
+
+      const colab = colaboradores[index];
+      colab.estatus = 'Baja';
+      colab.motivoBaja = motivo;
+      colab.comentariosBaja = comentarios || '';
+      colab.fechaBaja = new Date().toISOString();
+
+      colaboradores[index] = colab;
+      localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+
+      // Cerrar modal
+      cerrarModalBaja();
+
+      // Mostrar toast de confirmación
+      showToast(`${colab.nombres} ${colab.apellidos} ha sido dado de baja`, 'success');
+
+      // Navegar de vuelta a la lista del departamento
+      setTimeout(() => {
+        navigateToLocation('colaboradores-dept:' + colab.departamento);
+      }, 500);
+    }
+
+    /**
+     * Cargar departamentos con colaboradores dados de baja
+     */
+    function cargarDepartamentosBajas() {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const departamentosContainer = document.getElementById('bajas-departamentos-container');
+
+      // Contar colaboradores con estatus Baja por departamento
+      const contadores = {};
+      colaboradores.filter(c => c.estatus === 'Baja').forEach(colab => {
+        const dept = colab.departamento || 'Sin Departamento';
+        contadores[dept] = (contadores[dept] || 0) + 1;
+      });
+
+      const DEPARTAMENTOS = ['ADMINISTRACION', 'Almacen', 'Auditoria', 'B2B (Shipping)', 'B2C (Shipping)', 'Calidad', 'COMPRAS', 'DESARROLLO DE SOFTWARE', 'DISEÑO', 'ENFERMERIA', 'FFT', 'Finance', 'HR', 'IMPORT EXPORT', 'Incoming', 'LOGISTICA', 'Maintenance', 'MARKETING', 'OPERACIONES', 'Open Cell', 'PATIO', 'RMA', 'SEGURIDAD E HIGIENE', 'SEGURIDAD PATRIMONIAL', 'SHIPPING', 'SISTEMAS', 'Ventas', 'WAREHOUSE'];
+
+      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+        const count = contadores[dept] || 0;
+        const badgeClass = count === 0 ? 'zero' : '';
+
+        return `
+          <div class="module-card" onclick="verBajasDepartamento('${dept}')" style="cursor: pointer; position: relative;">
+            <div class="module-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                ${ICONS_DEPARTAMENTOS[dept] || '<path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>'}
+              </svg>
+            </div>
+            <h3 class="module-title">${dept}</h3>
+            <p class="module-description">${count} ${count === 1 ? 'baja' : 'bajas'}</p>
+            <span class="dept-count-badge ${badgeClass}">${count}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Cargar colaboradores dados de baja de un departamento
+     */
+    function cargarColaboradoresBaja(dept) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const bajasList = document.getElementById('bajas-colaboradores-lista');
+      const bajasEmpty = document.getElementById('bajas-empty');
+
+      // Filtrar colaboradores con estatus Baja del departamento
+      const colaboradoresBaja = colaboradores.filter(c => c.estatus === 'Baja' && c.departamento === dept);
+
+      // Ordenar por fecha de baja (más reciente primero)
+      colaboradoresBaja.sort((a, b) => {
+        const fechaA = a.fechaBaja ? new Date(a.fechaBaja) : new Date(0);
+        const fechaB = b.fechaBaja ? new Date(b.fechaBaja) : new Date(0);
+        return fechaB - fechaA;
+      });
+
+      // Actualizar título
+      document.getElementById('bajas-dept-title').textContent = dept;
+      document.getElementById('bajas-dept-subtitle').textContent = `${colaboradoresBaja.length} ${colaboradoresBaja.length === 1 ? 'colaborador dado de baja' : 'colaboradores dados de baja'}`;
+
+      if (colaboradoresBaja.length === 0) {
+        bajasList.style.display = 'none';
+        bajasEmpty.style.display = 'block';
+        return;
+      }
+
+      bajasList.style.display = 'block';
+      bajasEmpty.style.display = 'none';
+
+      // Generar HTML de colaboradores
+      bajasList.innerHTML = colaboradoresBaja.map(colab => {
+        const fechaBaja = colab.fechaBaja
+          ? new Date(colab.fechaBaja).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' })
+          : 'Fecha desconocida';
+
+        return `
+          <div class="colab-inasistencia-card" onclick="verDetalleBaja(${colab.id})">
+            <div>
+              <div class="colab-nombre">${colab.nombres} ${colab.apellidos}</div>
+              <div style="font-size: 0.75rem; color: #666; margin-top: 2px;">
+                ${colab.puesto || 'Sin puesto'} • ${colab.motivoBaja || 'Sin motivo'}
+              </div>
+              <div style="font-size: 0.7rem; color: #999; margin-top: 4px;">
+                Fecha de baja: ${fechaBaja}
+              </div>
+            </div>
+            <div class="inasistencia-badge badge-danger">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+              </svg>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Cargar detalle de un colaborador dado de baja
+     */
+    function cargarDetalleBaja(colaboradorId) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colab = colaboradores.find(c => c.id === colaboradorId);
+
+      if (!colab) {
+        showToast('Colaborador no encontrado', 'error');
+        return;
+      }
+
+      // Actualizar foto
+      const photoContainer = document.getElementById('baja-detalle-photo');
+      const initials = colab.nombres && colab.apellidos
+        ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+        : '??';
+
+      const nombreCompleto = `${colab.nombres} ${colab.apellidos}`;
+      if (colab.foto) {
+        photoContainer.innerHTML = `<img src="${colab.foto}" alt="${colab.nombres}" onclick="abrirModalFoto('${colab.foto}', '${nombreCompleto}')" style="cursor: pointer;">`;
+      } else {
+        photoContainer.textContent = initials;
+      }
+
+      // Actualizar información básica
+      document.getElementById('baja-detalle-nombre').textContent = `${colab.nombres} ${colab.apellidos}`;
+      document.getElementById('baja-detalle-puesto').textContent = colab.puesto || 'Sin puesto';
+      document.getElementById('baja-detalle-estatus').textContent = 'Baja';
+
+      // Actualizar información general
+      document.getElementById('baja-detalle-departamento').textContent = colab.departamento || '-';
+      document.getElementById('baja-detalle-numero').textContent = colab.numeroEmpleado || '-';
+      document.getElementById('baja-detalle-turno').textContent = colab.turno || '-';
+
+      const fechaIngreso = colab.fechaIngreso
+        ? new Date(colab.fechaIngreso).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+        : '-';
+      document.getElementById('baja-detalle-fecha-ingreso').textContent = fechaIngreso;
+
+      // Actualizar información de baja
+      document.getElementById('baja-detalle-motivo').textContent = colab.motivoBaja || '-';
+
+      const fechaBaja = colab.fechaBaja
+        ? new Date(colab.fechaBaja).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+        : '-';
+      document.getElementById('baja-detalle-fecha-baja').textContent = fechaBaja;
+
+      document.getElementById('baja-detalle-comentarios').textContent = colab.comentariosBaja || '-';
+    }
+
+    // Inicializar módulo de Bajas
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBajas);
+    } else {
+      initBajas();
     }
   </script>
 </body>
