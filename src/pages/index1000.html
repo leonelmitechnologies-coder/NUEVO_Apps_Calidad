@@ -4417,15 +4417,24 @@
 
     function cargarDepartamentosInasistencia() {
       const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
       const departamentosContainer = document.getElementById('inasistencia-departamentos-container');
 
       const rango = obtenerUltimos30Dias();
 
-      // Filtrar solo inasistencias de últimos 30 días
+      // Crear un Set de IDs de colaboradores activos para búsqueda rápida
+      const colaboradoresActivosIds = new Set(
+        colaboradores
+          .filter(c => (c.estatus || 'Activo') === 'Activo')
+          .map(c => c.id)
+      );
+
+      // Filtrar solo inasistencias de últimos 30 días de colaboradores ACTIVOS
       const inasistencias = historial.filter(r =>
         r.estado === 'ausente' &&
         r.fecha >= rango.fechaInicio &&
-        r.fecha <= rango.fechaFin
+        r.fecha <= rango.fechaFin &&
+        colaboradoresActivosIds.has(r.colaboradorId)
       );
 
       // Contar inasistencias por departamento
