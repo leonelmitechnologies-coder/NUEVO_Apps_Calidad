@@ -187,6 +187,20 @@ function redirect(url) {
  * Prevents going back to pages outside the application
  */
 function safeGoBack() {
+  // Check if we're in a subview within Asistencia
+  if (currentView === 'asistencia') {
+    const asistenciaColabView = document.getElementById('asistencia-colaboradores-view');
+
+    // Si el formulario de colaboradores está visible, volver al grid
+    if (asistenciaColabView && asistenciaColabView.style.display === 'block') {
+      // Call the volverAGrid function if it exists
+      if (typeof volverAGrid === 'function') {
+        volverAGrid();
+        return;
+      }
+    }
+  }
+
   // Define internal navigation routes for SPA
   const routes = {
     'usuarios': 'dashboard',

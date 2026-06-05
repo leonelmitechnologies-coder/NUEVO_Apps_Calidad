@@ -2041,8 +2041,8 @@
         });
       }
 
-      // Volver al grid de asistencia
-      function volverAGrid() {
+      // Volver al grid de asistencia (global para usar desde navbar back button)
+      window.volverAGrid = function() {
         asistenciaMain.style.display = 'grid';
         asistenciaColabView.style.display = 'none';
         colaboradorForm.reset();
