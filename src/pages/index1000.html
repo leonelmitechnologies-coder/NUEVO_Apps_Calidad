@@ -773,7 +773,7 @@
 
         <!-- Logo and Title -->
         <div class="navbar-logo">
-          <span class="navbar-title">Sistema de Asistencia</span>
+          <span class="navbar-title" id="currentModule">Dashboard</span>
         </div>
 
         <!-- User Info and Logout -->
@@ -1423,6 +1423,17 @@
 
         // Actualizar info de usuario en navbar
         updateNavbarUser();
+
+        // Actualizar título del módulo en navbar
+        const currentModule = document.getElementById('currentModule');
+        const moduleNames = {
+          dashboard: 'Dashboard',
+          usuarios: 'Usuarios',
+          asistencia: 'Asistencia'
+        };
+        if (currentModule) {
+          currentModule.textContent = moduleNames[viewName] || 'QC Manager';
+        }
       }
 
       // Actualizar título del documento

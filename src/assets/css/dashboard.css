@@ -396,7 +396,7 @@
 /* Tablet */
 @media (max-width: 768px) {
   .navbar-title {
-    display: none;
+    font-size: 1rem;
   }
 
   .user-name {
