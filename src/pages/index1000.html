@@ -3673,10 +3673,12 @@
               cargarSubmodulosTE(dept);
             }
           } else if (location.startsWith('tiempo-extra-registrar:')) {
-            const dept = location.replace('tiempo-extra-registrar:', '');
+            const params = location.replace('tiempo-extra-registrar:', '').split(':');
+            const dept = params[0];
+            const registroId = params[1] ? parseInt(params[1]) : null;
             if (teRegistrarView) {
               teRegistrarView.style.display = 'block';
-              cargarFormularioTE(dept);
+              cargarFormularioTE(dept, registroId);
             }
           } else if (location.startsWith('tiempo-extra-historial:')) {
             const dept = location.replace('tiempo-extra-historial:', '');
@@ -5245,32 +5247,102 @@
       }
     }
 
-    function cargarFormularioTE(dept) {
-      // Actualizar título y subtítulo
-      document.getElementById('te-registrar-title').textContent = 'Registrar Tiempo Extra';
-      document.getElementById('te-registrar-subtitle').textContent = dept;
-
+    function cargarFormularioTE(dept, registroId = null) {
       // Guardar departamento actual
       window.currentTEDept = dept;
 
-      // Limpiar todo
-      limpiarSeleccionTE();
+      // Guardar ID de registro si estamos editando
+      window.currentTERegistroEditando = registroId;
 
-      // Establecer fecha de hoy por defecto
-      const fechaInput = document.getElementById('te-fecha');
-      if (fechaInput) {
-        const hoy = new Date().toISOString().split('T')[0];
-        fechaInput.value = hoy;
+      // Si es modo edición, cargar datos del registro
+      if (registroId) {
+        const registros = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+        const registro = registros.find(r => r.id === registroId);
+
+        if (!registro) {
+          showToast('Registro no encontrado', 'error');
+          navigateToLocation('tiempo-extra-dept:' + dept);
+          return;
+        }
+
+        // Actualizar título y subtítulo
+        document.getElementById('te-registrar-title').textContent = 'Editar Tiempo Extra';
+        document.getElementById('te-registrar-subtitle').textContent = dept;
+
+        // Ocultar buscador, mostrar colaborador seleccionado
+        document.querySelector('.te-buscador-wrapper').style.display = 'none';
+
+        // Mostrar colaborador seleccionado
+        const seleccionadoDiv = document.getElementById('te-colaborador-seleccionado');
+        const photoDiv = document.getElementById('te-colab-photo');
+        const nombreDiv = document.getElementById('te-colab-nombre');
+        const puestoDiv = document.getElementById('te-colab-puesto');
+
+        window.currentTEColaboradorId = registro.colaboradorId;
+
+        const iniciales = registro.colaboradorNombre.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+        const fotoHTML = registro.foto
+          ? `<img src="${registro.foto}" alt="${registro.colaboradorNombre}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+          : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; font-weight: 700; font-size: 1.2rem; border-radius: 50%;">${iniciales}</div>`;
+
+        photoDiv.innerHTML = fotoHTML;
+        nombreDiv.textContent = registro.colaboradorNombre;
+        puestoDiv.textContent = registro.puesto;
+
+        seleccionadoDiv.style.display = 'block';
+
+        // Mostrar formulario y cargar datos
+        const form = document.getElementById('form-tiempo-extra');
+        form.style.display = 'block';
+
+        // Cargar datos en el formulario
+        document.getElementById('te-fecha').value = registro.fecha;
+        document.getElementById('te-hora-inicio').value = registro.horaInicio;
+        document.getElementById('te-hora-fin').value = registro.horaFin;
+        document.getElementById('te-area').value = registro.area;
+        document.getElementById('te-motivo').value = registro.motivo;
+        document.getElementById('te-autorizado').value = registro.autorizadoPor;
+
+        // Calcular horas
+        calcularHorasTE();
+
+        // Cambiar texto del botón
+        const submitBtn = document.querySelector('#form-tiempo-extra button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.textContent = 'Actualizar Tiempo Extra';
+        }
+      } else {
+        // Modo crear - actualizar título
+        document.getElementById('te-registrar-title').textContent = 'Registrar Tiempo Extra';
+        document.getElementById('te-registrar-subtitle').textContent = dept;
+
+        // Limpiar todo
+        limpiarSeleccionTE();
+
+        // Establecer fecha de hoy por defecto
+        const fechaInput = document.getElementById('te-fecha');
+        if (fechaInput) {
+          const hoy = new Date().toISOString().split('T')[0];
+          fechaInput.value = hoy;
+        }
+
+        // Inicializar buscador
+        initBuscadorTE(dept);
+
+        // Cambiar texto del botón
+        const submitBtn = document.querySelector('#form-tiempo-extra button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.textContent = 'Registrar Tiempo Extra';
+        }
       }
-
-      // Inicializar buscador
-      initBuscadorTE(dept);
 
       // Agregar listeners para cálculo automático de horas
       const horaInicio = document.getElementById('te-hora-inicio');
       const horaFin = document.getElementById('te-hora-fin');
 
       if (horaInicio && horaFin) {
+        horaInicio.removeEventListener('change', calcularHorasTE); // Remover para evitar duplicados
+        horaFin.removeEventListener('change', calcularHorasTE);
         horaInicio.addEventListener('change', calcularHorasTE);
         horaFin.addEventListener('change', calcularHorasTE);
       }
@@ -5471,36 +5543,84 @@
       if (minutosFin < minutosInicio) minutosFin += 24 * 60;
       const horasTotales = ((minutosFin - minutosInicio) / 60);
 
-      // Crear registro
-      const registro = {
-        id: Date.now(),
-        colaboradorId: colaborador.id,
-        colaboradorNombre: `${colaborador.nombres} ${colaborador.apellidos}`,
-        departamento: window.currentTEDept,
-        puesto: colaborador.puesto,
-        foto: colaborador.foto || null,
-        fecha: fecha,
-        horaInicio: horaInicio,
-        horaFin: horaFin,
-        horasTotales: horasTotales,
-        area: area,
-        motivo: motivo,
-        autorizadoPor: autorizadoPor,
-        registradoPor: window.currentUser ? window.currentUser.name : 'Sistema',
-        fechaRegistro: new Date().toISOString()
-      };
+      // Obtener historial
+      let historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
 
-      // Guardar en localStorage
-      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
-      historial.push(registro);
-      localStorage.setItem('historialTiempoExtra', JSON.stringify(historial));
+      // Verificar si estamos editando
+      if (window.currentTERegistroEditando) {
+        // MODO EDICIÓN: Actualizar registro existente
+        const index = historial.findIndex(r => r.id === window.currentTERegistroEditando);
 
-      // Mostrar toast de éxito
-      showToast('Tiempo extra registrado exitosamente', 'success');
+        if (index === -1) {
+          showToast('Error: Registro no encontrado', 'error');
+          return;
+        }
 
-      // Limpiar formulario y volver a sub-módulos
-      limpiarFormularioTE();
-      navigateToLocation('tiempo-extra-dept:' + window.currentTEDept);
+        // Mantener datos originales importantes
+        const registroOriginal = historial[index];
+
+        // Actualizar registro
+        historial[index] = {
+          ...registroOriginal,
+          colaboradorId: colaborador.id,
+          colaboradorNombre: `${colaborador.nombres} ${colaborador.apellidos}`,
+          departamento: window.currentTEDept,
+          puesto: colaborador.puesto,
+          foto: colaborador.foto || null,
+          fecha: fecha,
+          horaInicio: horaInicio,
+          horaFin: horaFin,
+          horasTotales: horasTotales,
+          area: area,
+          motivo: motivo,
+          autorizadoPor: autorizadoPor,
+          editadoPor: window.currentUser ? window.currentUser.name : 'Sistema',
+          fechaEdicion: new Date().toISOString()
+        };
+
+        // Guardar
+        localStorage.setItem('historialTiempoExtra', JSON.stringify(historial));
+
+        // Mostrar toast de éxito
+        showToast('Tiempo extra actualizado exitosamente', 'success');
+
+        // Limpiar variables de edición
+        window.currentTERegistroEditando = null;
+
+        // Limpiar formulario y volver a sub-módulos
+        limpiarFormularioTE();
+        navigateToLocation('tiempo-extra-dept:' + window.currentTEDept);
+      } else {
+        // MODO CREAR: Crear nuevo registro
+        const registro = {
+          id: Date.now(),
+          colaboradorId: colaborador.id,
+          colaboradorNombre: `${colaborador.nombres} ${colaborador.apellidos}`,
+          departamento: window.currentTEDept,
+          puesto: colaborador.puesto,
+          foto: colaborador.foto || null,
+          fecha: fecha,
+          horaInicio: horaInicio,
+          horaFin: horaFin,
+          horasTotales: horasTotales,
+          area: area,
+          motivo: motivo,
+          autorizadoPor: autorizadoPor,
+          registradoPor: window.currentUser ? window.currentUser.name : 'Sistema',
+          fechaRegistro: new Date().toISOString()
+        };
+
+        // Guardar en localStorage
+        historial.push(registro);
+        localStorage.setItem('historialTiempoExtra', JSON.stringify(historial));
+
+        // Mostrar toast de éxito
+        showToast('Tiempo extra registrado exitosamente', 'success');
+
+        // Limpiar formulario y volver a sub-módulos
+        limpiarFormularioTE();
+        navigateToLocation('tiempo-extra-dept:' + window.currentTEDept);
+      }
     }
 
     window.limpiarFormularioTE = function() {
@@ -5510,6 +5630,9 @@
 
       // Limpiar selección
       limpiarSeleccionTE();
+
+      // Limpiar variable de edición
+      window.currentTERegistroEditando = null;
 
       // Restablecer fecha de hoy
       const fechaInput = document.getElementById('te-fecha');
@@ -5759,9 +5882,17 @@
     }
 
     window.editarRegistroTE = function(registroId) {
-      // TODO: Implementar edición de registro
-      // Por ahora, solo mostramos un mensaje
-      showToast('Función de edición en desarrollo', 'info');
+      // Buscar el registro para obtener el departamento
+      const registros = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+      const registro = registros.find(r => r.id === registroId);
+
+      if (!registro) {
+        showToast('Registro no encontrado', 'error');
+        return;
+      }
+
+      // Navegar al formulario de registro en modo edición
+      navigateToLocation('tiempo-extra-registrar:' + registro.departamento + ':' + registroId);
     }
 
     window.confirmarBorrarRegistroTE = function(registroId) {
