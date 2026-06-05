@@ -2416,6 +2416,94 @@
   color: var(--color-primary);
 }
 
+/* Detalle de Semana - Cards de registros */
+.te-detalle-semana-card {
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid var(--color-border);
+  transition: all 0.2s;
+}
+
+.te-detalle-semana-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
+}
+
+.te-detalle-semana-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(30, 124, 186, 0.05), rgba(30, 124, 186, 0.02));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.te-detalle-semana-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.te-detalle-semana-info {
+  flex: 1;
+}
+
+.te-detalle-semana-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.te-detalle-semana-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.te-detalle-semana-horas {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(30, 124, 186, 0.3);
+}
+
+.te-detalle-semana-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.te-detalle-semana-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.te-detalle-semana-row .te-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.te-detalle-semana-row .te-value {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  flex: 1;
+}
+
 /* Responsive - Tiempo Extra */
 @media (max-width: 768px) {
   .te-buscador-wrapper label {
@@ -2496,5 +2584,51 @@
   .te-registro-horas {
     padding: 5px 10px;
     font-size: 0.8rem;
+  }
+
+  .te-detalle-semana-card {
+    margin-bottom: 12px;
+  }
+
+  .te-detalle-semana-header {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .te-detalle-semana-photo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .te-detalle-semana-info h3 {
+    font-size: 0.95rem;
+  }
+
+  .te-detalle-semana-info p {
+    font-size: 0.8rem;
+  }
+
+  .te-detalle-semana-horas {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .te-detalle-semana-body {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .te-detalle-semana-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .te-detalle-semana-row .te-label {
+    font-size: 0.75rem;
+    min-width: auto;
+  }
+
+  .te-detalle-semana-row .te-value {
+    font-size: 0.85rem;
   }
 }

@@ -2023,6 +2023,15 @@
             </div>
           </div>
 
+          <!-- Vista: Tiempo Extra - Detalle de Semana -->
+          <div id="tiempo-extra-semana-detalle" style="display: none;">
+            <h2 class="section-title" id="te-semana-detalle-title">Semana 23 - 2026</h2>
+            <p class="section-subtitle" id="te-semana-detalle-subtitle">5 registros • 40.50 hrs totales</p>
+            <div id="te-semana-detalle-container">
+              <!-- Registros se generan dinámicamente -->
+            </div>
+          </div>
+
           <!-- Vista: Tiempo Extra - Detalle de Registro -->
           <div id="tiempo-extra-detalle" style="display: none;">
             <div class="colab-detalle-card">
@@ -3462,6 +3471,7 @@
       const teDeptView = document.getElementById('tiempo-extra-dept');
       const teRegistrarView = document.getElementById('tiempo-extra-registrar');
       const teHistorialView = document.getElementById('tiempo-extra-historial');
+      const teSemanaDetalleView = document.getElementById('tiempo-extra-semana-detalle');
       const teDetalleView = document.getElementById('tiempo-extra-detalle');
 
       // Ocultar todas las vistas de asistencia
@@ -3486,6 +3496,7 @@
         teDeptView,
         teRegistrarView,
         teHistorialView,
+        teSemanaDetalleView,
         teDetalleView
       ];
 
@@ -3655,6 +3666,15 @@
             if (teHistorialView) {
               teHistorialView.style.display = 'block';
               cargarHistorialTE(dept);
+            }
+          } else if (location.startsWith('tiempo-extra-semana:')) {
+            // Formato: "tiempo-extra-semana:DEPT:SEMANA_KEY"
+            const params = location.replace('tiempo-extra-semana:', '').split(':');
+            const dept = params[0];
+            const semanaKey = params[1];
+            if (teSemanaDetalleView) {
+              teSemanaDetalleView.style.display = 'block';
+              cargarDetalleSemanaTE(dept, semanaKey);
             }
           } else if (location.startsWith('tiempo-extra-detalle:')) {
             const registroId = parseInt(location.replace('tiempo-extra-detalle:', ''));
@@ -5487,6 +5507,9 @@
       document.getElementById('te-historial-title').textContent = 'Historial Tiempo Extra';
       document.getElementById('te-historial-subtitle').textContent = dept;
 
+      // Guardar departamento actual para navegación
+      window.currentTEHistorialDept = dept;
+
       const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
       const registrosDept = historial.filter(r => r.departamento === dept);
 
@@ -5591,35 +5614,116 @@
 
         return `
           <div class="te-semana-grupo" style="background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 12px;">
-            <div class="te-semana-header" onclick="toggleSemanaTE(this)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; background: white; transition: background 0.2s; border-bottom: 1px solid var(--color-border);">
+            <div class="te-semana-header" onclick="verDetalleSemanaTE('${semanaKey}')" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; background: white; transition: background 0.2s; border-bottom: 1px solid var(--color-border);">
               <div style="flex: 1;">
                 <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text); margin-bottom: 4px;">Semana ${semana.semanaNum} - ${semana.año}</div>
                 <div style="font-size: 0.85rem; color: #666;">${rangoFechas} • ${totalRegistros} ${totalRegistros === 1 ? 'registro' : 'registros'} • ${totalHoras} hrs totales</div>
               </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="transition: transform 0.2s; color: var(--color-primary); flex-shrink: 0;">
-                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="color: var(--color-primary); flex-shrink: 0;">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
               </svg>
-            </div>
-            <div class="te-semana-contenido" style="padding: 12px; background: var(--color-bg); display: none;">
-              ${registrosHTML}
             </div>
           </div>
         `;
       }).join('');
     }
 
-    window.toggleSemanaTE = function(header) {
-      const grupo = header.closest('.te-semana-grupo');
-      const contenido = grupo.querySelector('.te-semana-contenido');
-      const chevron = header.querySelector('svg');
+    window.verDetalleSemanaTE = function(semanaKey) {
+      const dept = window.currentTEHistorialDept;
+      navigateToLocation('tiempo-extra-semana:' + dept + ':' + semanaKey);
+    }
 
-      if (contenido.style.display === 'none') {
-        contenido.style.display = 'block';
-        chevron.style.transform = 'rotate(180deg)';
-      } else {
-        contenido.style.display = 'none';
-        chevron.style.transform = 'rotate(0deg)';
+    function cargarDetalleSemanaTE(dept, semanaKey) {
+      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+      const registrosDept = historial.filter(r => r.departamento === dept);
+
+      // Agrupar por semana para obtener los registros de esta semana específica
+      const semanas = {};
+      registrosDept.forEach(reg => {
+        const fecha = new Date(reg.fecha + 'T00:00:00');
+        const semanaNum = getWeekNumber(fecha);
+        const año = fecha.getFullYear();
+        const key = `${año}-W${semanaNum}`;
+
+        if (!semanas[key]) {
+          semanas[key] = {
+            registros: [],
+            fechaInicio: getMonday(fecha),
+            semanaNum: semanaNum,
+            año: año
+          };
+        }
+
+        semanas[key].registros.push(reg);
+      });
+
+      const semana = semanas[semanaKey];
+      if (!semana) {
+        showToast('Semana no encontrada', 'error');
+        navigateToLocation('asistencia-grid');
+        return;
       }
+
+      const totalRegistros = semana.registros.length;
+      const totalHoras = semana.registros.reduce((sum, r) => sum + r.horasTotales, 0).toFixed(2);
+
+      // Calcular rango de fechas
+      const fechaInicio = semana.fechaInicio;
+      const fechaFin = new Date(fechaInicio);
+      fechaFin.setDate(fechaFin.getDate() + 6);
+      const rangoFechas = `${formatDateShort(fechaInicio)} - ${formatDateShort(fechaFin)}`;
+
+      // Actualizar título
+      document.getElementById('te-semana-detalle-title').textContent = `Semana ${semana.semanaNum} - ${semana.año}`;
+      document.getElementById('te-semana-detalle-subtitle').textContent = `${rangoFechas} • ${totalRegistros} ${totalRegistros === 1 ? 'registro' : 'registros'} • ${totalHoras} hrs totales`;
+
+      // Renderizar registros
+      const container = document.getElementById('te-semana-detalle-container');
+      container.innerHTML = semana.registros.map(reg => {
+        const iniciales = reg.colaboradorNombre.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+        const fotoHTML = reg.foto
+          ? `<img src="${reg.foto}" alt="${reg.colaboradorNombre}" style="width: 100%; height: 100%; object-fit: cover;">`
+          : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; font-weight: 700; font-size: 1.2rem;">${iniciales}</div>`;
+
+        return `
+          <div class="te-detalle-semana-card">
+            <div class="te-detalle-semana-header">
+              <div class="te-detalle-semana-photo">
+                ${fotoHTML}
+              </div>
+              <div class="te-detalle-semana-info">
+                <h3>${reg.colaboradorNombre}</h3>
+                <p>${reg.puesto}</p>
+              </div>
+              <div class="te-detalle-semana-horas">
+                ${reg.horasTotales.toFixed(2)} hrs
+              </div>
+            </div>
+            <div class="te-detalle-semana-body">
+              <div class="te-detalle-semana-row">
+                <span class="te-label">Fecha:</span>
+                <span class="te-value">${formatDate(new Date(reg.fecha + 'T00:00:00'))}</span>
+              </div>
+              <div class="te-detalle-semana-row">
+                <span class="te-label">Horario:</span>
+                <span class="te-value">${reg.horaInicio} - ${reg.horaFin}</span>
+              </div>
+              <div class="te-detalle-semana-row">
+                <span class="te-label">Área:</span>
+                <span class="te-value">${reg.area}</span>
+              </div>
+              <div class="te-detalle-semana-row">
+                <span class="te-label">Motivo:</span>
+                <span class="te-value">${reg.motivo}</span>
+              </div>
+              <div class="te-detalle-semana-row">
+                <span class="te-label">Autorizado por:</span>
+                <span class="te-value">${reg.autorizadoPor}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     window.verDetalleTiempoExtra = function(registroId) {
