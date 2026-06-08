@@ -8,6 +8,7 @@ const dashboardState = {
   vistaActual: 'semanal',
   semanaActual: 1,
   añoActual: 2026,
+  fechaDiaria: null, // Para vista diaria
   filtros: {
     departamento: 'Todos',
     turno: 'Todos',
@@ -16,7 +17,9 @@ const dashboardState = {
   datos: {
     colaboradores: [],
     metricas: null,
-    vistaSemanal: null
+    vistaSemanal: null,
+    vistaDiaria: null,
+    vistaTiempoExtra: null
   }
 };
 
@@ -28,10 +31,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const hoy = new Date();
   dashboardState.semanaActual = asistenciaService.getNumeroSemana(hoy);
   dashboardState.añoActual = hoy.getFullYear();
+  dashboardState.fechaDiaria = asistenciaService.formatFecha(hoy);
 
   // Inicializar inputs
   document.getElementById('inputSemana').value = dashboardState.semanaActual;
   document.getElementById('inputAño').value = dashboardState.añoActual;
+
+  // Inicializar input de fecha diaria si existe
+  const inputFechaDiaria = document.getElementById('inputFechaDiaria');
+  if (inputFechaDiaria) {
+    inputFechaDiaria.value = dashboardState.fechaDiaria;
+  }
 
   // Cargar departamentos en filtro
   await cargarDepartamentos();
@@ -84,6 +94,10 @@ async function cargarDatos() {
     // Cargar vista según el tab activo
     if (dashboardState.vistaActual === 'semanal') {
       await cargarVistaSemanal();
+    } else if (dashboardState.vistaActual === 'diaria') {
+      await cargarVistaDiaria();
+    } else if (dashboardState.vistaActual === 'tiempo-extra') {
+      await cargarVistaTiempoExtra();
     }
 
     // Actualizar UI
@@ -174,6 +188,10 @@ function actualizarEstadisticas() {
 function actualizarTabla() {
   if (dashboardState.vistaActual === 'semanal') {
     actualizarTablaSemanal();
+  } else if (dashboardState.vistaActual === 'diaria') {
+    actualizarTablaDiaria();
+  } else if (dashboardState.vistaActual === 'tiempo-extra') {
+    actualizarTablaTiempoExtra();
   }
 }
 
@@ -249,10 +267,17 @@ function actualizarTablaSemanal() {
     }
     tr.appendChild(tdFoto);
 
-    // Nombre
+    // Nombre + Badge BAJA si aplica
     const tdNombre = document.createElement('td');
-    tdNombre.textContent = colaborador.nombre;
     tdNombre.classList.add('nombre-cell');
+    if (colaborador.baja) {
+      tdNombre.innerHTML = `
+        ${colaborador.nombre}
+        <span class="badge-baja">BAJA</span>
+      `;
+    } else {
+      tdNombre.textContent = colaborador.nombre;
+    }
     tr.appendChild(tdNombre);
 
     // Número de nómina
@@ -277,10 +302,17 @@ function actualizarTablaSemanal() {
 
       tdDia.classList.add('asistencia-cell');
 
+      // Renderizar según el tipo de estado
       if (estado === 'Presente') {
-        tdDia.innerHTML = '<span class="badge badge-success">✓</span>';
+        tdDia.innerHTML = '<span class="badge badge-presente-mini">✓</span>';
       } else if (estado === 'Ausente') {
-        tdDia.innerHTML = '<span class="badge badge-danger">✗</span>';
+        tdDia.innerHTML = '<span class="badge badge-ausente-mini">✗</span>';
+      } else if (estado === 'Falta Injustificada' || estado === 'FI') {
+        tdDia.innerHTML = '<span class="badge badge-falta">FI</span>';
+      } else if (estado === 'Vacaciones') {
+        tdDia.innerHTML = '<span class="badge badge-vacaciones">Vacaciones</span>';
+      } else if (estado === 'Incapacidad') {
+        tdDia.innerHTML = '<span class="badge badge-incapacidad-mini">Inc</span>';
       } else {
         tdDia.innerHTML = '<span class="badge badge-default">-</span>';
       }
@@ -307,6 +339,324 @@ function actualizarTablaSemanal() {
       <tr>
         <td colspan="${6 + vistaSemanal.diasSemana.length + 1}" class="no-results">
           No se encontraron colaboradores con los filtros aplicados
+        </td>
+      </tr>
+    `;
+  }
+}
+
+/**
+ * Carga los datos de la vista diaria
+ */
+async function cargarVistaDiaria() {
+  const colaboradores = await asistenciaService.getColaboradoresActivos();
+  const registros = await asistenciaService.getRegistrosAsistencia({
+    departamento: dashboardState.filtros.departamento,
+    fechaInicio: dashboardState.fechaDiaria,
+    fechaFin: dashboardState.fechaDiaria
+  });
+
+  // Mapear registros por colaborador
+  const datosPorColaborador = colaboradores.map(colaborador => {
+    const registro = registros.find(r => r.colaboradorId === colaborador.id);
+    return {
+      ...colaborador,
+      estado: registro ? registro.estado : '-',
+      incapacidad: registro ? registro.incapacidad : null,
+      observaciones: registro ? registro.observaciones : null
+    };
+  });
+
+  dashboardState.datos.vistaDiaria = {
+    colaboradores: datosPorColaborador,
+    fecha: dashboardState.fechaDiaria
+  };
+}
+
+/**
+ * Carga los datos de la vista de tiempo extra
+ */
+async function cargarVistaTiempoExtra() {
+  const { fechaInicio, fechaFin } = asistenciaService.getRangoSemana(
+    dashboardState.semanaActual,
+    dashboardState.añoActual
+  );
+
+  const tiemposExtra = await asistenciaService.getTiemposExtra({
+    departamento: dashboardState.filtros.departamento,
+    fechaInicio,
+    fechaFin
+  });
+
+  // Agrupar por colaborador
+  const tiemposPorColaborador = {};
+
+  tiemposExtra.forEach(te => {
+    if (!tiemposPorColaborador[te.colaboradorId]) {
+      tiemposPorColaborador[te.colaboradorId] = {
+        colaborador: asistenciaService.getColaboradorById(te.colaboradorId),
+        registros: []
+      };
+    }
+    tiemposPorColaborador[te.colaboradorId].registros.push(te);
+  });
+
+  dashboardState.datos.vistaTiempoExtra = {
+    tiemposPorColaborador,
+    fechaInicio,
+    fechaFin
+  };
+}
+
+/**
+ * Actualiza la tabla en vista diaria
+ */
+function actualizarTablaDiaria() {
+  const vistaDiaria = dashboardState.datos.vistaDiaria;
+
+  if (!vistaDiaria) return;
+
+  const thead = document.querySelector('#tablaAsistencia thead tr');
+  const tbody = document.getElementById('tablaBody');
+
+  // Limpiar tabla
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+
+  // Obtener día de la semana y fecha
+  const fecha = new Date(vistaDiaria.fecha + 'T00:00:00');
+  const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+  const diaSemana = diasSemana[fecha.getDay()];
+  const dia = fecha.getDate();
+
+  // Crear encabezados
+  thead.innerHTML = `
+    <th>#</th>
+    <th>FOTO</th>
+    <th>NOMBRE ▼</th>
+    <th>NO. NÓMINA ▲</th>
+    <th>PUESTO ▲</th>
+    <th>DEPTO ▲</th>
+    <th>${diaSemana} ${dia}</th>
+  `;
+
+  // Aplicar filtro de búsqueda
+  let colaboradoresFiltrados = vistaDiaria.colaboradores;
+  if (dashboardState.filtros.busqueda) {
+    const busqueda = dashboardState.filtros.busqueda.toLowerCase();
+    colaboradoresFiltrados = colaboradoresFiltrados.filter(c =>
+      c.nombre.toLowerCase().includes(busqueda) ||
+      c.numeroNomina.toString().includes(busqueda) ||
+      (c.puesto && c.puesto.toLowerCase().includes(busqueda)) ||
+      (c.departamento && c.departamento.toLowerCase().includes(busqueda))
+    );
+  }
+
+  // Crear filas
+  colaboradoresFiltrados.forEach((colaborador, index) => {
+    const tr = document.createElement('tr');
+
+    // Número
+    const tdNum = document.createElement('td');
+    tdNum.textContent = index + 1;
+    tr.appendChild(tdNum);
+
+    // Foto
+    const tdFoto = document.createElement('td');
+    if (colaborador.photo) {
+      tdFoto.innerHTML = `<img src="${colaborador.photo}" alt="${colaborador.nombre}" class="colaborador-foto">`;
+    } else {
+      tdFoto.innerHTML = `<div class="colaborador-foto-placeholder">
+        <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+      </div>`;
+    }
+    tr.appendChild(tdFoto);
+
+    // Nombre + Badge BAJA si aplica
+    const tdNombre = document.createElement('td');
+    tdNombre.classList.add('nombre-cell');
+    if (colaborador.baja) {
+      tdNombre.innerHTML = `
+        ${colaborador.nombre}
+        <span class="badge-baja">BAJA</span>
+      `;
+    } else {
+      tdNombre.textContent = colaborador.nombre;
+    }
+    tr.appendChild(tdNombre);
+
+    // Número de nómina
+    const tdNomina = document.createElement('td');
+    tdNomina.textContent = colaborador.numeroNomina || 'N/A';
+    tr.appendChild(tdNomina);
+
+    // Puesto
+    const tdPuesto = document.createElement('td');
+    tdPuesto.textContent = colaborador.puesto || '-';
+    tr.appendChild(tdPuesto);
+
+    // Departamento
+    const tdDepto = document.createElement('td');
+    tdDepto.textContent = colaborador.departamento || '-';
+    tr.appendChild(tdDepto);
+
+    // Estado del día
+    const tdEstado = document.createElement('td');
+    tdEstado.classList.add('asistencia-cell');
+
+    if (colaborador.estado === 'Presente') {
+      tdEstado.innerHTML = '<span class="badge badge-presente">✓ Presente</span>';
+    } else if (colaborador.estado === 'Ausente') {
+      tdEstado.innerHTML = '<span class="badge badge-ausente">✗ Ausente</span>';
+    } else if (colaborador.incapacidad === 'Temporal') {
+      tdEstado.innerHTML = '<span class="badge badge-incapacidad">Incapacidad Temporal</span>';
+    } else {
+      tdEstado.innerHTML = '<span class="badge badge-default">-</span>';
+    }
+
+    tr.appendChild(tdEstado);
+
+    tbody.appendChild(tr);
+  });
+
+  // Mostrar mensaje si no hay resultados
+  if (colaboradoresFiltrados.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="no-results">
+          No se encontraron colaboradores con los filtros aplicados
+        </td>
+      </tr>
+    `;
+  }
+}
+
+/**
+ * Actualiza la tabla en vista de tiempo extra
+ */
+function actualizarTablaTiempoExtra() {
+  const vistaTiempoExtra = dashboardState.datos.vistaTiempoExtra;
+
+  if (!vistaTiempoExtra) return;
+
+  const thead = document.querySelector('#tablaAsistencia thead tr');
+  const tbody = document.getElementById('tablaBody');
+
+  // Limpiar tabla
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+
+  // Crear encabezados
+  thead.innerHTML = `
+    <th>#</th>
+    <th>FOTO</th>
+    <th>NOMBRE</th>
+    <th>NO. NÓMINA</th>
+    <th>PUESTO</th>
+    <th>DEPTO</th>
+    <th>FECHA</th>
+    <th>HORAS</th>
+    <th>MOTIVO</th>
+    <th>AUTORIZADO POR</th>
+  `;
+
+  // Obtener todos los registros y ordenarlos
+  const todosLosRegistros = [];
+  Object.values(vistaTiempoExtra.tiemposPorColaborador).forEach(({ colaborador, registros }) => {
+    registros.forEach(registro => {
+      todosLosRegistros.push({
+        colaborador,
+        ...registro
+      });
+    });
+  });
+
+  // Aplicar filtro de búsqueda
+  let registrosFiltrados = todosLosRegistros;
+  if (dashboardState.filtros.busqueda) {
+    const busqueda = dashboardState.filtros.busqueda.toLowerCase();
+    registrosFiltrados = todosLosRegistros.filter(r =>
+      r.colaborador.nombre.toLowerCase().includes(busqueda) ||
+      r.colaborador.numeroNomina.toString().includes(busqueda)
+    );
+  }
+
+  // Crear filas
+  registrosFiltrados.forEach((registro, index) => {
+    const tr = document.createElement('tr');
+
+    // Número
+    const tdNum = document.createElement('td');
+    tdNum.textContent = index + 1;
+    tr.appendChild(tdNum);
+
+    // Foto
+    const tdFoto = document.createElement('td');
+    if (registro.colaborador.photo) {
+      tdFoto.innerHTML = `<img src="${registro.colaborador.photo}" alt="${registro.colaborador.nombre}" class="colaborador-foto">`;
+    } else {
+      tdFoto.innerHTML = `<div class="colaborador-foto-placeholder">
+        <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+      </div>`;
+    }
+    tr.appendChild(tdFoto);
+
+    // Nombre
+    const tdNombre = document.createElement('td');
+    tdNombre.textContent = registro.colaborador.nombre;
+    tdNombre.classList.add('nombre-cell');
+    tr.appendChild(tdNombre);
+
+    // Número de nómina
+    const tdNomina = document.createElement('td');
+    tdNomina.textContent = registro.colaborador.numeroNomina || 'N/A';
+    tr.appendChild(tdNomina);
+
+    // Puesto
+    const tdPuesto = document.createElement('td');
+    tdPuesto.textContent = registro.colaborador.puesto || '-';
+    tr.appendChild(tdPuesto);
+
+    // Departamento
+    const tdDepto = document.createElement('td');
+    tdDepto.textContent = registro.colaborador.departamento || '-';
+    tr.appendChild(tdDepto);
+
+    // Fecha
+    const tdFecha = document.createElement('td');
+    tdFecha.textContent = registro.fecha;
+    tr.appendChild(tdFecha);
+
+    // Horas
+    const tdHoras = document.createElement('td');
+    tdHoras.innerHTML = `<span class="badge badge-horas">${registro.horas || 0}h</span>`;
+    tr.appendChild(tdHoras);
+
+    // Motivo
+    const tdMotivo = document.createElement('td');
+    tdMotivo.textContent = registro.motivo || '-';
+    tr.appendChild(tdMotivo);
+
+    // Autorizado por
+    const tdAutorizado = document.createElement('td');
+    tdAutorizado.textContent = registro.autorizadoPor || '-';
+    tr.appendChild(tdAutorizado);
+
+    tbody.appendChild(tr);
+  });
+
+  // Mostrar mensaje si no hay resultados
+  if (registrosFiltrados.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" class="no-results">
+          No hay registros de tiempo extra en este periodo
         </td>
       </tr>
     `;
@@ -428,6 +778,47 @@ function configurarEventListeners() {
     cargarDatos();
   });
 
+  // Navegación vista diaria
+  const inputFechaDiaria = document.getElementById('inputFechaDiaria');
+  if (inputFechaDiaria) {
+    inputFechaDiaria.addEventListener('change', (e) => {
+      dashboardState.fechaDiaria = e.target.value;
+      cargarDatos();
+    });
+  }
+
+  const btnDiaAnterior = document.getElementById('btnDiaAnterior');
+  if (btnDiaAnterior) {
+    btnDiaAnterior.addEventListener('click', () => {
+      const fecha = new Date(dashboardState.fechaDiaria + 'T00:00:00');
+      fecha.setDate(fecha.getDate() - 1);
+      dashboardState.fechaDiaria = asistenciaService.formatFecha(fecha);
+      document.getElementById('inputFechaDiaria').value = dashboardState.fechaDiaria;
+      cargarDatos();
+    });
+  }
+
+  const btnDiaSiguiente = document.getElementById('btnDiaSiguiente');
+  if (btnDiaSiguiente) {
+    btnDiaSiguiente.addEventListener('click', () => {
+      const fecha = new Date(dashboardState.fechaDiaria + 'T00:00:00');
+      fecha.setDate(fecha.getDate() + 1);
+      dashboardState.fechaDiaria = asistenciaService.formatFecha(fecha);
+      document.getElementById('inputFechaDiaria').value = dashboardState.fechaDiaria;
+      cargarDatos();
+    });
+  }
+
+  const btnHoyDiario = document.getElementById('btnHoyDiario');
+  if (btnHoyDiario) {
+    btnHoyDiario.addEventListener('click', () => {
+      const hoy = new Date();
+      dashboardState.fechaDiaria = asistenciaService.formatFecha(hoy);
+      document.getElementById('inputFechaDiaria').value = dashboardState.fechaDiaria;
+      cargarDatos();
+    });
+  }
+
   // Botones de exportar e imprimir
   document.getElementById('btnExportarTabla').addEventListener('click', exportarCSV);
   document.getElementById('btnExportarCSV').addEventListener('click', exportarCSV);
@@ -464,9 +855,17 @@ async function cambiarVista(vista) {
     btn.classList.toggle('active', btn.dataset.view === vista);
   });
 
-  // Mostrar/ocultar selector de periodo
+  // Mostrar/ocultar selectores de periodo
   const selectorSemanal = document.getElementById('selectorSemanal');
+  const selectorDiario = document.getElementById('selectorDiario');
+
   selectorSemanal.style.display = vista === 'semanal' ? 'flex' : 'none';
+  selectorDiario.style.display = vista === 'diaria' ? 'flex' : 'none';
+
+  // Vista tiempo extra usa selector semanal
+  if (vista === 'tiempo-extra') {
+    selectorSemanal.style.display = 'flex';
+  }
 
   // Cargar datos según la vista
   await cargarDatos();

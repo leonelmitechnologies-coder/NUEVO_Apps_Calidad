@@ -249,6 +249,27 @@
       <button class="btn-hoy" id="btnHoy">Hoy</button>
     </section>
 
+    <!-- Period Selector (Vista Diaria) -->
+    <section class="period-selector" id="selectorDiario" style="display: none;">
+      <div class="period-display">
+        <button class="btn-nav" id="btnDiaAnterior" title="Día anterior">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+          </svg>
+        </button>
+
+        <input type="date" id="inputFechaDiaria" class="period-input-date">
+
+        <button class="btn-nav" id="btnDiaSiguiente" title="Día siguiente">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
+      </div>
+
+      <button class="btn-hoy" id="btnHoyDiario">Hoy</button>
+    </section>
+
     <!-- Data Table -->
     <section class="data-table-section">
       <div class="table-wrapper">

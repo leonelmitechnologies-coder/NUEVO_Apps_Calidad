@@ -497,6 +497,26 @@ body {
   box-shadow: 0 0 0 3px rgba(30, 124, 186, 0.1);
 }
 
+.period-input-date {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s;
+  background: white;
+  color: var(--text-primary);
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.period-input-date:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 124, 186, 0.1);
+}
+
 .period-display {
   display: flex;
   align-items: center;
@@ -650,6 +670,128 @@ body {
 .badge-default {
   background: #e9ecef;
   color: var(--text-muted);
+}
+
+/* Nuevos badges para estados específicos */
+.badge-presente {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: #d4edda;
+  color: var(--color-success);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badge-ausente {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: #f8d7da;
+  color: var(--color-danger);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badge-incapacidad {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: #cfe2ff;
+  color: #084298;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badge-falta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #fff3cd;
+  color: #856404;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-vacaciones {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #e7d5ff;
+  color: #6b21a8;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-incapacidad-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #cfe2ff;
+  color: #084298;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-presente-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #d4edda;
+  color: var(--color-success);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.badge-ausente-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f8d7da;
+  color: var(--color-danger);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.badge-horas {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: #d1ecf1;
+  color: #0c5460;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.badge-baja {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #f8d7da;
+  color: var(--color-danger);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-left: 8px;
+  letter-spacing: 0.5px;
 }
 
 .semana-total {
