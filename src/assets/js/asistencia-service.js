@@ -48,7 +48,7 @@ class AsistenciaService {
    */
   async getRegistrosAsistencia(filtros = {}) {
     // TODO: Reemplazar con fetch(this.baseUrl + '/asistencia', { params: filtros })
-    const registros = JSON.parse(localStorage.getItem('registrosAsistencia') || '[]');
+    const registros = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
 
     let resultado = registros;
 
@@ -144,8 +144,8 @@ class AsistenciaService {
     const tiemposExtra = await this.getTiemposExtra(filtros);
 
     // Contar presentes y ausentes
-    const presentes = registros.filter(r => r.estado === 'Presente').length;
-    const ausentes = registros.filter(r => r.estado === 'Ausente').length;
+    const presentes = registros.filter(r => r.estado === 'presente').length;
+    const ausentes = registros.filter(r => r.estado === 'ausente').length;
     const totalRegistros = registros.length;
 
     // Calcular colaboradores sin registrar en el periodo
@@ -159,7 +159,7 @@ class AsistenciaService {
 
     // Encontrar departamento con más faltas
     const faltasPorDepto = {};
-    registros.filter(r => r.estado === 'Ausente').forEach(r => {
+    registros.filter(r => r.estado === 'ausente').forEach(r => {
       const colaborador = this.getColaboradorById(r.colaboradorId);
       if (colaborador && colaborador.departamento) {
         faltasPorDepto[colaborador.departamento] = (faltasPorDepto[colaborador.departamento] || 0) + 1;
@@ -231,14 +231,22 @@ class AsistenciaService {
 
       diasSemana.forEach(dia => {
         const registro = registrosColaborador.find(r => r.fecha === dia.fecha);
-        asistenciaPorDia[dia.fecha] = registro ? registro.estado : '-';
+        if (registro) {
+          // Guardar objeto con estado y tipo de inasistencia
+          asistenciaPorDia[dia.fecha] = {
+            estado: registro.estado,
+            tipoInasistencia: registro.tipoInasistencia
+          };
+        } else {
+          asistenciaPorDia[dia.fecha] = '-';
+        }
       });
 
       return {
         ...colaborador,
         diasSemana: asistenciaPorDia,
-        totalPresentes: registrosColaborador.filter(r => r.estado === 'Presente').length,
-        totalAusentes: registrosColaborador.filter(r => r.estado === 'Ausente').length
+        totalPresentes: registrosColaborador.filter(r => r.estado === 'presente').length,
+        totalAusentes: registrosColaborador.filter(r => r.estado === 'ausente').length
       };
     });
 

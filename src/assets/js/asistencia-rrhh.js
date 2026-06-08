@@ -397,21 +397,40 @@ function actualizarTablaSemanal() {
     // Días de la semana
     vistaSemanal.diasSemana.forEach(dia => {
       const tdDia = document.createElement('td');
-      const estado = colaborador.diasSemana[dia.fecha];
+      const registro = colaborador.diasSemana[dia.fecha];
 
       tdDia.classList.add('asistencia-cell');
 
-      // Renderizar según el tipo de estado
-      if (estado === 'Presente') {
-        tdDia.innerHTML = '<span class="badge badge-presente-mini">✓</span>';
-      } else if (estado === 'Ausente') {
-        tdDia.innerHTML = '<span class="badge badge-ausente-mini">✗</span>';
-      } else if (estado === 'Falta Injustificada' || estado === 'FI') {
-        tdDia.innerHTML = '<span class="badge badge-falta">FI</span>';
-      } else if (estado === 'Vacaciones') {
-        tdDia.innerHTML = '<span class="badge badge-vacaciones">Vacaciones</span>';
-      } else if (estado === 'Incapacidad') {
-        tdDia.innerHTML = '<span class="badge badge-incapacidad-mini">Inc</span>';
+      // Si es un string simple (por compatibilidad con datos antiguos)
+      if (typeof registro === 'string') {
+        if (registro === 'presente') {
+          tdDia.innerHTML = '<span class="badge badge-presente-mini">✓</span>';
+        } else if (registro === 'ausente') {
+          tdDia.innerHTML = '<span class="badge badge-ausente-mini">✗</span>';
+        } else {
+          tdDia.innerHTML = '<span class="badge badge-default">-</span>';
+        }
+      } else if (registro && typeof registro === 'object') {
+        // Nuevo formato con objeto {estado, tipoInasistencia}
+        if (registro.estado === 'presente') {
+          tdDia.innerHTML = '<span class="badge badge-presente-mini">✓</span>';
+        } else if (registro.estado === 'ausente' && registro.tipoInasistencia) {
+          // Mostrar las iniciales del tipo de inasistencia
+          const tipo = registro.tipoInasistencia;
+          let badgeClass = 'badge-ausente-mini';
+
+          // Asignar clase específica según el tipo
+          if (tipo === 'FI') badgeClass = 'badge-falta';
+          else if (tipo === 'FJ') badgeClass = 'badge-falta-justificada';
+          else if (tipo === 'Vacaciones') badgeClass = 'badge-vacaciones';
+          else if (tipo === 'IT') badgeClass = 'badge-incapacidad-mini';
+          else if (tipo === 'PSG' || tipo === 'PCG') badgeClass = 'badge-permiso';
+          else if (tipo === 'RET') badgeClass = 'badge-retardo';
+
+          tdDia.innerHTML = `<span class="badge ${badgeClass}">${tipo}</span>`;
+        } else {
+          tdDia.innerHTML = '<span class="badge badge-default">-</span>';
+        }
       } else {
         tdDia.innerHTML = '<span class="badge badge-default">-</span>';
       }
@@ -480,6 +499,7 @@ async function cargarVistaDiaria() {
     return {
       ...colaborador,
       estado: registro ? registro.estado : '-',
+      tipoInasistencia: registro ? registro.tipoInasistencia : null,
       incapacidad: registro ? registro.incapacidad : null,
       observaciones: registro ? registro.observaciones : null
     };
@@ -628,10 +648,52 @@ function actualizarTablaDiaria() {
     const tdEstado = document.createElement('td');
     tdEstado.classList.add('asistencia-cell');
 
-    if (colaborador.estado === 'Presente') {
+    if (colaborador.estado === 'presente') {
       tdEstado.innerHTML = '<span class="badge badge-presente">✓ Presente</span>';
-    } else if (colaborador.estado === 'Ausente') {
-      tdEstado.innerHTML = '<span class="badge badge-ausente">✗ Ausente</span>';
+    } else if (colaborador.estado === 'ausente') {
+      // Si hay tipo de inasistencia, mostrarlo
+      if (colaborador.tipoInasistencia) {
+        const tipo = colaborador.tipoInasistencia;
+        let badgeClass = 'badge-ausente';
+        let tipoTexto = tipo;
+
+        // Asignar clase y texto completo según el tipo
+        if (tipo === 'FI') {
+          badgeClass = 'badge-falta';
+          tipoTexto = 'Falta Injustificada (FI)';
+        } else if (tipo === 'FJ') {
+          badgeClass = 'badge-falta-justificada';
+          tipoTexto = 'Falta Justificada (FJ)';
+        } else if (tipo === 'Vacaciones') {
+          badgeClass = 'badge-vacaciones';
+          tipoTexto = 'Vacaciones';
+        } else if (tipo === 'IT') {
+          badgeClass = 'badge-incapacidad';
+          tipoTexto = 'Incapacidad Temporal (IT)';
+        } else if (tipo === 'PSG') {
+          badgeClass = 'badge-permiso';
+          tipoTexto = 'Permiso Sin Goce (PSG)';
+        } else if (tipo === 'PCG') {
+          badgeClass = 'badge-permiso';
+          tipoTexto = 'Permiso Con Goce (PCG)';
+        } else if (tipo === 'RET') {
+          badgeClass = 'badge-retardo';
+          tipoTexto = 'Retardo (RET)';
+        } else if (tipo === 'Suspension') {
+          badgeClass = 'badge-suspension';
+          tipoTexto = 'Suspensión';
+        } else if (tipo === 'CUM') {
+          badgeClass = 'badge-cumpleanos';
+          tipoTexto = 'Cumpleaños (CUM)';
+        } else if (tipo === 'FES') {
+          badgeClass = 'badge-festivo';
+          tipoTexto = 'Festivo (FES)';
+        }
+
+        tdEstado.innerHTML = `<span class="badge ${badgeClass}">${tipoTexto}</span>`;
+      } else {
+        tdEstado.innerHTML = '<span class="badge badge-ausente">✗ Ausente</span>';
+      }
     } else if (colaborador.incapacidad === 'Temporal') {
       tdEstado.innerHTML = '<span class="badge badge-incapacidad">Incapacidad Temporal</span>';
     } else {
@@ -1201,7 +1263,7 @@ function configurarActualizacionTiempoReal() {
   // Listener para cambios en localStorage desde otras pestañas
   window.addEventListener('storage', async (e) => {
     // Solo reaccionar a cambios en las keys relevantes
-    const keysRelevantes = ['colaboradores', 'registrosAsistencia', 'tiemposExtra'];
+    const keysRelevantes = ['colaboradores', 'historialAsistencia', 'tiemposExtra'];
 
     if (keysRelevantes.includes(e.key)) {
       console.log(`Cambio detectado en ${e.key}, actualizando dashboard...`);
@@ -1215,6 +1277,39 @@ function configurarActualizacionTiempoReal() {
       }
 
       // Recargar todos los datos del dashboard
+      await cargarDatos();
+    }
+  });
+
+  // Listener para cuando la página se vuelve visible (útil al navegar hacia atrás o cambiar de pestaña)
+  document.addEventListener('visibilitychange', async () => {
+    if (!document.hidden) {
+      console.log('Página visible, verificando actualizaciones...');
+
+      // Actualizar a la semana/fecha actual si estamos en vista semanal o diaria
+      const hoy = new Date();
+      if (dashboardState.vistaActual === 'semanal') {
+        dashboardState.semanaActual = asistenciaService.getNumeroSemana(hoy);
+        dashboardState.añoActual = hoy.getFullYear();
+        document.getElementById('inputSemana').value = dashboardState.semanaActual;
+        document.getElementById('inputAño').value = dashboardState.añoActual;
+      } else if (dashboardState.vistaActual === 'diaria') {
+        dashboardState.fechaDiaria = asistenciaService.formatFecha(hoy);
+        const inputFechaDiaria = document.getElementById('inputFechaDiaria');
+        if (inputFechaDiaria) {
+          inputFechaDiaria.value = dashboardState.fechaDiaria;
+        }
+      }
+
+      await cargarDatos();
+    }
+  });
+
+  // Listener para cuando se navega de vuelta a la página
+  window.addEventListener('pageshow', async (event) => {
+    // event.persisted indica que la página viene del cache (navegación hacia atrás)
+    if (event.persisted) {
+      console.log('Página restaurada desde caché, actualizando datos...');
       await cargarDatos();
     }
   });
@@ -1277,7 +1372,7 @@ function exportarCSV() {
 
     vistaSemanal.diasSemana.forEach(dia => {
       const estado = colaborador.diasSemana[dia.fecha];
-      csv += `,${estado === 'Presente' ? 'P' : estado === 'Ausente' ? 'A' : '-'}`;
+      csv += `,${estado === 'presente' ? 'P' : estado === 'ausente' ? 'A' : '-'}`;
     });
 
     csv += `,${colaborador.totalPresentes || 0}`;
@@ -1380,8 +1475,8 @@ async function abrirModalDetalleColaborador(colaboradorId) {
   const registrosColaborador = registros.filter(r => r.colaboradorId === colaboradorId);
 
   // Calcular métricas
-  const presentes = registrosColaborador.filter(r => r.estado === 'Presente').length;
-  const ausentes = registrosColaborador.filter(r => r.estado === 'Ausente').length;
+  const presentes = registrosColaborador.filter(r => r.estado === 'presente').length;
+  const ausentes = registrosColaborador.filter(r => r.estado === 'ausente').length;
   const totalDias = registrosColaborador.length;
   const porcentajeAsistencia = totalDias > 0 ? Math.round((presentes / totalDias) * 100) : 0;
 
@@ -1425,7 +1520,7 @@ async function abrirModalDetalleColaborador(colaboradorId) {
 
   // Desglose de inasistencias
   const desglose = {};
-  registrosColaborador.filter(r => r.estado === 'Ausente').forEach(r => {
+  registrosColaborador.filter(r => r.estado === 'ausente').forEach(r => {
     const tipo = r.tipo || 'Falta';
     desglose[tipo] = (desglose[tipo] || 0) + 1;
   });
@@ -1447,7 +1542,7 @@ async function abrirModalDetalleColaborador(colaboradorId) {
   }
 
   // Historial de inasistencias
-  const ausencias = registrosColaborador.filter(r => r.estado === 'Ausente').slice(-10);
+  const ausencias = registrosColaborador.filter(r => r.estado === 'ausente').slice(-10);
   const modalHistorial = document.getElementById('modalHistorial');
 
   if (ausencias.length === 0) {
@@ -1493,7 +1588,7 @@ async function abrirModalDetalleColaborador(colaboradorId) {
         <div class="asistencia-semana-dias">
           ${diasSemana.map(dia => {
             const estado = colabData.diasSemana[dia.fecha] || '-';
-            const claseEstado = estado === 'Presente' ? 'presente' : estado === 'Ausente' ? 'ausente' : '';
+            const claseEstado = estado === 'presente' ? 'presente' : estado === 'ausente' ? 'ausente' : '';
 
             return `
               <div class="dia-item ${claseEstado}">

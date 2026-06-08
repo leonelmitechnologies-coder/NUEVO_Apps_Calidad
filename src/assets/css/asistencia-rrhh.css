@@ -769,6 +769,90 @@ body {
   font-weight: 600;
 }
 
+.badge-falta-justificada {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #d1ecf1;
+  color: #0c5460;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-permiso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #e2e3e5;
+  color: #383d41;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-retardo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #fff3cd;
+  color: #856404;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-suspension {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #f8d7da;
+  color: #721c24;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-cumpleanos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #fce4ec;
+  color: #c2185b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-festivo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #e7f3ff;
+  color: #1976d2;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .badge-horas {
   display: inline-flex;
   align-items: center;
