@@ -2934,6 +2934,86 @@
   max-width: 180px;
 }
 
+/* ============================================
+   CUSTOM SELECT DROPDOWNS - Sistema Style
+   ============================================ */
+
+/* Base select styling */
+.perfil-section select.form-control,
+#securityQuestionForm select,
+#newSecurityQuestion,
+#currentSecurityQuestion {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23002171' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding-right: 40px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Hover state */
+.perfil-section select.form-control:hover,
+#securityQuestionForm select:hover,
+#newSecurityQuestion:hover {
+  border-color: #002171;
+  background-color: #f8f9fb;
+}
+
+/* Focus state */
+.perfil-section select.form-control:focus,
+#securityQuestionForm select:focus,
+#newSecurityQuestion:focus {
+  outline: none;
+  border-color: #002171;
+  box-shadow: 0 0 0 3px rgba(0, 33, 113, 0.1);
+  background-color: white;
+}
+
+/* Disabled state */
+.perfil-section select.form-control:disabled,
+#currentSecurityQuestion:disabled,
+#currentSecurityQuestion[readonly] {
+  background-color: #f5f5f5;
+  background-image: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+  border-color: #E2E8F0;
+}
+
+/* Select options styling */
+.perfil-section select option,
+#securityQuestionForm select option,
+#newSecurityQuestion option {
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background-color: white;
+}
+
+/* First option (placeholder) */
+.perfil-section select option:first-child,
+#newSecurityQuestion option:first-child {
+  color: #94A3B8;
+}
+
+/* Selected option */
+.perfil-section select option:checked,
+#newSecurityQuestion option:checked {
+  background: linear-gradient(135deg, rgba(0, 33, 113, 0.08), rgba(0, 33, 113, 0.04));
+  color: #002171;
+  font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .perfil-section {
@@ -2965,5 +3045,231 @@
   .perfil-password-actions .btn-primary,
   .perfil-password-actions .btn-secondary {
     max-width: 100%;
+  }
+
+  /* Security Question Section - Mobile */
+  .perfil-section-title {
+    font-size: 1.1rem;
+  }
+
+  .perfil-section p {
+    font-size: 0.9rem;
+  }
+
+  .perfil-card {
+    padding: 16px;
+  }
+
+  /* Form labels more compact on mobile */
+  .perfil-section label {
+    font-size: 0.9rem;
+  }
+
+  /* Select dropdown full width on mobile */
+  .perfil-section select.form-control {
+    width: 100%;
+    font-size: 0.95rem;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  /* Security question section specific */
+  .perfil-section {
+    overflow: visible;
+  }
+
+  .perfil-card {
+    overflow: visible;
+  }
+
+  /* Better spacing for security question form */
+  #securityQuestionForm .form-group {
+    margin-bottom: 18px;
+  }
+
+  /* Dropdown options readable on mobile */
+  .perfil-section select option {
+    padding: 12px 10px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  /* Form hints smaller on mobile */
+  .form-hint {
+    font-size: 0.8rem;
+  }
+
+  /* Dashed border box more compact */
+  .perfil-section [style*="border: 2px dashed"] {
+    padding: 16px !important;
+  }
+
+  /* Top label on dashed border */
+  .perfil-section [style*="position: absolute"][style*="top: -12px"] {
+    font-size: 0.85rem;
+    padding: 0 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-section {
+    padding: 14px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+  }
+
+  .perfil-section-title {
+    font-size: 1rem;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .perfil-section-title svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .perfil-section > p {
+    font-size: 0.85rem;
+    margin-bottom: 14px !important;
+    line-height: 1.4;
+  }
+
+  .perfil-card {
+    padding: 12px;
+  }
+
+  /* Security Question Form specific */
+  #securityQuestionForm {
+    margin: 0 !important;
+  }
+
+  #securityQuestionForm .form-group {
+    margin-bottom: 16px !important;
+  }
+
+  .perfil-section label {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .perfil-section input.form-control {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+
+  .perfil-section select.form-control {
+    font-size: 0.88rem;
+    padding: 10px 12px;
+    max-height: 45vh;
+    line-height: 1.4;
+  }
+
+  .perfil-section select option {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .form-hint {
+    font-size: 0.75rem;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  /* Dashed border more compact */
+  .perfil-section [style*="border: 2px dashed"] {
+    padding: 12px !important;
+    border-radius: 6px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Top label smaller */
+  .perfil-section [style*="position: absolute"][style*="top: -12px"] {
+    font-size: 0.8rem;
+    padding: 0 10px !important;
+    white-space: nowrap;
+  }
+
+  /* Buttons full width and stack */
+  .perfil-password-actions {
+    gap: 10px;
+    margin-top: 16px !important;
+  }
+
+  .perfil-password-actions button {
+    font-size: 0.9rem;
+    padding: 12px 16px;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 375px) {
+  .perfil-section {
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  .perfil-section-title {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+
+  .perfil-section > p {
+    font-size: 0.8rem;
+    margin-bottom: 12px !important;
+  }
+
+  .perfil-card {
+    padding: 10px;
+  }
+
+  #securityQuestionForm .form-group {
+    margin-bottom: 14px !important;
+  }
+
+  .perfil-section label {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
+
+  .perfil-section input.form-control {
+    font-size: 0.85rem;
+    padding: 9px 10px;
+  }
+
+  .perfil-section select.form-control {
+    font-size: 0.82rem;
+    padding: 9px 10px;
+    max-height: 40vh;
+  }
+
+  .perfil-section select option {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+
+  .form-hint {
+    font-size: 0.7rem;
+  }
+
+  .perfil-section [style*="border: 2px dashed"] {
+    padding: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .perfil-section [style*="position: absolute"][style*="top: -12px"] {
+    font-size: 0.75rem;
+    padding: 0 8px !important;
+  }
+
+  .perfil-password-actions {
+    margin-top: 14px !important;
+  }
+
+  .perfil-password-actions button {
+    font-size: 0.85rem;
+    padding: 11px 14px;
+    min-height: 42px;
   }
 }

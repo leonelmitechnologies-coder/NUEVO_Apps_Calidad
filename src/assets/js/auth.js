@@ -64,6 +64,8 @@ async function login(username, password) {
             departamento: foundUser.departamento || null,
             departamentosPasarAsistencia: foundUser.departamentosPasarAsistencia || (foundUser.departamento ? [foundUser.departamento] : []),
             departamentosTiempoExtra: foundUser.departamentosTiempoExtra || (foundUser.departamento ? [foundUser.departamento] : []),
+            securityQuestion: foundUser.securityQuestion || null,
+            securityAnswer: foundUser.securityAnswer || null,
             permisos: foundUser.permisos || {
               usuarios: false,
               asistencia: true,
@@ -80,18 +82,54 @@ async function login(username, password) {
         });
       } else if (username === TEST_CREDENTIALS.username && password === TEST_CREDENTIALS.password) {
         // Fallback to test credentials (admin/admin123)
+        // Check if admin exists in appUsers, if not create it
+        let adminUser = appUsers.find(u => u.usuario === 'admin');
+
+        if (!adminUser) {
+          // Create admin user in appUsers
+          adminUser = {
+            id: Date.now(),
+            usuario: 'admin',
+            password: 'admin123',
+            nombre: 'Administrador',
+            apellido: 'Sistema',
+            puesto: 'Administrador',
+            departamento: null,
+            departamentosPasarAsistencia: [],
+            departamentosTiempoExtra: [],
+            securityQuestion: null,
+            securityAnswer: null,
+            permisos: {
+              usuarios: true,
+              asistencia: true,
+              pasarAsistencia: true,
+              agregarColaborador: true,
+              historial: true,
+              inasistencia: true,
+              colaboradores: true,
+              bajas: true,
+              tiempoExtra: true,
+              miPerfil: true
+            }
+          };
+          appUsers.push(adminUser);
+          localStorage.setItem('appUsers', JSON.stringify(appUsers));
+        }
+
         resolve({
           success: true,
           token: 'mock-token-' + Date.now(),
           user: {
-            id: 1,
-            username: username,
-            name: 'Administrador',
-            password: password,
-            departamento: null, // null = puede ver todos los departamentos
-            departamentosPasarAsistencia: [], // array vacío = puede ver todos
-            departamentosTiempoExtra: [], // array vacío = puede ver todos
-            permisos: {
+            id: adminUser.id,
+            username: adminUser.usuario,
+            name: `${adminUser.nombre} ${adminUser.apellido}`,
+            password: adminUser.password,
+            departamento: adminUser.departamento || null,
+            departamentosPasarAsistencia: adminUser.departamentosPasarAsistencia || [],
+            departamentosTiempoExtra: adminUser.departamentosTiempoExtra || [],
+            securityQuestion: adminUser.securityQuestion || null,
+            securityAnswer: adminUser.securityAnswer || null,
+            permisos: adminUser.permisos || {
               usuarios: true,
               asistencia: true,
               pasarAsistencia: true,
@@ -272,8 +310,17 @@ async function handleLogin(event) {
       // Small delay for UX
       await sleep(100);
 
-      // Redirect to dashboard
-      navigateTo('dashboard');
+      // Check if user needs to set up security question (first time login)
+      if (!result.user.securityQuestion || !result.user.securityAnswer) {
+        // Redirect to dashboard first, then show setup modal
+        navigateTo('dashboard');
+        setTimeout(() => {
+          openSetupSecurityQuestionModal();
+        }, 500);
+      } else {
+        // Redirect to dashboard normally
+        navigateTo('dashboard');
+      }
     }
   } catch (error) {
     // Show error message
@@ -357,15 +404,382 @@ function setupInputValidation() {
  */
 function handleForgotPassword(event) {
   event.preventDefault();
+  openForgotPasswordModal();
+}
 
+/* ============================================
+   PASSWORD RECOVERY - SECURITY QUESTION
+   New simplified flow
+   ============================================ */
+
+// State for recovery process
+const recoveryState = {
+  username: null,
+  userPassword: null,
+  attempts: 0,
+  lastAttempt: 0,
+  maxAttempts: 3,
+  lockoutTime: 15 * 60 * 1000 // 15 minutes
+};
+
+/**
+ * Opens the forgot password modal (Step 1)
+ */
+function openForgotPasswordModal() {
+  const modal = document.getElementById('forgotPasswordModal');
+  if (!modal) return;
+
+  // Reset to step 1
+  showRecoveryStep(1);
+
+  // Clear inputs
+  const usernameInput = document.getElementById('recoveryUsername');
+  if (usernameInput) {
+    usernameInput.value = '';
+  }
+
+  // Reset attempts if lockout expired
+  if (recoveryState.attempts >= recoveryState.maxAttempts) {
+    const timeSinceLastAttempt = Date.now() - recoveryState.lastAttempt;
+    if (timeSinceLastAttempt >= recoveryState.lockoutTime) {
+      recoveryState.attempts = 0;
+    }
+  }
+
+  // Show modal
+  modal.style.display = 'flex';
+}
+
+/**
+ * Closes the forgot password modal
+ */
+function closeForgotPasswordModal() {
+  const modal = document.getElementById('forgotPasswordModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+
+  // Reset state
+  recoveryState.username = null;
+  recoveryState.userPassword = null;
+  showRecoveryStep(1);
+}
+
+/**
+ * Shows specific step in recovery process
+ * @param {number} step - Step number (1, 2, or 3)
+ */
+function showRecoveryStep(step) {
+  const steps = [1, 2, 3];
+  steps.forEach(s => {
+    const stepElement = document.getElementById(`recoveryStep${s}`);
+    if (stepElement) {
+      stepElement.style.display = s === step ? 'block' : 'none';
+    }
+  });
+}
+
+/**
+ * Goes back to step 1
+ */
+function goBackToRecoveryStep1() {
+  showRecoveryStep(1);
+}
+
+/**
+ * Verifies username and shows security question (Step 1 -> Step 2)
+ */
+function verifyUsernameForRecovery() {
+  const usernameInput = document.getElementById('recoveryUsername');
+  const username = usernameInput.value.trim();
+
+  if (!username) {
+    showToast('Por favor ingresa tu nombre de usuario', 'warning');
+    usernameInput.focus();
+    return;
+  }
+
+  // Check if user is locked out
+  if (isLockedOut()) {
+    const timeLeft = getRemainingLockoutTime();
+    showToast(`Demasiados intentos. Intenta en ${timeLeft} minutos`, 'error');
+    return;
+  }
+
+  // Check if user exists
+  const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
+  const user = appUsers.find(u => u.usuario === username);
+
+  // SECURITY: Always show same message (prevent user enumeration)
+  if (!user || !user.securityQuestion || !user.securityAnswer) {
+    showToast('Usuario no encontrado o sin pregunta configurada. Contacta al administrador.', 'error');
+    return;
+  }
+
+  // Store username and password for later
+  recoveryState.username = username;
+  recoveryState.userPassword = user.password;
+
+  // Show user's security question
+  const questionLabel = document.getElementById('recoveryQuestion');
+  if (questionLabel) {
+    questionLabel.textContent = user.securityQuestion;
+  }
+
+  // Clear answer input
+  const answerInput = document.getElementById('recoveryAnswer');
+  if (answerInput) {
+    answerInput.value = '';
+  }
+
+  // Go to step 2
+  showRecoveryStep(2);
+}
+
+/**
+ * Verifies security answer and shows password (Step 2 -> Step 3)
+ */
+function verifySecurityAnswer() {
+  const answerInput = document.getElementById('recoveryAnswer');
+  const userAnswer = answerInput.value.trim().toLowerCase();
+
+  if (!userAnswer) {
+    showToast('Por favor ingresa tu respuesta', 'warning');
+    answerInput.focus();
+    return;
+  }
+
+  // Get user to verify answer
+  const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
+  const user = appUsers.find(u => u.usuario === recoveryState.username);
+
+  if (!user) {
+    handleRecoveryFailedAttempt();
+    return;
+  }
+
+  // Verify answer (case-insensitive)
+  const correctAnswer = (user.securityAnswer || '').toLowerCase();
+  const isCorrect = userAnswer === correctAnswer;
+
+  if (isCorrect) {
+    // Success! Reset attempts and show password
+    recoveryState.attempts = 0;
+
+    // Display the password
+    const recoveredPasswordInput = document.getElementById('recoveredPassword');
+    if (recoveredPasswordInput) {
+      recoveredPasswordInput.value = recoveryState.userPassword;
+    }
+
+    // Log security event
+    logSecurityEvent('password_recovered', recoveryState.username);
+
+    showRecoveryStep(3);
+  } else {
+    // Failed attempt
+    handleRecoveryFailedAttempt();
+  }
+}
+
+/**
+ * Handles failed recovery attempt
+ */
+function handleRecoveryFailedAttempt() {
+  recoveryState.attempts++;
+  recoveryState.lastAttempt = Date.now();
+
+  const remainingAttempts = recoveryState.maxAttempts - recoveryState.attempts;
+
+  if (remainingAttempts > 0) {
+    showToast(`Respuesta incorrecta. Intentos restantes: ${remainingAttempts}`, 'error');
+  } else {
+    // Lock out user
+    showToast('Demasiados intentos fallidos. Bloqueado por 15 minutos', 'error');
+    closeForgotPasswordModal();
+
+    // Log security event
+    logSecurityEvent('password_recovery_lockout', recoveryState.username);
+  }
+}
+
+/**
+ * Checks if user is locked out
+ * @returns {boolean}
+ */
+function isLockedOut() {
+  if (recoveryState.attempts < recoveryState.maxAttempts) {
+    return false;
+  }
+
+  const timeSinceLastAttempt = Date.now() - recoveryState.lastAttempt;
+  return timeSinceLastAttempt < recoveryState.lockoutTime;
+}
+
+/**
+ * Gets remaining lockout time in minutes
+ * @returns {number}
+ */
+function getRemainingLockoutTime() {
+  const timeSinceLastAttempt = Date.now() - recoveryState.lastAttempt;
+  const remainingTime = recoveryState.lockoutTime - timeSinceLastAttempt;
+  return Math.ceil(remainingTime / (60 * 1000));
+}
+
+/**
+ * Closes recovery modal and fills login with username
+ */
+function closeRecoveryAndFillLogin() {
+  // Auto-fill username in login form
+  const usernameInput = document.getElementById('username');
+  if (usernameInput && recoveryState.username) {
+    usernameInput.value = recoveryState.username;
+  }
+
+  // Close modal
+  closeForgotPasswordModal();
+
+  // Focus password field
   const passwordInput = document.getElementById('password');
-  showError(passwordInput, 'Funcionalidad en desarrollo. Contacta al administrador del sistema.');
+  if (passwordInput) {
+    setTimeout(() => passwordInput.focus(), 300);
+  }
+}
 
-  // Auto-hide message after 3 seconds
-  setTimeout(() => {
-    clearError(passwordInput);
-  }, 3000);
+/**
+ * Toggles password visibility
+ * @param {string} inputId - Input element ID
+ */
+function togglePasswordVisibility(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
 
-  // TODO: Implement forgot password flow
-  // navigateTo('recover-password');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+/**
+ * Logs security events for audit trail
+ * @param {string} event - Event type
+ * @param {string} username - Username involved
+ */
+function logSecurityEvent(event, username) {
+  const securityLog = JSON.parse(localStorage.getItem('securityLog') || '[]');
+
+  securityLog.push({
+    event,
+    username,
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent
+  });
+
+  // Keep only last 100 events
+  if (securityLog.length > 100) {
+    securityLog.shift();
+  }
+
+  localStorage.setItem('securityLog', JSON.stringify(securityLog));
+}
+
+/* ============================================
+   SECURITY QUESTION SETUP (First Login)
+   ============================================ */
+
+/**
+ * Opens the security question setup modal
+ */
+function openSetupSecurityQuestionModal() {
+  const modal = document.getElementById('setupSecurityQuestionModal');
+  if (!modal) return;
+
+  // Clear inputs
+  const questionSelect = document.getElementById('setupSecurityQuestion');
+  const answerInput = document.getElementById('setupSecurityAnswer');
+
+  if (questionSelect) questionSelect.value = '';
+  if (answerInput) answerInput.value = '';
+
+  // Show modal
+  modal.style.display = 'flex';
+}
+
+/**
+ * Saves security question from setup modal
+ */
+window.saveSecurityQuestion = function() {
+  try {
+    const questionSelect = document.getElementById('setupSecurityQuestion');
+    const answerInput = document.getElementById('setupSecurityAnswer');
+
+    if (!questionSelect || !answerInput) {
+      console.error('Elements not found:', {questionSelect, answerInput});
+      alert('Error: No se encontraron los campos del formulario');
+      return;
+    }
+
+    const question = questionSelect.value;
+    const answer = answerInput.value.trim();
+
+    // Helper to show message (with fallback)
+    const showMessage = (msg, type) => {
+      if (typeof showToast === 'function') {
+        showToast(msg, type);
+      } else {
+        alert(msg);
+      }
+    };
+
+    if (!question || question === '') {
+      showMessage('Por favor selecciona una pregunta', 'warning');
+      questionSelect.focus();
+      return;
+    }
+
+    if (!answer) {
+      showMessage('Por favor ingresa tu respuesta', 'warning');
+      answerInput.focus();
+      return;
+    }
+
+    if (answer.length < 2) {
+      showMessage('La respuesta debe tener al menos 2 caracteres', 'warning');
+      answerInput.focus();
+      return;
+    }
+
+    // Save to user's record
+    const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
+    const userIndex = appUsers.findIndex(u => u.usuario === window.currentUser.username);
+
+    if (userIndex !== -1) {
+      appUsers[userIndex].securityQuestion = question;
+      appUsers[userIndex].securityAnswer = answer.toLowerCase(); // Store lowercase
+      localStorage.setItem('appUsers', JSON.stringify(appUsers));
+
+      // Update current user object
+      window.currentUser.securityQuestion = question;
+      window.currentUser.securityAnswer = answer.toLowerCase();
+
+      showMessage('Pregunta de seguridad configurada exitosamente', 'success');
+
+      // Close modal
+      const modal = document.getElementById('setupSecurityQuestionModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+
+      // Log event
+      logSecurityEvent('security_question_setup', window.currentUser.username);
+
+      // Refresh the Mi Perfil section if it's visible
+      if (typeof cargarPreguntaSeguridad === 'function') {
+        cargarPreguntaSeguridad();
+      }
+    } else {
+      console.error('User not found in appUsers array');
+      showMessage('Error al guardar la pregunta de seguridad', 'error');
+    }
+  } catch (error) {
+    console.error('Error in saveSecurityQuestion:', error);
+    alert('Error al guardar: ' + error.message);
+  }
 }

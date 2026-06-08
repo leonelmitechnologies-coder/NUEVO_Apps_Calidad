@@ -421,10 +421,401 @@ body {
   }
 }
 
+/* ============================================
+   MODAL STYLES - Recovery & Setup
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 480px;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.recovery-step,
+.forgot-step {
+  padding: 32px;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.modal-btn-cancel:hover {
+  background: #e5e5e5;
+}
+
+.modal-btn-confirm {
+  background: #002171;
+  color: white;
+}
+
+.modal-btn-confirm:hover {
+  background: #001a5c;
+}
+
+/* ============================================
+   CUSTOM SELECT DROPDOWNS - Modal Style
+   ============================================ */
+
+/* Base select styling for modals */
+.recovery-step select,
+.forgot-step select,
+#setupSecurityQuestion,
+#recoveryAnswer {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23002171' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding-right: 40px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 8px !important;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  font-size: 0.95rem;
+}
+
+/* Hover state */
+.recovery-step select:hover,
+.forgot-step select:hover,
+#setupSecurityQuestion:hover {
+  border-color: #002171 !important;
+  background-color: #f8f9fb;
+}
+
+/* Focus state */
+.recovery-step select:focus,
+.forgot-step select:focus,
+#setupSecurityQuestion:focus {
+  outline: none;
+  border-color: #002171 !important;
+  box-shadow: 0 0 0 3px rgba(0, 33, 113, 0.1) !important;
+  background-color: white;
+}
+
+/* Select options styling */
+.recovery-step select option,
+.forgot-step select option,
+#setupSecurityQuestion option {
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background-color: white;
+}
+
+/* First option (placeholder) */
+#setupSecurityQuestion option:first-child {
+  color: #94A3B8;
+}
+
+/* Selected option */
+.recovery-step select option:checked,
+.forgot-step select option:checked,
+#setupSecurityQuestion option:checked {
+  background: linear-gradient(135deg, rgba(0, 33, 113, 0.08), rgba(0, 33, 113, 0.04));
+  color: #002171;
+  font-weight: 600;
+}
+
+/* Mobile Optimization for Modals */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: 40px;
+    overflow-y: auto;
+  }
+
+  .modal-box {
+    max-width: 100%;
+    border-radius: 10px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .recovery-step,
+  .forgot-step {
+    padding: 24px 20px;
+    overflow: visible;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .modal-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    min-height: 44px;
+  }
+
+  /* Form elements in modal */
+  .recovery-step .form-group,
+  .forgot-step .form-group {
+    margin-bottom: 20px;
+  }
+
+  .recovery-step label,
+  .forgot-step label {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .recovery-step input,
+  .recovery-step select,
+  .forgot-step input,
+  .forgot-step select {
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+
+  /* Select dropdown max height in modals */
+  .recovery-step select,
+  .forgot-step select,
+  #setupSecurityQuestion {
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+
+  /* Select options in modals */
+  .recovery-step select option,
+  .forgot-step select option,
+  #setupSecurityQuestion option {
+    padding: 10px 8px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .recovery-step p,
+  .forgot-step p {
+    font-size: 0.9rem;
+  }
+
+  /* Warning/info boxes in modals */
+  .recovery-step [style*="background: #fff3cd"],
+  .recovery-step [style*="background: #d1ecf1"],
+  .forgot-step [style*="background: #fff3cd"],
+  .forgot-step [style*="background: #d1ecf1"] {
+    padding: 10px !important;
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Small text / hints in modals */
+  .recovery-step small,
+  .forgot-step small,
+  #setupSecurityQuestionModal small {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    display: block;
+    margin-top: 5px;
+  }
+
+  /* Form control in setup modal */
+  #setupSecurityQuestionModal .form-control {
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+
+  #setupSecurityQuestionModal label {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
+
+  /* Password display box */
+  .recovery-step [style*="background: #f8f9fa"] {
+    padding: 16px !important;
+  }
+
+  .recovery-step [style*="background: #f8f9fa"] input {
+    font-size: 1.3rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 12px;
+    padding-top: 30px;
+  }
+
+  .recovery-step,
+  .forgot-step {
+    padding: 20px 16px;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .modal-btn {
+    padding: 13px 18px;
+    font-size: 0.9rem;
+  }
+
+  .recovery-step input,
+  .recovery-step select,
+  .forgot-step input,
+  .forgot-step select {
+    font-size: 0.9rem;
+    padding: 11px;
+  }
+
+  /* Select dropdown in small mobile */
+  .recovery-step select,
+  .forgot-step select,
+  #setupSecurityQuestion {
+    max-height: 42vh;
+    font-size: 0.88rem;
+  }
+
+  /* Select options smaller */
+  .recovery-step select option,
+  .forgot-step select option,
+  #setupSecurityQuestion option {
+    padding: 9px 7px;
+    font-size: 0.85rem;
+  }
+
+  .recovery-step [style*="background: #f8f9fa"] input {
+    font-size: 1.1rem !important;
+    letter-spacing: 1px !important;
+  }
+}
+
+@media (max-width: 375px) {
+  .recovery-step,
+  .forgot-step {
+    padding: 18px 14px;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+  }
+
+  .recovery-step p,
+  .forgot-step p {
+    font-size: 0.85rem;
+  }
+
+  .modal-btn {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+  }
+
+  .recovery-step input,
+  .recovery-step select,
+  .forgot-step input,
+  .forgot-step select {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  /* Select dropdown in very small mobile */
+  .recovery-step select,
+  .forgot-step select,
+  #setupSecurityQuestion {
+    max-height: 38vh;
+    font-size: 0.82rem;
+  }
+
+  /* Select options even smaller */
+  .recovery-step select option,
+  .forgot-step select option,
+  #setupSecurityQuestion option {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+
+  /* Form hints smaller */
+  .recovery-step small,
+  .forgot-step small {
+    font-size: 0.7rem;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
     transition: none !important;
+  }
+
+  .modal-box {
+    animation: none;
   }
 }
