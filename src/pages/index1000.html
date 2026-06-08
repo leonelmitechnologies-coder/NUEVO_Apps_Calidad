@@ -3183,9 +3183,17 @@
           window.navigateToLocation('asistencia-grid', false); // false = no agregar al historial (ya se agregó arriba)
         }
 
-        // Si estamos navegando a mi-perfil, cargar la foto actual
+        // Si estamos navegando a mi-perfil, cargar datos del perfil
         if (viewName === 'mi-perfil') {
-          setTimeout(() => cargarFotoPerfil(), 100);
+          setTimeout(() => {
+            cargarFotoPerfil();
+
+            // Actualizar contraseña actual
+            const passwordActualDisplay = document.getElementById('passwordActualDisplay');
+            if (passwordActualDisplay && window.currentUser) {
+              passwordActualDisplay.value = window.currentUser.password;
+            }
+          }, 100);
         }
       }
 
@@ -3745,6 +3753,9 @@
         return;
       }
 
+      // Preservar la foto existente si no se seleccionó una nueva
+      const photoToSave = photo !== null && photo !== undefined ? photo : users[userIndex].photo;
+
       // Update user
       users[userIndex] = {
         ...users[userIndex],
@@ -3754,7 +3765,7 @@
         password,
         puesto,
         departamento,
-        photo: photo || null,
+        photo: photoToSave,
         departamentosPasarAsistencia: deptsPasarAsistencia,
         departamentosTiempoExtra: deptsTiempoExtra,
         permisos: {
@@ -3778,7 +3789,7 @@
       // Si el usuario editado es el usuario logueado, actualizar currentUser
       if (window.currentUser && window.currentUser.username === usuario) {
         window.currentUser.name = `${nombre} ${apellido}`;
-        window.currentUser.photo = photo || null;
+        window.currentUser.photo = photoToSave;
         window.currentUser.password = password;
         window.currentUser.departamento = departamento || null;
         window.currentUser.departamentosPasarAsistencia = deptsPasarAsistencia;
