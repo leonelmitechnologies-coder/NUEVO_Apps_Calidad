@@ -1406,23 +1406,32 @@
 
             <!-- Sección: Cambiar Contraseña -->
             <div class="perfil-section">
-              <h2 class="perfil-section-title">Cambiar Contraseña</h2>
+              <h2 class="perfil-section-title">Gestión de Contraseña</h2>
+
+              <!-- Mostrar contraseña actual -->
+              <div class="form-group" style="margin-bottom: 24px;">
+                <label for="passwordActualDisplay">Contraseña Actual</label>
+                <div class="password-input-wrapper">
+                  <input type="password" id="passwordActualDisplay" readonly style="background-color: #f5f5f5; cursor: default;">
+                  <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('passwordActualDisplay')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                      <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                  </button>
+                </div>
+                <small class="form-hint" style="color: #666;">Esta es tu contraseña actual</small>
+              </div>
+
+              <!-- Divisor visual -->
+              <div style="border-top: 2px solid #e0e0e0; margin: 32px 0; position: relative;">
+                <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: white; padding: 0 16px; color: #666; font-weight: 500;">Cambiar Contraseña</span>
+              </div>
+
+              <!-- Formulario de cambio de contraseña -->
               <form id="formCambiarPassword" class="perfil-password-form">
                 <!-- Hidden username field for password managers and accessibility -->
                 <input type="text" id="perfilUsername" autocomplete="username" style="display: none;">
-
-                <div class="form-group">
-                  <label for="passwordActual">Contraseña Actual *</label>
-                  <div class="password-input-wrapper">
-                    <input type="password" id="passwordActual" autocomplete="current-password" required placeholder="Ingresa tu contraseña actual">
-                    <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('passwordActual')">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
 
                 <div class="form-group">
                   <label for="passwordNueva">Nueva Contraseña *</label>
@@ -1449,6 +1458,7 @@
                       </svg>
                     </button>
                   </div>
+                  <small class="form-hint">Debe coincidir con la nueva contraseña</small>
                 </div>
 
                 <div class="perfil-password-actions">
@@ -2488,15 +2498,28 @@
      */
     function updateNavbarUser() {
       const user = getCurrentUser();
-      if (user) {
-        const userNameElement = document.getElementById('userName');
-        const userAvatarElement = document.getElementById('userAvatar');
+      if (!user) return;
 
-        if (userNameElement) {
-          userNameElement.textContent = user.username;
-        }
+      const userNameElement = document.getElementById('userName');
+      const userAvatarElement = document.getElementById('userAvatar');
 
-        if (userAvatarElement) {
+      // Actualizar nombre de usuario
+      if (userNameElement) {
+        userNameElement.textContent = user.username;
+      }
+
+      // Actualizar avatar
+      if (userAvatarElement) {
+        // Usar window.currentUser para acceder a la foto (getCurrentUser solo tiene username/token)
+        if (window.currentUser && window.currentUser.photo) {
+          // Mostrar foto de perfil
+          userAvatarElement.style.backgroundImage = `url(${window.currentUser.photo})`;
+          userAvatarElement.style.backgroundSize = 'cover';
+          userAvatarElement.style.backgroundPosition = 'center';
+          userAvatarElement.textContent = '';
+        } else {
+          // Mostrar iniciales si no hay foto
+          userAvatarElement.style.backgroundImage = 'none';
           userAvatarElement.textContent = getInitials(user.username);
         }
       }
@@ -2661,6 +2684,25 @@
           e.preventDefault();
           navigateTo('mi-perfil');
         });
+      }
+
+      // Inicializar window.currentUser si el usuario ya está autenticado
+      if (isAuthenticated()) {
+        const username = localStorage.getItem('username');
+        if (username) {
+          const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
+          const foundUser = appUsers.find(u => u.usuario === username);
+
+          if (foundUser) {
+            window.currentUser = {
+              id: foundUser.id,
+              username: foundUser.usuario,
+              name: `${foundUser.nombre} ${foundUser.apellido}`,
+              photo: foundUser.photo || null,
+              password: foundUser.password
+            };
+          }
+        }
       }
 
       // Vista inicial según autenticación
@@ -6197,6 +6239,12 @@
         perfilUsernameInput.value = window.currentUser.username;
       }
 
+      // Mostrar contraseña actual en el campo de solo lectura
+      const passwordActualDisplay = document.getElementById('passwordActualDisplay');
+      if (passwordActualDisplay && window.currentUser) {
+        passwordActualDisplay.value = window.currentUser.password;
+      }
+
       // Listener para cambio de foto
       const perfilFotoInput = document.getElementById('perfilFotoInput');
       if (perfilFotoInput) {
@@ -6258,6 +6306,12 @@
       reader.onload = function(e) {
         const fotoBase64 = e.target.result;
 
+        // Verificar que window.currentUser existe
+        if (!window.currentUser || !window.currentUser.username) {
+          showToast('Error: usuario no autenticado', 'error');
+          return;
+        }
+
         // Actualizar usuario en localStorage (appUsers)
         const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
         const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
@@ -6271,7 +6325,7 @@
 
           // Actualizar preview
           const preview = document.getElementById('perfilFotoPreview');
-          preview.innerHTML = `<img src="${fotoBase64}" alt="${window.currentUser.name}">`;
+          preview.innerHTML = `<img src="${fotoBase64}" alt="${window.currentUser.name || 'Usuario'}">`;
 
           // Mostrar botón eliminar
           const btnEliminar = document.getElementById('btnEliminarFotoPerfil');
@@ -6290,6 +6344,12 @@
     }
 
     function eliminarFotoPerfil() {
+      // Verificar que window.currentUser existe
+      if (!window.currentUser || !window.currentUser.username) {
+        showToast('Error: usuario no autenticado', 'error');
+        return;
+      }
+
       // Actualizar usuario en localStorage (appUsers)
       const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
       const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
@@ -6320,19 +6380,12 @@
     function handleCambiarPassword(event) {
       event.preventDefault();
 
-      const passwordActual = document.getElementById('passwordActual').value;
       const passwordNueva = document.getElementById('passwordNueva').value;
       const passwordConfirmar = document.getElementById('passwordConfirmar').value;
 
-      // Validar contraseña actual
-      if (passwordActual !== window.currentUser.password) {
-        showToast('La contraseña actual es incorrecta', 'error');
-        return;
-      }
-
       // Validar que las contraseñas coincidan
       if (passwordNueva !== passwordConfirmar) {
-        showToast('Las contraseñas nuevas no coinciden', 'error');
+        showToast('Las contraseñas no coinciden', 'error');
         return;
       }
 
@@ -6342,8 +6395,8 @@
         return;
       }
 
-      // Validar que la nueva contraseña sea diferente
-      if (passwordNueva === passwordActual) {
+      // Validar que la nueva contraseña sea diferente a la actual
+      if (passwordNueva === window.currentUser.password) {
         showToast('La nueva contraseña debe ser diferente a la actual', 'error');
         return;
       }
@@ -6358,6 +6411,12 @@
 
         // Actualizar currentUser global
         window.currentUser.password = passwordNueva;
+
+        // Actualizar el campo de contraseña actual (display)
+        const passwordActualDisplay = document.getElementById('passwordActualDisplay');
+        if (passwordActualDisplay) {
+          passwordActualDisplay.value = passwordNueva;
+        }
 
         // Limpiar formulario
         limpiarFormularioPassword();
@@ -6394,7 +6453,13 @@
         userAvatar.style.backgroundPosition = 'center';
         userAvatar.textContent = '';
       } else if (window.currentUser) {
-        const iniciales = window.currentUser.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+        // Obtener iniciales del nombre o username como fallback
+        let iniciales = 'U';
+        if (window.currentUser.name) {
+          iniciales = window.currentUser.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+        } else if (window.currentUser.username) {
+          iniciales = window.currentUser.username.substring(0, 2).toUpperCase();
+        }
         userAvatar.style.backgroundImage = 'none';
         userAvatar.textContent = iniciales;
       }
