@@ -1623,6 +1623,39 @@
                 </div>
               </div>
 
+              <!-- Departamentos Visibles por Submódulo -->
+              <div class="form-group">
+                <label style="font-weight: 600; font-size: 1.1em; margin-bottom: 12px; display: block;">Departamentos Visibles</label>
+                <p style="color: #666; font-size: 0.9em; margin-bottom: 16px;">Selecciona los departamentos que este usuario podrá ver en cada submódulo. Por defecto, el departamento asignado ya está seleccionado.</p>
+
+                <!-- Pasar Asistencia -->
+                <div style="margin-bottom: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                  <label style="font-weight: 600; margin-bottom: 8px; display: block;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 6px;">
+                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                      <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                    </svg>
+                    Pasar Asistencia
+                  </label>
+                  <div id="departamentos-pasar-asistencia" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 8px;">
+                    <!-- Se llenará dinámicamente -->
+                  </div>
+                </div>
+
+                <!-- Tiempo Extra -->
+                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                  <label style="font-weight: 600; margin-bottom: 8px; display: block;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 6px;">
+                      <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
+                    </svg>
+                    Tiempo Extra
+                  </label>
+                  <div id="departamentos-tiempo-extra" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 8px;">
+                    <!-- Se llenará dinámicamente -->
+                  </div>
+                </div>
+              </div>
+
               <div class="form-actions">
                 <button type="submit" class="btn-primary" id="btnSubmitUser">Crear Usuario</button>
                 <button type="button" class="btn-secondary" id="btnCancelEdit" style="display: none">Cancelar</button>
@@ -1772,6 +1805,39 @@
                       <div class="permiso-check">✓</div>
                     </div>
                   </label>
+                </div>
+              </div>
+
+              <!-- Departamentos Visibles por Submódulo -->
+              <div class="form-group">
+                <label style="font-weight: 600; font-size: 1.1em; margin-bottom: 12px; display: block;">Departamentos Visibles</label>
+                <p style="color: #666; font-size: 0.9em; margin-bottom: 16px;">Selecciona los departamentos que este usuario podrá ver en cada submódulo. Por defecto, el departamento asignado ya está seleccionado.</p>
+
+                <!-- Pasar Asistencia -->
+                <div style="margin-bottom: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                  <label style="font-weight: 600; margin-bottom: 8px; display: block;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 6px;">
+                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                      <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                    </svg>
+                    Pasar Asistencia
+                  </label>
+                  <div id="departamentos-pasar-asistencia-edit" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 8px;">
+                    <!-- Se llenará dinámicamente -->
+                  </div>
+                </div>
+
+                <!-- Tiempo Extra -->
+                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                  <label style="font-weight: 600; margin-bottom: 8px; display: block;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 6px;">
+                      <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
+                    </svg>
+                    Tiempo Extra
+                  </label>
+                  <div id="departamentos-tiempo-extra-edit" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 8px;">
+                    <!-- Se llenará dinámicamente -->
+                  </div>
                 </div>
               </div>
 
@@ -3204,6 +3270,8 @@
               photo: foundUser.photo || null,
               password: foundUser.password,
               departamento: foundUser.departamento || null,
+              departamentosPasarAsistencia: foundUser.departamentosPasarAsistencia || (foundUser.departamento ? [foundUser.departamento] : []),
+              departamentosTiempoExtra: foundUser.departamentosTiempoExtra || (foundUser.departamento ? [foundUser.departamento] : []),
               permisos: foundUser.permisos || {
                 usuarios: false,
                 asistencia: true,
@@ -3456,6 +3524,63 @@
         });
       }
 
+      // Función para generar checkboxes de departamentos
+      function generarCheckboxesDepartamentos() {
+        const containerPasarAsistencia = document.getElementById('departamentos-pasar-asistencia');
+        const containerTiempoExtra = document.getElementById('departamentos-tiempo-extra');
+        const containerPasarAsistenciaEdit = document.getElementById('departamentos-pasar-asistencia-edit');
+        const containerTiempoExtraEdit = document.getElementById('departamentos-tiempo-extra-edit');
+
+        const checkboxHTML = DEPARTAMENTOS.map(dept => `
+          <label style="display: flex; align-items: center; padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+            <input type="checkbox" value="${dept}" style="margin-right: 8px; cursor: pointer;">
+            <span style="font-size: 0.9em;">${dept}</span>
+          </label>
+        `).join('');
+
+        if (containerPasarAsistencia) containerPasarAsistencia.innerHTML = checkboxHTML;
+        if (containerTiempoExtra) containerTiempoExtra.innerHTML = checkboxHTML;
+        if (containerPasarAsistenciaEdit) containerPasarAsistenciaEdit.innerHTML = checkboxHTML;
+        if (containerTiempoExtraEdit) containerTiempoExtraEdit.innerHTML = checkboxHTML;
+      }
+
+      // Generar checkboxes al iniciar
+      generarCheckboxesDepartamentos();
+
+      // Manejar cambio en el dropdown de departamento (CREATE form)
+      const departamentoSelect = document.getElementById('departamento');
+      if (departamentoSelect) {
+        departamentoSelect.addEventListener('change', (e) => {
+          const selectedDept = e.target.value;
+          if (selectedDept) {
+            // Auto-seleccionar el departamento asignado en ambos submódulos
+            document.querySelectorAll('#departamentos-pasar-asistencia input[type="checkbox"]').forEach(cb => {
+              if (cb.value === selectedDept) cb.checked = true;
+            });
+            document.querySelectorAll('#departamentos-tiempo-extra input[type="checkbox"]').forEach(cb => {
+              if (cb.value === selectedDept) cb.checked = true;
+            });
+          }
+        });
+      }
+
+      // Manejar cambio en el dropdown de departamento (EDIT form)
+      const departamentoSelectEdit = document.getElementById('departamentoEdit');
+      if (departamentoSelectEdit) {
+        departamentoSelectEdit.addEventListener('change', (e) => {
+          const selectedDept = e.target.value;
+          if (selectedDept) {
+            // Auto-seleccionar el departamento asignado en ambos submódulos
+            document.querySelectorAll('#departamentos-pasar-asistencia-edit input[type="checkbox"]').forEach(cb => {
+              if (cb.value === selectedDept) cb.checked = true;
+            });
+            document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]').forEach(cb => {
+              if (cb.value === selectedDept) cb.checked = true;
+            });
+          }
+        });
+      }
+
       // Handle form submission (CREATE)
       const userForm = document.getElementById('userForm');
       userForm.addEventListener('submit', (e) => {
@@ -3496,6 +3621,15 @@
 
       const photo = window.getCurrentPhoto();
 
+      // Obtener departamentos seleccionados para Pasar Asistencia y Tiempo Extra
+      const deptsPasarAsistencia = Array.from(
+        document.querySelectorAll('#departamentos-pasar-asistencia input[type="checkbox"]:checked')
+      ).map(cb => cb.value);
+
+      const deptsTiempoExtra = Array.from(
+        document.querySelectorAll('#departamentos-tiempo-extra input[type="checkbox"]:checked')
+      ).map(cb => cb.value);
+
       // Get existing users from localStorage
       const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
 
@@ -3509,6 +3643,8 @@
         puesto,
         departamento,
         photo: photo || null,
+        departamentosPasarAsistencia: deptsPasarAsistencia,
+        departamentosTiempoExtra: deptsTiempoExtra,
         permisos: {
           usuarios: permisoUsuarios,
           asistencia: permisoAsistencia,
@@ -3568,6 +3704,15 @@
 
       const photo = window.getCurrentPhotoEdit();
 
+      // Obtener departamentos seleccionados para Pasar Asistencia y Tiempo Extra
+      const deptsPasarAsistencia = Array.from(
+        document.querySelectorAll('#departamentos-pasar-asistencia-edit input[type="checkbox"]:checked')
+      ).map(cb => cb.value);
+
+      const deptsTiempoExtra = Array.from(
+        document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]:checked')
+      ).map(cb => cb.value);
+
       // Get existing users
       const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
 
@@ -3596,6 +3741,8 @@
         puesto,
         departamento,
         photo: photo || null,
+        departamentosPasarAsistencia: deptsPasarAsistencia,
+        departamentosTiempoExtra: deptsTiempoExtra,
         permisos: {
           usuarios: permisoUsuarios,
           asistencia: permisoAsistencia,
@@ -3620,6 +3767,8 @@
         window.currentUser.photo = photo || null;
         window.currentUser.password = password;
         window.currentUser.departamento = departamento || null;
+        window.currentUser.departamentosPasarAsistencia = deptsPasarAsistencia;
+        window.currentUser.departamentosTiempoExtra = deptsTiempoExtra;
         window.currentUser.permisos = {
           usuarios: permisoUsuarios,
           asistencia: permisoAsistencia,
@@ -3776,6 +3925,18 @@
       document.getElementById('permiso-colaboradoresEdit').checked = user.permisos.colaboradores || false;
       document.getElementById('permiso-bajasEdit').checked = user.permisos.bajas || false;
       document.getElementById('permiso-tiempo-extraEdit').checked = user.permisos.tiempoExtra || false;
+
+      // Cargar departamentos seleccionados para Pasar Asistencia
+      const deptsPasarAsistencia = user.departamentosPasarAsistencia || (user.departamento ? [user.departamento] : []);
+      document.querySelectorAll('#departamentos-pasar-asistencia-edit input[type="checkbox"]').forEach(cb => {
+        cb.checked = deptsPasarAsistencia.includes(cb.value);
+      });
+
+      // Cargar departamentos seleccionados para Tiempo Extra
+      const deptsTiempoExtra = user.departamentosTiempoExtra || (user.departamento ? [user.departamento] : []);
+      document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]').forEach(cb => {
+        cb.checked = deptsTiempoExtra.includes(cb.value);
+      });
 
       // Load photo if exists
       if (user.photo) {
@@ -4609,11 +4770,45 @@
 
     /**
      * Obtiene los departamentos que el usuario actual puede ver
+     * @param {string} submodulo - 'pasar-asistencia', 'tiempo-extra', o null para usar departamento base
      * Si el usuario tiene departamento asignado, solo ve ese departamento
      * Si el usuario NO tiene departamento (admin), ve todos los departamentos
      */
-    function getDepartamentosPermitidos() {
-      if (window.currentUser && window.currentUser.departamento) {
+    function getDepartamentosPermitidos(submodulo = null) {
+      if (!window.currentUser) {
+        return DEPARTAMENTOS; // Si no hay usuario, mostrar todos (no debería pasar)
+      }
+
+      // Caso especial para Pasar Asistencia
+      if (submodulo === 'pasar-asistencia') {
+        const deptos = window.currentUser.departamentosPasarAsistencia;
+        if (deptos && deptos.length > 0) {
+          return deptos;
+        }
+        // Si no tiene departamentos específicos pero tiene departamento base, usar ese
+        if (window.currentUser.departamento) {
+          return [window.currentUser.departamento];
+        }
+        // Admin o sin configuración: ver todos
+        return DEPARTAMENTOS;
+      }
+
+      // Caso especial para Tiempo Extra
+      if (submodulo === 'tiempo-extra') {
+        const deptos = window.currentUser.departamentosTiempoExtra;
+        if (deptos && deptos.length > 0) {
+          return deptos;
+        }
+        // Si no tiene departamentos específicos pero tiene departamento base, usar ese
+        if (window.currentUser.departamento) {
+          return [window.currentUser.departamento];
+        }
+        // Admin o sin configuración: ver todos
+        return DEPARTAMENTOS;
+      }
+
+      // Para otros submódulos (Colaboradores, Historial, Inasistencia, Bajas)
+      if (window.currentUser.departamento) {
         // Usuario con departamento específico: solo puede ver su departamento
         return [window.currentUser.departamento];
       }
@@ -4797,8 +4992,8 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      // Renderizar solo los departamentos permitidos para el usuario
-      const departamentosPermitidos = getDepartamentosPermitidos();
+      // Renderizar solo los departamentos permitidos para Pasar Asistencia
+      const departamentosPermitidos = getDepartamentosPermitidos('pasar-asistencia');
       departamentosContainer.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
@@ -6062,8 +6257,8 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      // Renderizar solo los departamentos permitidos para el usuario
-      const departamentosPermitidos = getDepartamentosPermitidos();
+      // Renderizar solo los departamentos permitidos para Tiempo Extra
+      const departamentosPermitidos = getDepartamentosPermitidos('tiempo-extra');
       container.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
