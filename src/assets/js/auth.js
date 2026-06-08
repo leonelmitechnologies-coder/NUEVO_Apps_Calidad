@@ -60,7 +60,19 @@ async function login(username, password) {
             username: foundUser.usuario,
             name: `${foundUser.nombre} ${foundUser.apellido}`,
             photo: foundUser.photo || null,
-            password: foundUser.password
+            password: foundUser.password,
+            permisos: foundUser.permisos || {
+              usuarios: false,
+              asistencia: true,
+              pasarAsistencia: false,
+              agregarColaborador: false,
+              historial: false,
+              inasistencia: false,
+              colaboradores: false,
+              bajas: false,
+              tiempoExtra: false,
+              miPerfil: true
+            }
           }
         });
       } else if (username === TEST_CREDENTIALS.username && password === TEST_CREDENTIALS.password) {
@@ -72,7 +84,19 @@ async function login(username, password) {
             id: 1,
             username: username,
             name: 'Administrador',
-            password: password
+            password: password,
+            permisos: {
+              usuarios: true,
+              asistencia: true,
+              pasarAsistencia: true,
+              agregarColaborador: true,
+              historial: true,
+              inasistencia: true,
+              colaboradores: true,
+              bajas: true,
+              tiempoExtra: true,
+              miPerfil: true
+            }
           }
         });
       } else {

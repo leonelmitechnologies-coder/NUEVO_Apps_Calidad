@@ -189,6 +189,226 @@
       width: auto;
     }
 
+    /* Sección de Permisos/Control de Acceso */
+    .permisos-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border: 2px solid #e3f2fd;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+
+    .permisos-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1976d2;
+      margin: 0 0 8px 0;
+    }
+
+    .permisos-title svg {
+      color: #1976d2;
+    }
+
+    .permisos-subtitle {
+      color: #666;
+      font-size: 14px;
+      margin: 0 0 20px 0;
+    }
+
+    .permisos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .permiso-card {
+      position: relative;
+      display: block;
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .permiso-card:hover {
+      border-color: #1976d2;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .permiso-card input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .permiso-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .permiso-content > svg {
+      flex-shrink: 0;
+      color: #666;
+      transition: color 0.3s ease;
+    }
+
+    .permiso-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .permiso-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .permiso-desc {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .permiso-check {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    /* Estado checked */
+    .permiso-card input[type="checkbox"]:checked ~ .permiso-content > svg {
+      color: #1976d2;
+    }
+
+    .permiso-card input[type="checkbox"]:checked ~ .permiso-content .permiso-check {
+      background: #1976d2;
+    }
+
+    .permiso-card input[type="checkbox"]:checked {
+      border-color: #1976d2;
+    }
+
+    /* Estado disabled (Mi Perfil siempre habilitado) */
+    .permiso-card.permiso-always-enabled {
+      background: #f5f5f5;
+      border-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .permiso-card.permiso-always-enabled:hover {
+      border-color: #ccc;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .permiso-card.permiso-always-enabled .permiso-content > svg {
+      color: #999;
+    }
+
+    .permiso-card.permiso-always-enabled .permiso-check {
+      background: #999;
+    }
+
+    .permiso-card.permiso-always-enabled .permiso-desc {
+      font-style: italic;
+      color: #999;
+    }
+
+    /* Submódulos - diseño compacto e indentado */
+    .permisos-submodulos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+      padding-left: 16px;
+      border-left: 3px solid #e3f2fd;
+    }
+
+    .permiso-submodulo {
+      position: relative;
+      display: block;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .permiso-submodulo:hover {
+      border-color: #2e7d32;
+      background: white;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.1);
+    }
+
+    .permiso-submodulo input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .permiso-submodulo-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .permiso-submodulo-content svg {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: #666;
+      transition: color 0.2s ease;
+    }
+
+    .permiso-submodulo-name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .permiso-submodulo-check {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .permiso-submodulo input[type="checkbox"]:checked ~ .permiso-submodulo-content svg {
+      color: #2e7d32;
+    }
+
+    .permiso-submodulo input[type="checkbox"]:checked ~ .permiso-submodulo-content .permiso-submodulo-check {
+      background: #2e7d32;
+    }
+
     .photo-upload {
       display: flex;
       flex-direction: column;
@@ -1258,11 +1478,149 @@
                 </div>
               </div>
 
-              <div class="form-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" id="permiso-usuarios" checked>
-                  <span>Acceso a módulo de Usuarios</span>
-                </label>
+              <!-- Sección de Control de Acceso -->
+              <div class="permisos-section">
+                <h3 class="permisos-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                  </svg>
+                  Control de Acceso a Módulos
+                </h3>
+                <p class="permisos-subtitle">Selecciona los módulos y submódulos a los que el usuario tendrá acceso</p>
+
+                <div class="permisos-grid" style="grid-template-columns: 1fr;">
+                  <!-- Módulo Usuarios -->
+                  <label class="permiso-card">
+                    <input type="checkbox" id="permiso-usuarios" checked>
+                    <div class="permiso-content">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                      </svg>
+                      <div class="permiso-info">
+                        <span class="permiso-name">Usuarios</span>
+                        <span class="permiso-desc">Gestión de usuarios del sistema</span>
+                      </div>
+                      <div class="permiso-check">✓</div>
+                    </div>
+                  </label>
+
+                  <!-- Módulo Asistencia con Submódulos -->
+                  <div>
+                    <label class="permiso-card">
+                      <input type="checkbox" id="permiso-asistencia" checked>
+                      <div class="permiso-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                        </svg>
+                        <div class="permiso-info">
+                          <span class="permiso-name">Asistencia</span>
+                          <span class="permiso-desc">Registro y gestión de asistencias</span>
+                        </div>
+                        <div class="permiso-check">✓</div>
+                      </div>
+                    </label>
+
+                    <!-- Submódulos de Asistencia -->
+                    <div class="permisos-submodulos">
+                      <label class="permiso-submodulo">
+                        <input type="checkbox" id="permiso-pasar-asistencia" checked>
+                        <div class="permiso-submodulo-content">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                          </svg>
+                          <span class="permiso-submodulo-name">Pasar Asistencia</span>
+                          <div class="permiso-submodulo-check">✓</div>
+                        </div>
+                      </label>
+
+                      <label class="permiso-submodulo">
+                        <input type="checkbox" id="permiso-agregar-colaborador" checked>
+                        <div class="permiso-submodulo-content">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                          </svg>
+                          <span class="permiso-submodulo-name">Agregar Colaborador</span>
+                          <div class="permiso-submodulo-check">✓</div>
+                        </div>
+                      </label>
+
+                      <label class="permiso-submodulo">
+                        <input type="checkbox" id="permiso-historial" checked>
+                        <div class="permiso-submodulo-content">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/>
+                            <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                            <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                          </svg>
+                          <span class="permiso-submodulo-name">Historial</span>
+                          <div class="permiso-submodulo-check">✓</div>
+                        </div>
+                      </label>
+
+                      <label class="permiso-submodulo">
+                        <input type="checkbox" id="permiso-inasistencia" checked>
+                        <div class="permiso-submodulo-content">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                          </svg>
+                          <span class="permiso-submodulo-name">Inasistencia</span>
+                          <div class="permiso-submodulo-check">✓</div>
+                        </div>
+                      </label>
+
+                      <label class="permiso-submodulo">
+                        <input type="checkbox" id="permiso-colaboradores" checked>
+                        <div class="permiso-submodulo-content">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                            <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                          </svg>
+                          <span class="permiso-submodulo-name">Colaboradores</span>
+                          <div class="permiso-submodulo-check">✓</div>
+                        </div>
+                      </label>
+
+                      <label class="permiso-submodulo">
+                        <input type="checkbox" id="permiso-bajas" checked>
+                        <div class="permiso-submodulo-content">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                          </svg>
+                          <span class="permiso-submodulo-name">Bajas</span>
+                          <div class="permiso-submodulo-check">✓</div>
+                        </div>
+                      </label>
+
+                      <label class="permiso-submodulo">
+                        <input type="checkbox" id="permiso-tiempo-extra" checked>
+                        <div class="permiso-submodulo-content">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
+                          </svg>
+                          <span class="permiso-submodulo-name">Tiempo Extra</span>
+                          <div class="permiso-submodulo-check">✓</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Mi Perfil -->
+                  <label class="permiso-card permiso-always-enabled">
+                    <input type="checkbox" id="permiso-mi-perfil" checked disabled>
+                    <div class="permiso-content">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                      </svg>
+                      <div class="permiso-info">
+                        <span class="permiso-name">Mi Perfil</span>
+                        <span class="permiso-desc">Acceso siempre habilitado</span>
+                      </div>
+                      <div class="permiso-check">✓</div>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               <div class="form-actions">
@@ -1349,11 +1707,72 @@
                 </div>
               </div>
 
-              <div class="form-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" id="permiso-usuariosEdit" checked>
-                  <span>Acceso a módulo de Usuarios</span>
-                </label>
+              <!-- Sección de Control de Acceso (copiado del formulario de crear con IDs Edit) -->
+              <div class="permisos-section">
+                <h3 class="permisos-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                  </svg>
+                  Control de Acceso a Módulos
+                </h3>
+                <p class="permisos-subtitle">Selecciona los módulos y submódulos a los que el usuario tendrá acceso</p>
+
+                <div class="permisos-grid" style="grid-template-columns: 1fr;">
+                  <label class="permiso-card">
+                    <input type="checkbox" id="permiso-usuariosEdit" checked>
+                    <div class="permiso-content">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                      </svg>
+                      <div class="permiso-info">
+                        <span class="permiso-name">Usuarios</span>
+                        <span class="permiso-desc">Gestión de usuarios del sistema</span>
+                      </div>
+                      <div class="permiso-check">✓</div>
+                    </div>
+                  </label>
+
+                  <div>
+                    <label class="permiso-card">
+                      <input type="checkbox" id="permiso-asistenciaEdit" checked>
+                      <div class="permiso-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                        </svg>
+                        <div class="permiso-info">
+                          <span class="permiso-name">Asistencia</span>
+                          <span class="permiso-desc">Registro y gestión de asistencias</span>
+                        </div>
+                        <div class="permiso-check">✓</div>
+                      </div>
+                    </label>
+
+                    <div class="permisos-submodulos">
+                      <label class="permiso-submodulo"><input type="checkbox" id="permiso-pasar-asistenciaEdit" checked><div class="permiso-submodulo-content"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg><span class="permiso-submodulo-name">Pasar Asistencia</span><div class="permiso-submodulo-check">✓</div></div></label>
+                      <label class="permiso-submodulo"><input type="checkbox" id="permiso-agregar-colaboradorEdit" checked><div class="permiso-submodulo-content"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg><span class="permiso-submodulo-name">Agregar Colaborador</span><div class="permiso-submodulo-check">✓</div></div></label>
+                      <label class="permiso-submodulo"><input type="checkbox" id="permiso-historialEdit" checked><div class="permiso-submodulo-content"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/><path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/><path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/></svg><span class="permiso-submodulo-name">Historial</span><div class="permiso-submodulo-check">✓</div></div></label>
+                      <label class="permiso-submodulo"><input type="checkbox" id="permiso-inasistenciaEdit" checked><div class="permiso-submodulo-content"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg><span class="permiso-submodulo-name">Inasistencia</span><div class="permiso-submodulo-check">✓</div></div></label>
+                      <label class="permiso-submodulo"><input type="checkbox" id="permiso-colaboradoresEdit" checked><div class="permiso-submodulo-content"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/><path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg><span class="permiso-submodulo-name">Colaboradores</span><div class="permiso-submodulo-check">✓</div></div></label>
+                      <label class="permiso-submodulo"><input type="checkbox" id="permiso-bajasEdit" checked><div class="permiso-submodulo-content"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg><span class="permiso-submodulo-name">Bajas</span><div class="permiso-submodulo-check">✓</div></div></label>
+                      <label class="permiso-submodulo"><input type="checkbox" id="permiso-tiempo-extraEdit" checked><div class="permiso-submodulo-content"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/></svg><span class="permiso-submodulo-name">Tiempo Extra</span><div class="permiso-submodulo-check">✓</div></div></label>
+                    </div>
+                  </div>
+
+                  <label class="permiso-card permiso-always-enabled">
+                    <input type="checkbox" id="permiso-mi-perfilEdit" checked disabled>
+                    <div class="permiso-content">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                      </svg>
+                      <div class="permiso-info">
+                        <span class="permiso-name">Mi Perfil</span>
+                        <span class="permiso-desc">Acceso siempre habilitado</span>
+                      </div>
+                      <div class="permiso-check">✓</div>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               <div class="form-actions">
@@ -2526,6 +2945,66 @@
     }
 
     /**
+     * Aplica permisos de módulos - Oculta módulos a los que el usuario no tiene acceso
+     */
+    function applyModulePermissions() {
+      if (!window.currentUser || !window.currentUser.permisos) {
+        // Si no hay permisos definidos, mostrar todos por defecto (retrocompatibilidad)
+        return;
+      }
+
+      const permisos = window.currentUser.permisos;
+
+      // Módulo de Usuarios
+      const linkUsuarios = document.getElementById('link-usuarios');
+      if (linkUsuarios) {
+        if (permisos.usuarios) {
+          linkUsuarios.style.display = '';
+        } else {
+          linkUsuarios.style.display = 'none';
+        }
+      }
+
+      // Módulo de Asistencia
+      const linkAsistencia = document.getElementById('link-asistencia');
+      if (linkAsistencia) {
+        if (permisos.asistencia !== undefined ? permisos.asistencia : true) {
+          linkAsistencia.style.display = '';
+        } else {
+          linkAsistencia.style.display = 'none';
+        }
+      }
+
+      // Submódulos de Asistencia
+      const submodulos = [
+        { id: 'link-pasar-asistencia', permiso: 'pasarAsistencia' },
+        { id: 'link-agregar-colaborador', permiso: 'agregarColaborador' },
+        { id: 'link-historial-asistencia', permiso: 'historial' },
+        { id: 'link-inasistencia', permiso: 'inasistencia' },
+        { id: 'link-colaboradores-lista', permiso: 'colaboradores' },
+        { id: 'link-bajas', permiso: 'bajas' },
+        { id: 'link-tiempo-extra', permiso: 'tiempoExtra' }
+      ];
+
+      submodulos.forEach(({ id, permiso }) => {
+        const link = document.getElementById(id);
+        if (link) {
+          if (permisos[permiso]) {
+            link.style.display = '';
+          } else {
+            link.style.display = 'none';
+          }
+        }
+      });
+
+      // Mi Perfil siempre visible (no se controla con permisos)
+      const linkMiPerfil = document.getElementById('link-mi-perfil');
+      if (linkMiPerfil) {
+        linkMiPerfil.style.display = '';
+      }
+    }
+
+    /**
      * Función central de navegación para el SPA
      * @param {string} viewName - Nombre de la vista (login, dashboard, usuarios)
      */
@@ -2547,6 +3026,25 @@
         if (!isAuthenticated()) {
           navigateTo('login');
           return;
+        }
+
+        // Validar permisos para módulos protegidos
+        if (window.currentUser && window.currentUser.permisos) {
+          const permisos = window.currentUser.permisos;
+
+          // Verificar acceso al módulo de Usuarios
+          if (viewName === 'usuarios' && !permisos.usuarios) {
+            showToast('No tienes permiso para acceder a este módulo', 'error');
+            navigateTo('dashboard');
+            return;
+          }
+
+          // Verificar acceso al módulo de Asistencia
+          if (viewName === 'asistencia' && permisos.asistencia === false) {
+            showToast('No tienes permiso para acceder a este módulo', 'error');
+            navigateTo('dashboard');
+            return;
+          }
         }
 
         // Mostrar app shell (vistas autenticadas)
@@ -2575,6 +3073,11 @@
 
         // Actualizar info de usuario en navbar
         updateNavbarUser();
+
+        // Aplicar permisos de módulos si estamos en el dashboard o asistencia
+        if (viewName === 'dashboard' || viewName === 'asistencia') {
+          applyModulePermissions();
+        }
 
         // Actualizar título del módulo en navbar
         const currentModule = document.getElementById('currentModule');
@@ -2699,7 +3202,19 @@
               username: foundUser.usuario,
               name: `${foundUser.nombre} ${foundUser.apellido}`,
               photo: foundUser.photo || null,
-              password: foundUser.password
+              password: foundUser.password,
+              permisos: foundUser.permisos || {
+                usuarios: false,
+                asistencia: true,
+                pasarAsistencia: false,
+                agregarColaborador: false,
+                historial: false,
+                inasistencia: false,
+                colaboradores: false,
+                bajas: false,
+                tiempoExtra: false,
+                miPerfil: true
+              }
             };
           }
         }
@@ -2906,6 +3421,40 @@
       nombreEditInput.addEventListener('input', generateUsernameEdit);
       apellidoEditInput.addEventListener('input', generateUsernameEdit);
 
+      // Checkbox cascading: when Asistencia is unchecked, uncheck all submodules (CREATE form)
+      const permisoAsistenciaCheckbox = document.getElementById('permiso-asistencia');
+      if (permisoAsistenciaCheckbox) {
+        permisoAsistenciaCheckbox.addEventListener('change', (e) => {
+          if (!e.target.checked) {
+            // Uncheck all submodules
+            document.getElementById('permiso-pasar-asistencia').checked = false;
+            document.getElementById('permiso-agregar-colaborador').checked = false;
+            document.getElementById('permiso-historial').checked = false;
+            document.getElementById('permiso-inasistencia').checked = false;
+            document.getElementById('permiso-colaboradores').checked = false;
+            document.getElementById('permiso-bajas').checked = false;
+            document.getElementById('permiso-tiempo-extra').checked = false;
+          }
+        });
+      }
+
+      // Checkbox cascading: when Asistencia is unchecked, uncheck all submodules (EDIT form)
+      const permisoAsistenciaCheckboxEdit = document.getElementById('permiso-asistenciaEdit');
+      if (permisoAsistenciaCheckboxEdit) {
+        permisoAsistenciaCheckboxEdit.addEventListener('change', (e) => {
+          if (!e.target.checked) {
+            // Uncheck all submodules
+            document.getElementById('permiso-pasar-asistenciaEdit').checked = false;
+            document.getElementById('permiso-agregar-colaboradorEdit').checked = false;
+            document.getElementById('permiso-historialEdit').checked = false;
+            document.getElementById('permiso-inasistenciaEdit').checked = false;
+            document.getElementById('permiso-colaboradoresEdit').checked = false;
+            document.getElementById('permiso-bajasEdit').checked = false;
+            document.getElementById('permiso-tiempo-extraEdit').checked = false;
+          }
+        });
+      }
+
       // Handle form submission (CREATE)
       const userForm = document.getElementById('userForm');
       userForm.addEventListener('submit', (e) => {
@@ -2929,7 +3478,21 @@
       const password = document.getElementById('password-nuevo').value;
       const puesto = document.getElementById('puesto').value;
       const departamento = document.getElementById('departamento').value;
+
+      // Obtener permisos de módulos principales
       const permisoUsuarios = document.getElementById('permiso-usuarios').checked;
+      const permisoAsistencia = document.getElementById('permiso-asistencia').checked;
+      const permisoMiPerfil = document.getElementById('permiso-mi-perfil').checked;
+
+      // Obtener permisos de submódulos de Asistencia
+      const permisoPasarAsistencia = document.getElementById('permiso-pasar-asistencia').checked;
+      const permisoAgregarColaborador = document.getElementById('permiso-agregar-colaborador').checked;
+      const permisoHistorial = document.getElementById('permiso-historial').checked;
+      const permisoInasistencia = document.getElementById('permiso-inasistencia').checked;
+      const permisoColaboradores = document.getElementById('permiso-colaboradores').checked;
+      const permisoBajas = document.getElementById('permiso-bajas').checked;
+      const permisoTiempoExtra = document.getElementById('permiso-tiempo-extra').checked;
+
       const photo = window.getCurrentPhoto();
 
       // Get existing users from localStorage
@@ -2946,7 +3509,16 @@
         departamento,
         photo: photo || null,
         permisos: {
-          usuarios: permisoUsuarios
+          usuarios: permisoUsuarios,
+          asistencia: permisoAsistencia,
+          pasarAsistencia: permisoPasarAsistencia,
+          agregarColaborador: permisoAgregarColaborador,
+          historial: permisoHistorial,
+          inasistencia: permisoInasistencia,
+          colaboradores: permisoColaboradores,
+          bajas: permisoBajas,
+          tiempoExtra: permisoTiempoExtra,
+          miPerfil: permisoMiPerfil
         },
         fechaCreacion: new Date().toISOString()
       };
@@ -2978,7 +3550,21 @@
       const password = document.getElementById('password-nuevoEdit').value;
       const puesto = document.getElementById('puestoEdit').value;
       const departamento = document.getElementById('departamentoEdit').value;
+
+      // Obtener permisos de módulos principales
       const permisoUsuarios = document.getElementById('permiso-usuariosEdit').checked;
+      const permisoAsistencia = document.getElementById('permiso-asistenciaEdit').checked;
+      const permisoMiPerfil = document.getElementById('permiso-mi-perfilEdit').checked;
+
+      // Obtener permisos de submódulos de Asistencia
+      const permisoPasarAsistencia = document.getElementById('permiso-pasar-asistenciaEdit').checked;
+      const permisoAgregarColaborador = document.getElementById('permiso-agregar-colaboradorEdit').checked;
+      const permisoHistorial = document.getElementById('permiso-historialEdit').checked;
+      const permisoInasistencia = document.getElementById('permiso-inasistenciaEdit').checked;
+      const permisoColaboradores = document.getElementById('permiso-colaboradoresEdit').checked;
+      const permisoBajas = document.getElementById('permiso-bajasEdit').checked;
+      const permisoTiempoExtra = document.getElementById('permiso-tiempo-extraEdit').checked;
+
       const photo = window.getCurrentPhotoEdit();
 
       // Get existing users
@@ -3010,7 +3596,16 @@
         departamento,
         photo: photo || null,
         permisos: {
-          usuarios: permisoUsuarios
+          usuarios: permisoUsuarios,
+          asistencia: permisoAsistencia,
+          pasarAsistencia: permisoPasarAsistencia,
+          agregarColaborador: permisoAgregarColaborador,
+          historial: permisoHistorial,
+          inasistencia: permisoInasistencia,
+          colaboradores: permisoColaboradores,
+          bajas: permisoBajas,
+          tiempoExtra: permisoTiempoExtra,
+          miPerfil: permisoMiPerfil
         },
         fechaActualizacion: new Date().toISOString()
       };
@@ -3023,10 +3618,27 @@
         window.currentUser.name = `${nombre} ${apellido}`;
         window.currentUser.photo = photo || null;
         window.currentUser.password = password;
+        window.currentUser.permisos = {
+          usuarios: permisoUsuarios,
+          asistencia: permisoAsistencia,
+          pasarAsistencia: permisoPasarAsistencia,
+          agregarColaborador: permisoAgregarColaborador,
+          historial: permisoHistorial,
+          inasistencia: permisoInasistencia,
+          colaboradores: permisoColaboradores,
+          bajas: permisoBajas,
+          tiempoExtra: permisoTiempoExtra,
+          miPerfil: permisoMiPerfil
+        };
 
         // Actualizar avatar en navbar
         if (typeof updateUserAvatar === 'function') {
           updateUserAvatar();
+        }
+
+        // Reaplicar permisos de módulos si estamos en el dashboard
+        if (typeof applyModulePermissions === 'function') {
+          applyModulePermissions();
         }
       }
 
@@ -3079,8 +3691,27 @@
             </div>
             <div class="user-detail">
               <span class="label">Permisos:</span>
-              <span class="value">
-                ${user.permisos.usuarios ? '<span class="user-badge">Usuarios</span>' : '-'}
+              <span class="value" style="display: flex; gap: 6px; flex-wrap: wrap; flex-direction: column; align-items: flex-start;">
+                ${user.permisos.usuarios ? '<span class="user-badge">Usuarios</span>' : ''}
+                ${user.permisos.asistencia || user.permisos.asistencia === undefined ? `
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="user-badge" style="background: #e8f5e9; color: #2e7d32;">Asistencia</span>
+                    ${(() => {
+                      const submodulos = [];
+                      if (user.permisos.pasarAsistencia) submodulos.push('Pasar Asistencia');
+                      if (user.permisos.agregarColaborador) submodulos.push('Agregar Colaborador');
+                      if (user.permisos.historial) submodulos.push('Historial');
+                      if (user.permisos.inasistencia) submodulos.push('Inasistencia');
+                      if (user.permisos.colaboradores) submodulos.push('Colaboradores');
+                      if (user.permisos.bajas) submodulos.push('Bajas');
+                      if (user.permisos.tiempoExtra) submodulos.push('Tiempo Extra');
+                      return submodulos.length > 0 ?
+                        `<span style="font-size: 0.85em; color: #666; margin-left: 12px;">• ${submodulos.join(', ')}</span>` : '';
+                    })()}
+                  </div>
+                ` : ''}
+                ${user.permisos.miPerfil || user.permisos.miPerfil === undefined ? '<span class="user-badge" style="background: #f3e5f5; color: #7b1fa2;">Mi Perfil</span>' : ''}
+                ${!user.permisos.usuarios && !user.permisos.asistencia && !user.permisos.miPerfil ? '<span style="color: #999;">Sin permisos</span>' : ''}
               </span>
             </div>
           </div>
@@ -3129,7 +3760,20 @@
       document.getElementById('password-nuevoEdit').value = user.password;
       document.getElementById('puestoEdit').value = user.puesto;
       document.getElementById('departamentoEdit').value = user.departamento;
-      document.getElementById('permiso-usuariosEdit').checked = user.permisos.usuarios;
+
+      // Cargar permisos de módulos principales (con valores por defecto para retrocompatibilidad)
+      document.getElementById('permiso-usuariosEdit').checked = user.permisos.usuarios || false;
+      document.getElementById('permiso-asistenciaEdit').checked = user.permisos.asistencia !== undefined ? user.permisos.asistencia : true;
+      document.getElementById('permiso-mi-perfilEdit').checked = user.permisos.miPerfil !== undefined ? user.permisos.miPerfil : true;
+
+      // Cargar permisos de submódulos de Asistencia (valores por defecto en false para retrocompatibilidad)
+      document.getElementById('permiso-pasar-asistenciaEdit').checked = user.permisos.pasarAsistencia || false;
+      document.getElementById('permiso-agregar-colaboradorEdit').checked = user.permisos.agregarColaborador || false;
+      document.getElementById('permiso-historialEdit').checked = user.permisos.historial || false;
+      document.getElementById('permiso-inasistenciaEdit').checked = user.permisos.inasistencia || false;
+      document.getElementById('permiso-colaboradoresEdit').checked = user.permisos.colaboradores || false;
+      document.getElementById('permiso-bajasEdit').checked = user.permisos.bajas || false;
+      document.getElementById('permiso-tiempo-extraEdit').checked = user.permisos.tiempoExtra || false;
 
       // Load photo if exists
       if (user.photo) {
@@ -3639,6 +4283,32 @@
      * @param {boolean} addToHistory - Si agregar a historial (default: true)
      */
     window.navigateToLocation = function(location, addToHistory = true) {
+      // Validar permisos para submódulos de Asistencia
+      if (window.currentUser && window.currentUser.permisos) {
+        const permisos = window.currentUser.permisos;
+
+        // Mapeo de locations a permisos
+        const locationPermissions = {
+          'pasar-asistencia-lista': 'pasarAsistencia',
+          'agregar-colaborador': 'agregarColaborador',
+          'colaboradores-lista': 'colaboradores',
+          'historial-lista': 'historial',
+          'inasistencia-lista': 'inasistencia',
+          'bajas-lista': 'bajas',
+          'tiempo-extra-lista': 'tiempoExtra'
+        };
+
+        // Verificar si el location base requiere permiso
+        const baseLocation = location.split(':')[0]; // Para manejar locations con parámetros
+        const requiredPermission = locationPermissions[baseLocation];
+
+        if (requiredPermission && !permisos[requiredPermission]) {
+          showToast('No tienes permiso para acceder a esta función', 'error');
+          navigateToLocation('asistencia-grid', false);
+          return;
+        }
+      }
+
       // Obtener todos los contenedores de vistas
       const asistenciaMain = document.getElementById('asistencia-main');
       const colaboradoresListaView = document.getElementById('asistencia-colaboradores-lista');
