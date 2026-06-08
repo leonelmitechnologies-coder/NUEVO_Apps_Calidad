@@ -2355,6 +2355,23 @@
             <h2 class="section-title" id="dept-detalle-title">Departamento</h2>
             <p class="section-subtitle" id="dept-detalle-subtitle">0 colaboradores</p>
 
+            <!-- Buscador de Colaboradores -->
+            <div class="search-colaboradores-container" style="margin: 20px 0;">
+              <div style="position: relative; max-width: 400px;">
+                <input
+                  type="text"
+                  id="search-colaboradores-lista"
+                  class="search-input"
+                  placeholder="Buscar colaborador por nombre o número de nómina..."
+                  style="width: 100%; padding: 10px 40px 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                     style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none;">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+              </div>
+            </div>
+
             <div id="colaboradores-dept-container">
               <!-- Los colaboradores del departamento se cargarán aquí -->
             </div>
@@ -5068,6 +5085,17 @@
       window.verColaboradorDetalle = function(colaboradorId) {
         navigateToLocation('colaborador-detalle:' + colaboradorId);
       }
+
+      // Event listener para el buscador de colaboradores (lista)
+      const searchColaboradoresLista = document.getElementById('search-colaboradores-lista');
+      if (searchColaboradoresLista) {
+        searchColaboradoresLista.addEventListener('input', (e) => {
+          // Re-cargar colaboradores con el filtro aplicado
+          if (nombreDeptListaActual) {
+            cargarColaboradoresDepartamento(nombreDeptListaActual);
+          }
+        });
+      }
     }
 
     /**
@@ -5151,9 +5179,29 @@
       }).join('');
     }
 
+    // Variables globales para el buscador de colaboradores
+    let colaboradoresDeptListaActuales = [];
+    let nombreDeptListaActual = '';
+
     function cargarColaboradoresDepartamento(nombreDepartamento) {
+      nombreDeptListaActual = nombreDepartamento;
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-      const colaboradoresDept = colaboradores.filter(c => c.departamento === nombreDepartamento && (c.estatus || 'Activo') === 'Activo');
+      let colaboradoresDept = colaboradores.filter(c => c.departamento === nombreDepartamento && (c.estatus || 'Activo') === 'Activo');
+
+      // Guardar para el buscador
+      colaboradoresDeptListaActuales = colaboradoresDept;
+
+      // Aplicar filtro de búsqueda si existe
+      const searchInput = document.getElementById('search-colaboradores-lista');
+      const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+
+      if (searchTerm) {
+        colaboradoresDept = colaboradoresDept.filter(c => {
+          const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
+          const numeroNomina = (c.numeroNomina || '').toString().toLowerCase();
+          return nombreCompleto.includes(searchTerm) || numeroNomina.includes(searchTerm);
+        });
+      }
 
       // Actualizar título
       document.getElementById('dept-detalle-title').textContent = nombreDepartamento;
