@@ -262,8 +262,9 @@ class AsistenciaService {
 
     // Encontrar el primer lunes del año
     const diaSemana = primerDia.getDay();
-    const diasHastaPrimerLunes = diaSemana === 0 ? 1 : (8 - diaSemana);
-    const primerLunes = new Date(año, 0, diasHastaPrimerLunes);
+    // Si ya es lunes (1), usar ese día. Si es domingo (0), avanzar 1 día. Para otros días, calcular días hasta el próximo lunes
+    const diasHastaPrimerLunes = (7 - diaSemana + 1) % 7;
+    const primerLunes = new Date(año, 0, 1 + diasHastaPrimerLunes);
 
     // Calcular el lunes de la semana solicitada
     const lunesSemana = new Date(primerLunes);
@@ -325,9 +326,24 @@ class AsistenciaService {
    * @returns {number} Número de semana
    */
   getNumeroSemana(fecha) {
-    const primerDia = new Date(fecha.getFullYear(), 0, 1);
-    const diasTranscurridos = Math.floor((fecha - primerDia) / (24 * 60 * 60 * 1000));
-    return Math.ceil((diasTranscurridos + primerDia.getDay() + 1) / 7);
+    const año = fecha.getFullYear();
+
+    // Obtener el primer día del año
+    const primerDia = new Date(año, 0, 1);
+    const diaSemana = primerDia.getDay();
+
+    // Calcular el primer lunes del año (usando la misma lógica que getRangoSemana)
+    const diasHastaPrimerLunes = (7 - diaSemana + 1) % 7;
+    const primerLunes = new Date(año, 0, 1 + diasHastaPrimerLunes);
+
+    // Si la fecha es antes del primer lunes, pertenece a la última semana del año anterior
+    if (fecha < primerLunes) {
+      return this.getNumeroSemana(new Date(año - 1, 11, 31));
+    }
+
+    // Calcular cuántas semanas completas han pasado desde el primer lunes
+    const diasDesdeInicio = Math.floor((fecha - primerLunes) / (24 * 60 * 60 * 1000));
+    return Math.floor(diasDesdeInicio / 7) + 1;
   }
 }
 

@@ -805,8 +805,11 @@ function actualizarRangoFechas() {
   const fechaInicio = new Date(vistaSemanal.fechaInicio + 'T00:00:00');
   const fechaFin = new Date(vistaSemanal.fechaFin + 'T00:00:00');
 
+  const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
+  const diaInicioSemana = diasSemana[fechaInicio.getDay()];
+  const diaFinSemana = diasSemana[fechaFin.getDay()];
   const diaInicio = fechaInicio.getDate();
   const diaFin = fechaFin.getDate();
   const mesInicio = meses[fechaInicio.getMonth()];
@@ -815,9 +818,9 @@ function actualizarRangoFechas() {
 
   let texto = '';
   if (mesInicio === mesFin) {
-    texto = `Lun ${diaInicio} - Vie ${diaFin} ${mesFin} ${añoFin}`;
+    texto = `${diaInicioSemana} ${diaInicio} - ${diaFinSemana} ${diaFin} ${mesFin} ${añoFin}`;
   } else {
-    texto = `Lun ${diaInicio} ${mesInicio} - Vie ${diaFin} ${mesFin} ${añoFin}`;
+    texto = `${diaInicioSemana} ${diaInicio} ${mesInicio} - ${diaFinSemana} ${diaFin} ${mesFin} ${añoFin}`;
   }
 
   document.getElementById('rangoFechas').textContent = texto;
