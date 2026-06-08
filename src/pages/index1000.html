@@ -178,6 +178,20 @@
       border-radius: 6px 6px 0 0;
     }
 
+    /* Departamentos Grid - Responsive */
+    .departamentos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .departamentos-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+    }
+
     /* Multiselect Dropdown */
     .multiselect-dropdown {
       position: relative;
@@ -290,6 +304,29 @@
 
     .multiselect-content span {
       flex: 1;
+    }
+
+    /* Responsive adjustments for mobile */
+    @media (max-width: 768px) {
+      .multiselect-button {
+        padding: 12px;
+        font-size: 13px;
+      }
+
+      .multiselect-button .selected-count {
+        font-size: 11px;
+        padding: 2px 6px;
+      }
+
+      .multiselect-content label {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .multiselect-content input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+      }
     }
 
     .checkbox-label {
@@ -1743,7 +1780,7 @@
                 <p style="color: #666; font-size: 0.8em; margin-bottom: 10px;">Selecciona departamentos visibles por submódulo</p>
 
                 <!-- Grid de 2 columnas para los submódulos -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="departamentos-grid">
 
                   <!-- Pasar Asistencia - Dropdown -->
                   <div class="multiselect-dropdown">
@@ -1941,7 +1978,7 @@
                 <p style="color: #666; font-size: 0.8em; margin-bottom: 10px;">Selecciona departamentos visibles por submódulo</p>
 
                 <!-- Grid de 2 columnas para los submódulos -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="departamentos-grid">
 
                   <!-- Pasar Asistencia - Dropdown -->
                   <div class="multiselect-dropdown">
