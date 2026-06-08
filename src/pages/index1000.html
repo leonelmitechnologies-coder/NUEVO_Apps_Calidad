@@ -3203,6 +3203,7 @@
               name: `${foundUser.nombre} ${foundUser.apellido}`,
               photo: foundUser.photo || null,
               password: foundUser.password,
+              departamento: foundUser.departamento || null,
               permisos: foundUser.permisos || {
                 usuarios: false,
                 asistencia: true,
@@ -3618,6 +3619,7 @@
         window.currentUser.name = `${nombre} ${apellido}`;
         window.currentUser.photo = photo || null;
         window.currentUser.password = password;
+        window.currentUser.departamento = departamento || null;
         window.currentUser.permisos = {
           usuarios: permisoUsuarios,
           asistencia: permisoAsistencia,
@@ -4605,6 +4607,20 @@
       }
     }
 
+    /**
+     * Obtiene los departamentos que el usuario actual puede ver
+     * Si el usuario tiene departamento asignado, solo ve ese departamento
+     * Si el usuario NO tiene departamento (admin), ve todos los departamentos
+     */
+    function getDepartamentosPermitidos() {
+      if (window.currentUser && window.currentUser.departamento) {
+        // Usuario con departamento específico: solo puede ver su departamento
+        return [window.currentUser.departamento];
+      }
+      // Admin o usuario sin departamento: puede ver todos
+      return DEPARTAMENTOS;
+    }
+
     function cargarDepartamentos() {
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
       const departamentosContainer = document.getElementById('departamentos-container');
@@ -4616,8 +4632,9 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      // Renderizar TODOS los departamentos (incluso con 0)
-      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+      // Renderizar solo los departamentos permitidos para el usuario
+      const departamentosPermitidos = getDepartamentosPermitidos();
+      departamentosContainer.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
         const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR']; // Fallback a HR si no existe
@@ -4780,8 +4797,9 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      // Renderizar TODOS los departamentos
-      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+      // Renderizar solo los departamentos permitidos para el usuario
+      const departamentosPermitidos = getDepartamentosPermitidos();
+      departamentosContainer.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
         const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];
@@ -5190,8 +5208,9 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      // Renderizar TODOS los departamentos
-      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+      // Renderizar solo los departamentos permitidos para el usuario
+      const departamentosPermitidos = getDepartamentosPermitidos();
+      departamentosContainer.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
         const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];
@@ -5548,8 +5567,9 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      // Renderizar TODOS los departamentos
-      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+      // Renderizar solo los departamentos permitidos para el usuario
+      const departamentosPermitidos = getDepartamentosPermitidos();
+      departamentosContainer.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
         const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];
@@ -5866,9 +5886,9 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      const DEPARTAMENTOS = ['ADMINISTRACION', 'Almacen', 'Auditoria', 'B2B (Shipping)', 'B2C (Shipping)', 'Calidad', 'COMPRAS', 'DESARROLLO DE SOFTWARE', 'DISEÑO', 'ENFERMERIA', 'FFT', 'Finance', 'HR', 'IMPORT EXPORT', 'Incoming', 'LOGISTICA', 'Maintenance', 'MARKETING', 'OPERACIONES', 'Open Cell', 'PATIO', 'RMA', 'SEGURIDAD E HIGIENE', 'SEGURIDAD PATRIMONIAL', 'SHIPPING', 'SISTEMAS', 'Ventas', 'WAREHOUSE'];
-
-      departamentosContainer.innerHTML = DEPARTAMENTOS.map(dept => {
+      // Renderizar solo los departamentos permitidos para el usuario
+      const departamentosPermitidos = getDepartamentosPermitidos();
+      departamentosContainer.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
 
@@ -6042,8 +6062,9 @@
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
 
-      // Renderizar TODOS los departamentos
-      container.innerHTML = DEPARTAMENTOS.map(dept => {
+      // Renderizar solo los departamentos permitidos para el usuario
+      const departamentosPermitidos = getDepartamentosPermitidos();
+      container.innerHTML = departamentosPermitidos.map(dept => {
         const count = contadores[dept] || 0;
         const badgeClass = count === 0 ? 'zero' : '';
         const icon = ICONS_DEPARTAMENTOS[dept] || ICONS_DEPARTAMENTOS['HR'];

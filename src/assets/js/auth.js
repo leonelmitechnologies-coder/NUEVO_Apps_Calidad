@@ -61,6 +61,7 @@ async function login(username, password) {
             name: `${foundUser.nombre} ${foundUser.apellido}`,
             photo: foundUser.photo || null,
             password: foundUser.password,
+            departamento: foundUser.departamento || null,
             permisos: foundUser.permisos || {
               usuarios: false,
               asistencia: true,
@@ -85,6 +86,7 @@ async function login(username, password) {
             username: username,
             name: 'Administrador',
             password: password,
+            departamento: null, // null = puede ver todos los departamentos
             permisos: {
               usuarios: true,
               asistencia: true,
