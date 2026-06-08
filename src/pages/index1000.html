@@ -2462,6 +2462,23 @@
               </div>
             </div>
 
+            <!-- Buscador de Colaboradores -->
+            <div class="search-colaboradores-container" style="margin: 20px 0;">
+              <div style="position: relative; max-width: 400px;">
+                <input
+                  type="text"
+                  id="search-colaboradores-asistencia"
+                  class="search-input"
+                  placeholder="Buscar colaborador por nombre o número de nómina..."
+                  style="width: 100%; padding: 10px 40px 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                     style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none;">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+              </div>
+            </div>
+
             <!-- Colaboradores agrupados por turno -->
             <div id="asistencia-colaboradores-container">
               <!-- Los colaboradores se cargarán aquí agrupados por turno -->
@@ -5264,6 +5281,17 @@
       window.verDepartamentoAsistencia = function(nombreDepartamento) {
         navigateToLocation('pasar-asistencia-dept:' + nombreDepartamento);
       }
+
+      // Event listener para el buscador de colaboradores
+      const searchColaboradores = document.getElementById('search-colaboradores-asistencia');
+      if (searchColaboradores) {
+        searchColaboradores.addEventListener('input', (e) => {
+          // Re-cargar colaboradores con el filtro aplicado
+          if (nombreDepartamentoActual) {
+            cargarColaboradoresAsistencia(nombreDepartamentoActual);
+          }
+        });
+      }
     }
 
     function cargarDepartamentosAsistencia() {
@@ -5326,7 +5354,12 @@
       }
     }
 
+    // Variables globales para el buscador
+    let colaboradoresDeptActuales = [];
+    let nombreDepartamentoActual = '';
+
     function cargarColaboradoresAsistencia(nombreDepartamento) {
+      nombreDepartamentoActual = nombreDepartamento;
       const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
 
       // Filtrar por departamento y estatus activo
@@ -5335,8 +5368,24 @@
         (c.estatus || 'Activo') === 'Activo'
       );
 
+      // Guardar para el buscador
+      colaboradoresDeptActuales = colaboradoresDeptTodos;
+
+      // Aplicar filtro de búsqueda si existe
+      const searchInput = document.getElementById('search-colaboradores-asistencia');
+      const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+
+      let colaboradoresFiltrados = colaboradoresDeptTodos;
+      if (searchTerm) {
+        colaboradoresFiltrados = colaboradoresDeptTodos.filter(c => {
+          const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
+          const numeroNomina = (c.numeroNomina || '').toString().toLowerCase();
+          return nombreCompleto.includes(searchTerm) || numeroNomina.includes(searchTerm);
+        });
+      }
+
       // FILTRAR: Excluir colaboradores que ya tienen registro HOY
-      const colaboradoresDept = colaboradoresDeptTodos.filter(c => {
+      const colaboradoresDept = colaboradoresFiltrados.filter(c => {
         const registroHoy = obtenerRegistroAsistenciaHoy(c.id);
         return !registroHoy; // Solo mostrar si NO tiene registro hoy
       });
