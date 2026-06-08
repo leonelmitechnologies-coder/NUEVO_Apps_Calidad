@@ -970,6 +970,44 @@
       .colab-list {
         grid-template-columns: 1fr;
       }
+
+      /* Ajustar tarjetas de colaboradores en móvil */
+      .colab-card-compact {
+        padding: 10px;
+        gap: 8px;
+      }
+
+      /* Permitir wrap en móvil cuando hay botones de asistencia */
+      .colab-card-compact:has(.asistencia-actions) {
+        flex-wrap: wrap;
+      }
+
+      /* Info de colaborador toma todo el ancho disponible */
+      .colab-card-compact .colab-info-compact {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* Botones de asistencia en móvil */
+      .colab-card-compact .asistencia-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-left: 0;
+        margin-top: 8px;
+      }
+
+      /* Hacer botones más pequeños en móvil */
+      .btn-asistencia {
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+      }
+
+      .btn-asistencia svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
     }
 
     /* Detalle de Colaborador */

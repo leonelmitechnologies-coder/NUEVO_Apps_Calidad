@@ -129,10 +129,16 @@ async function cargarDepartamentos() {
  * Carga los turnos en el filtro multiselect
  */
 async function cargarTurnos() {
-  // Obtener todos los turnos únicos de TODOS los colaboradores
+  // Turnos predefinidos del sistema (siempre se muestran)
+  const turnosPredefinidos = ['Turno 1', 'Turno 2'];
+
+  // Obtener turnos adicionales de colaboradores (por si hay turnos personalizados)
   const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-  const turnosSet = new Set(colaboradores.map(c => c.turno).filter(t => t));
-  const turnos = Array.from(turnosSet).sort();
+  const turnosColaboradores = colaboradores.map(c => c.turno).filter(t => t);
+
+  // Combinar y eliminar duplicados
+  const todosTurnos = [...new Set([...turnosPredefinidos, ...turnosColaboradores])];
+  const turnos = todosTurnos.sort();
 
   const container = document.getElementById('optionsFiltroTurno');
 
@@ -148,7 +154,7 @@ async function cargarTurnos() {
   `;
   container.appendChild(labelTodos);
 
-  // Agregar turnos del sistema
+  // Agregar TODOS los turnos (predefinidos + personalizados)
   turnos.forEach(turno => {
     const label = document.createElement('label');
     label.className = 'multiselect-option';
