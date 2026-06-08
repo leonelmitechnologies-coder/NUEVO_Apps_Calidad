@@ -178,6 +178,120 @@
       border-radius: 6px 6px 0 0;
     }
 
+    /* Multiselect Dropdown */
+    .multiselect-dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .multiselect-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .multiselect-button:hover {
+      border-color: #999;
+      background: #fafafa;
+    }
+
+    .multiselect-button:focus {
+      outline: none;
+      border-color: #1E7CBA;
+    }
+
+    .multiselect-button svg:first-child {
+      flex-shrink: 0;
+    }
+
+    .multiselect-button > span:nth-of-type(1) {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .multiselect-button .selected-count {
+      font-size: 12px;
+      color: #666;
+      background: #f0f0f0;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    .multiselect-button .chevron {
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+
+    .multiselect-dropdown.open .multiselect-button {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: #1E7CBA;
+    }
+
+    .multiselect-dropdown.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .multiselect-content {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 0;
+      overflow: hidden;
+      background: white;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      transition: max-height 0.3s ease;
+    }
+
+    .multiselect-dropdown.open .multiselect-content {
+      max-height: 300px;
+      overflow-y: auto;
+      border-color: #1E7CBA;
+    }
+
+    .multiselect-content label {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-size: 13px;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    .multiselect-content label:hover {
+      background: #f5f5f5;
+    }
+
+    .multiselect-content input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .multiselect-content span {
+      flex: 1;
+    }
+
     .checkbox-label {
       display: flex;
       align-items: center;
@@ -1631,29 +1745,37 @@
                 <!-- Grid de 2 columnas para los submódulos -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
 
-                  <!-- Pasar Asistencia -->
-                  <div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; background: white;">
-                    <div style="padding: 8px 10px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; font-weight: 600; font-size: 0.85em; display: flex; align-items: center; gap: 6px; color: #333;">
+                  <!-- Pasar Asistencia - Dropdown -->
+                  <div class="multiselect-dropdown">
+                    <button type="button" class="multiselect-button" data-target="departamentos-pasar-asistencia">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                         <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                       </svg>
-                      Pasar Asistencia
-                    </div>
-                    <div id="departamentos-pasar-asistencia" style="padding: 6px; max-height: 250px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                      <span>Pasar Asistencia</span>
+                      <span class="selected-count">0 seleccionados</span>
+                      <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                      </svg>
+                    </button>
+                    <div class="multiselect-content" id="departamentos-pasar-asistencia">
                       <!-- Se llenará dinámicamente -->
                     </div>
                   </div>
 
-                  <!-- Tiempo Extra -->
-                  <div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; background: white;">
-                    <div style="padding: 8px 10px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; font-weight: 600; font-size: 0.85em; display: flex; align-items: center; gap: 6px; color: #333;">
+                  <!-- Tiempo Extra - Dropdown -->
+                  <div class="multiselect-dropdown">
+                    <button type="button" class="multiselect-button" data-target="departamentos-tiempo-extra">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
                       </svg>
-                      Tiempo Extra
-                    </div>
-                    <div id="departamentos-tiempo-extra" style="padding: 6px; max-height: 250px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                      <span>Tiempo Extra</span>
+                      <span class="selected-count">0 seleccionados</span>
+                      <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                      </svg>
+                    </button>
+                    <div class="multiselect-content" id="departamentos-tiempo-extra">
                       <!-- Se llenará dinámicamente -->
                     </div>
                   </div>
@@ -1821,29 +1943,37 @@
                 <!-- Grid de 2 columnas para los submódulos -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
 
-                  <!-- Pasar Asistencia -->
-                  <div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; background: white;">
-                    <div style="padding: 8px 10px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; font-weight: 600; font-size: 0.85em; display: flex; align-items: center; gap: 6px; color: #333;">
+                  <!-- Pasar Asistencia - Dropdown -->
+                  <div class="multiselect-dropdown">
+                    <button type="button" class="multiselect-button" data-target="departamentos-pasar-asistencia-edit">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                         <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                       </svg>
-                      Pasar Asistencia
-                    </div>
-                    <div id="departamentos-pasar-asistencia-edit" style="padding: 6px; max-height: 250px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                      <span>Pasar Asistencia</span>
+                      <span class="selected-count">0 seleccionados</span>
+                      <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                      </svg>
+                    </button>
+                    <div class="multiselect-content" id="departamentos-pasar-asistencia-edit">
                       <!-- Se llenará dinámicamente -->
                     </div>
                   </div>
 
-                  <!-- Tiempo Extra -->
-                  <div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; background: white;">
-                    <div style="padding: 8px 10px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; font-weight: 600; font-size: 0.85em; display: flex; align-items: center; gap: 6px; color: #333;">
+                  <!-- Tiempo Extra - Dropdown -->
+                  <div class="multiselect-dropdown">
+                    <button type="button" class="multiselect-button" data-target="departamentos-tiempo-extra-edit">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
                       </svg>
-                      Tiempo Extra
-                    </div>
-                    <div id="departamentos-tiempo-extra-edit" style="padding: 6px; max-height: 250px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                      <span>Tiempo Extra</span>
+                      <span class="selected-count">0 seleccionados</span>
+                      <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                      </svg>
+                    </button>
+                    <div class="multiselect-content" id="departamentos-tiempo-extra-edit">
                       <!-- Se llenará dinámicamente -->
                     </div>
                   </div>
@@ -3544,7 +3674,7 @@
         });
       }
 
-      // Función para generar checkboxes de departamentos (ultra compactos, colores del sistema)
+      // Función para generar checkboxes de departamentos (dropdown style)
       function generarCheckboxesDepartamentos() {
         const containerPasarAsistencia = document.getElementById('departamentos-pasar-asistencia');
         const containerTiempoExtra = document.getElementById('departamentos-tiempo-extra');
@@ -3552,11 +3682,9 @@
         const containerTiempoExtraEdit = document.getElementById('departamentos-tiempo-extra-edit');
 
         const checkboxHTML = DEPARTAMENTOS.map(dept => `
-          <label style="display: flex; align-items: center; padding: 4px 6px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; transition: all 0.15s; font-size: 0.75em;"
-                 onmouseover="this.style.borderColor='#999'; this.style.backgroundColor='#f0f0f0';"
-                 onmouseout="this.style.borderColor='#e0e0e0'; this.style.backgroundColor='#fafafa';">
-            <input type="checkbox" value="${dept}" style="margin-right: 6px; cursor: pointer; width: 14px; height: 14px;">
-            <span style="flex: 1; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${dept}">${dept}</span>
+          <label>
+            <input type="checkbox" value="${dept}">
+            <span>${dept}</span>
           </label>
         `).join('');
 
@@ -3568,6 +3696,76 @@
 
       // Generar checkboxes al iniciar
       generarCheckboxesDepartamentos();
+
+      // Configurar multiselect dropdowns
+      function setupMultiselectDropdowns() {
+        const dropdowns = document.querySelectorAll('.multiselect-dropdown');
+
+        dropdowns.forEach(dropdown => {
+          const button = dropdown.querySelector('.multiselect-button');
+          const content = dropdown.querySelector('.multiselect-content');
+          const countSpan = button.querySelector('.selected-count');
+          const checkboxes = content.querySelectorAll('input[type="checkbox"]');
+
+          // Toggle dropdown al hacer clic en el botón
+          button.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Cerrar otros dropdowns
+            dropdowns.forEach(otherDropdown => {
+              if (otherDropdown !== dropdown) {
+                otherDropdown.classList.remove('open');
+              }
+            });
+
+            // Toggle este dropdown
+            dropdown.classList.toggle('open');
+          });
+
+          // Actualizar contador cuando cambian los checkboxes
+          function updateCount() {
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            countSpan.textContent = checkedCount === 0 ? '0 seleccionados' :
+                                    checkedCount === 1 ? '1 seleccionado' :
+                                    `${checkedCount} seleccionados`;
+          }
+
+          checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateCount);
+          });
+
+          // Inicializar contador
+          updateCount();
+        });
+
+        // Cerrar dropdowns al hacer clic fuera
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.multiselect-dropdown')) {
+            dropdowns.forEach(dropdown => {
+              dropdown.classList.remove('open');
+            });
+          }
+        });
+      }
+
+      setupMultiselectDropdowns();
+
+      // Función auxiliar para actualizar contadores de un dropdown
+      function updateDropdownCounter(contentId) {
+        const content = document.getElementById(contentId);
+        if (!content) return;
+
+        const dropdown = content.closest('.multiselect-dropdown');
+        if (!dropdown) return;
+
+        const countSpan = dropdown.querySelector('.selected-count');
+        const checkboxes = content.querySelectorAll('input[type="checkbox"]');
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+        countSpan.textContent = checkedCount === 0 ? '0 seleccionados' :
+                                checkedCount === 1 ? '1 seleccionado' :
+                                `${checkedCount} seleccionados`;
+      }
 
       // Manejar cambio en el dropdown de departamento (CREATE form)
       const departamentoSelect = document.getElementById('departamento');
@@ -3582,6 +3780,10 @@
             document.querySelectorAll('#departamentos-tiempo-extra input[type="checkbox"]').forEach(cb => {
               if (cb.value === selectedDept) cb.checked = true;
             });
+
+            // Actualizar contadores
+            updateDropdownCounter('departamentos-pasar-asistencia');
+            updateDropdownCounter('departamentos-tiempo-extra');
           }
         });
       }
@@ -3599,6 +3801,10 @@
             document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]').forEach(cb => {
               if (cb.value === selectedDept) cb.checked = true;
             });
+
+            // Actualizar contadores
+            updateDropdownCounter('departamentos-pasar-asistencia-edit');
+            updateDropdownCounter('departamentos-tiempo-extra-edit');
           }
         });
       }
@@ -3962,6 +4168,12 @@
       document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]').forEach(cb => {
         cb.checked = deptsTiempoExtra.includes(cb.value);
       });
+
+      // Actualizar contadores de los dropdowns en el formulario de edición
+      setTimeout(() => {
+        updateDropdownCounter('departamentos-pasar-asistencia-edit');
+        updateDropdownCounter('departamentos-tiempo-extra-edit');
+      }, 100);
 
       // Load photo if exists
       if (user.photo) {
