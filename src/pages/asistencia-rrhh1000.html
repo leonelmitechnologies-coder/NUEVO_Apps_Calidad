@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dashboard de Asistencia - RRHH | MI Technologies">
+  <title>Dashboard de Asistencia - RRHH | MI Technologies</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/asistencia-rrhh.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <img src="../assets/img/logo.png" alt="MI Technologies" class="logo">
+      <div class="header-title">
+        <h1>Dashboard de Asistencia - RRHH</h1>
+        <p>MI Technologies | Control de Asistencia del Personal</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="btn-icon" id="btnConexionApp" title="Conexión en vivo con App">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 3a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a6 6 0 1 1 12 0v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1V8a5 5 0 0 0-5-5z"/>
+        </svg>
+        <span>Conexión en vivo con App</span>
+      </button>
+
+      <button class="btn-icon" id="btnExportarCSV" title="Exportar a CSV">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+        </svg>
+        <span>CSV</span>
+      </button>
+
+      <button class="btn-icon" id="btnImprimir" title="Imprimir">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+          <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+        </svg>
+        <span>Imprimir</span>
+      </button>
+
+      <button class="btn-icon" id="btnModoOscuro" title="Alternar modo oscuro">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        </svg>
+      </button>
+
+      <button class="btn-back" id="btnVolver" title="Volver al sistema">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+        </svg>
+        <span>Volver</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="stats-info">
+        <span id="totalColaboradores">0 colaboradores</span>
+        <span class="separator">•</span>
+        <span id="totalRegistros">0 registros</span>
+        <span class="separator">•</span>
+        <span id="totalTE">0 TE</span>
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar colaborador..." class="search-input">
+      </div>
+
+      <div class="sync-info">
+        <span>Último sync: <strong id="lastSync">--:--:--</strong></span>
+      </div>
+    </section>
+
+    <!-- Metrics Cards -->
+    <section class="metrics-section">
+      <div class="metric-card">
+        <div class="metric-header">
+          <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+          </svg>
+          <h3>COLABORADORES</h3>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value-group">
+            <div class="metric-item primary">
+              <span class="metric-number" id="metricActivos">0</span>
+              <span class="metric-label">Activos</span>
+            </div>
+            <div class="metric-item secondary">
+              <span class="metric-number" id="metricBajas">0</span>
+              <span class="metric-label">Bajas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+          </svg>
+          <h3>ASISTENCIA PROMEDIO</h3>
+        </div>
+        <div class="metric-content">
+          <div class="metric-single">
+            <span class="metric-big" id="metricPromedio">0%</span>
+            <span class="metric-detail" id="metricPromedioDetalle">0 presentes de 0 registros</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+          <h3>INASISTENCIAS DEL PERIODO</h3>
+        </div>
+        <div class="metric-content">
+          <div class="metric-single danger">
+            <span class="metric-big" id="metricInasistencias">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+          </svg>
+          <h3>DESGLOSE DE ASISTENCIA</h3>
+        </div>
+        <div class="metric-content">
+          <div class="metric-breakdown">
+            <div class="breakdown-item success">
+              <span class="breakdown-number" id="metricPresentes">0</span>
+              <span class="breakdown-label">Presentes</span>
+            </div>
+            <div class="breakdown-item danger">
+              <span class="breakdown-number" id="metricAusentes">0</span>
+              <span class="breakdown-label">Ausentes</span>
+            </div>
+            <div class="breakdown-item warning">
+              <span class="breakdown-number" id="metricSinRegistrar">0</span>
+              <span class="breakdown-label">Sin registrar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M3 2.5a2.5 2.5 0 0 1 5 0 2.5 2.5 0 0 1 5 0v.006c0 .07 0 .27-.038.494H15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 14.5V7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2.038A2.968 2.968 0 0 1 3 2.506V2.5zm1.068.5H7v-.5a1.5 1.5 0 1 0-3 0c0 .085.002.274.045.43a.522.522 0 0 0 .023.07zM9 3h2.932a.56.56 0 0 0 .023-.07c.043-.156.045-.345.045-.43a1.5 1.5 0 0 0-3 0V3zM1 4v2h6V4H1zm8 0v2h6V4H9zm5 3H9v8h4.5a.5.5 0 0 0 .5-.5V7zm-7 8V7H2v7.5a.5.5 0 0 0 .5.5H7z"/>
+          </svg>
+          <h3>DEPTO. CON MÁS FALTAS</h3>
+        </div>
+        <div class="metric-content">
+          <div class="metric-single">
+            <span class="metric-big" id="metricDeptoFaltas">-</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section">
+      <div class="filters-left">
+        <div class="filter-group">
+          <label for="filtroDepartamento">Departamento:</label>
+          <select id="filtroDepartamento" class="filter-select">
+            <option value="Todos">Todos</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filtroTurno">Turno:</label>
+          <select id="filtroTurno" class="filter-select">
+            <option value="Todos">Todos</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+            <option value="Nocturno">Nocturno</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-reportes" id="btnReportes">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4zm0 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+          <path d="M2 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+        Reportes
+      </button>
+    </section>
+
+    <!-- View Tabs -->
+    <section class="view-tabs">
+      <button class="tab-btn active" data-view="semanal">Vista Semanal</button>
+      <button class="tab-btn" data-view="diaria">Vista Diaria</button>
+      <button class="tab-btn" data-view="tiempo-extra">Tiempo Extra</button>
+    </section>
+
+    <!-- Period Selector (Vista Semanal) -->
+    <section class="period-selector" id="selectorSemanal">
+      <div class="period-controls">
+        <div class="period-input-group">
+          <label>Semana:</label>
+          <input type="number" id="inputSemana" min="1" max="53" value="1" class="period-input">
+        </div>
+
+        <div class="period-input-group">
+          <label>Año:</label>
+          <input type="number" id="inputAño" min="2020" max="2030" value="2026" class="period-input">
+        </div>
+      </div>
+
+      <div class="period-display">
+        <button class="btn-nav" id="btnSemanaAnterior" title="Semana anterior">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+          </svg>
+        </button>
+
+        <span id="rangoFechas" class="period-text">Lun 8 - Vie 12 Jun 2026</span>
+
+        <button class="btn-nav" id="btnSemanaSiguiente" title="Semana siguiente">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
+      </div>
+
+      <button class="btn-hoy" id="btnHoy">Hoy</button>
+    </section>
+
+    <!-- Data Table -->
+    <section class="data-table-section">
+      <div class="table-wrapper">
+        <table class="data-table" id="tablaAsistencia">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>FOTO</th>
+              <th>NOMBRE</th>
+              <th>NO. NÓMINA</th>
+              <th>PUESTO</th>
+              <th>DEPTO</th>
+              <!-- Columnas de días se generan dinámicamente -->
+            </tr>
+          </thead>
+          <tbody id="tablaBody">
+            <!-- Filas se generan dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <button class="btn-export" id="btnExportarTabla">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+          </svg>
+          Exportar CSV
+        </button>
+
+        <button class="btn-print" id="btnImprimirTabla">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+            <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+          </svg>
+          Imprimir
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast notifications -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/asistencia-service.js"></script>
+  <script src="../assets/js/asistencia-rrhh.js"></script>
+</body>
+</html>
