@@ -52,11 +52,11 @@ class AsistenciaService {
 
     let resultado = registros;
 
-    // Aplicar filtros
-    if (filtros.departamento && filtros.departamento !== 'Todos') {
+    // Aplicar filtros de departamentos (array)
+    if (filtros.departamentos && filtros.departamentos.length > 0) {
       resultado = resultado.filter(r => {
         const colaborador = this.getColaboradorById(r.colaboradorId);
-        return colaborador && colaborador.departamento === filtros.departamento;
+        return colaborador && filtros.departamentos.includes(colaborador.departamento);
       });
     }
 
@@ -82,8 +82,9 @@ class AsistenciaService {
 
     let resultado = tiempos;
 
-    if (filtros.departamento && filtros.departamento !== 'Todos') {
-      resultado = resultado.filter(t => t.departamento === filtros.departamento);
+    // Aplicar filtros de departamentos (array)
+    if (filtros.departamentos && filtros.departamentos.length > 0) {
+      resultado = resultado.filter(t => filtros.departamentos.includes(t.departamento));
     }
 
     if (filtros.fechaInicio) {
@@ -123,7 +124,22 @@ class AsistenciaService {
    * @returns {Object} Métricas calculadas
    */
   async getMetricas(filtros = {}) {
-    const colaboradores = await this.getColaboradoresActivos();
+    let colaboradores = await this.getColaboradoresActivos();
+
+    // Filtrar colaboradores por departamentos si aplica
+    if (filtros.departamentos && filtros.departamentos.length > 0) {
+      colaboradores = colaboradores.filter(c =>
+        filtros.departamentos.includes(c.departamento)
+      );
+    }
+
+    // Filtrar colaboradores por turnos si aplica
+    if (filtros.turnos && filtros.turnos.length > 0) {
+      colaboradores = colaboradores.filter(c =>
+        filtros.turnos.includes(c.turno)
+      );
+    }
+
     const registros = await this.getRegistrosAsistencia(filtros);
     const tiemposExtra = await this.getTiemposExtra(filtros);
 
@@ -181,7 +197,22 @@ class AsistenciaService {
    * @returns {Object} Datos de la semana
    */
   async getVistaSemanal(semana, año, filtros = {}) {
-    const colaboradores = await this.getColaboradoresActivos();
+    let colaboradores = await this.getColaboradoresActivos();
+
+    // Filtrar colaboradores por departamentos si aplica
+    if (filtros.departamentos && filtros.departamentos.length > 0) {
+      colaboradores = colaboradores.filter(c =>
+        filtros.departamentos.includes(c.departamento)
+      );
+    }
+
+    // Filtrar colaboradores por turnos si aplica
+    if (filtros.turnos && filtros.turnos.length > 0) {
+      colaboradores = colaboradores.filter(c =>
+        filtros.turnos.includes(c.turno)
+      );
+    }
+
     const { fechaInicio, fechaFin } = this.getRangoSemana(semana, año);
 
     const registros = await this.getRegistrosAsistencia({

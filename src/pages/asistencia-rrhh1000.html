@@ -183,20 +183,47 @@
     <section class="filters-section">
       <div class="filters-left">
         <div class="filter-group">
-          <label for="filtroDepartamento">Departamento:</label>
-          <select id="filtroDepartamento" class="filter-select">
-            <option value="Todos">Todos</option>
-          </select>
+          <label>Departamento:</label>
+          <div class="multiselect-wrapper">
+            <button type="button" class="multiselect-button" id="btnFiltroDepartamento">
+              <span id="labelFiltroDepartamento">Todos los departamentos</span>
+              <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+            <div class="multiselect-dropdown" id="dropdownFiltroDepartamento" style="display: none;">
+              <div class="multiselect-search">
+                <input type="text" placeholder="Buscar departamento..." id="searchFiltroDepartamento">
+              </div>
+              <div class="multiselect-options" id="optionsFiltroDepartamento">
+                <label class="multiselect-option">
+                  <input type="checkbox" value="Todos" checked>
+                  <span>Todos</span>
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="filter-group">
-          <label for="filtroTurno">Turno:</label>
-          <select id="filtroTurno" class="filter-select">
-            <option value="Todos">Todos</option>
-            <option value="Matutino">Matutino</option>
-            <option value="Vespertino">Vespertino</option>
-            <option value="Nocturno">Nocturno</option>
-          </select>
+          <label>Turno:</label>
+          <div class="multiselect-wrapper">
+            <button type="button" class="multiselect-button" id="btnFiltroTurno">
+              <span id="labelFiltroTurno">Todos los turnos</span>
+              <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+            <div class="multiselect-dropdown" id="dropdownFiltroTurno" style="display: none;">
+              <div class="multiselect-options" id="optionsFiltroTurno">
+                <label class="multiselect-option">
+                  <input type="checkbox" value="Todos" checked data-turno>
+                  <span>Todos</span>
+                </label>
+                <!-- Los turnos se cargarán dinámicamente desde los colaboradores -->
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -314,6 +341,117 @@
 
   <!-- Toast notifications -->
   <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Modal Detalle Colaborador -->
+  <div id="modalDetalleColaborador" class="modal-overlay" style="display: none;">
+    <div class="modal-detalle">
+      <div class="modal-header">
+        <h2 id="modalTitulo">Detalle del Colaborador</h2>
+        <button class="btn-close-modal" onclick="cerrarModalDetalle()">
+          <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Información Principal -->
+        <div class="colab-info-principal">
+          <div class="colab-foto-grande" id="modalFoto">
+            <svg width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+            </svg>
+          </div>
+          <div class="colab-datos-principales">
+            <h3 id="modalNombre">Nombre del Colaborador</h3>
+            <div class="datos-grid">
+              <div class="dato-item">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                </svg>
+                <span id="modalDepartamento">Departamento</span>
+              </div>
+              <div class="dato-item">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                  <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                  <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                </svg>
+                <span id="modalPuesto">Puesto</span>
+              </div>
+              <div class="dato-item">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                </svg>
+                <span id="modalTurno">Turno</span>
+              </div>
+              <div class="dato-item">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                </svg>
+                <span>No. <span id="modalNumero">0000</span></span>
+              </div>
+              <div class="dato-item">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM9.5 7h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm3 0h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zM2 10.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
+                </svg>
+                <span>Ingreso: <span id="modalFechaIngreso">-</span></span>
+              </div>
+              <div class="dato-item">
+                <span class="badge-estatus" id="modalEstatus">Activo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="metricas-grid">
+          <div class="metrica-card">
+            <div class="metrica-valor" id="modalTotalDias">0</div>
+            <div class="metrica-label">Total Días</div>
+          </div>
+          <div class="metrica-card metrica-presente">
+            <div class="metrica-valor" id="modalPresentes">0</div>
+            <div class="metrica-label">Presentes</div>
+          </div>
+          <div class="metrica-card metrica-ausente">
+            <div class="metrica-valor" id="modalAusentes">0</div>
+            <div class="metrica-label">Ausentes</div>
+          </div>
+          <div class="metrica-card metrica-porcentaje">
+            <div class="metrica-valor" id="modalPorcentaje">0%</div>
+            <div class="metrica-label">Asistencia</div>
+          </div>
+        </div>
+
+        <!-- Desglose de Inasistencias -->
+        <div class="seccion-detalle">
+          <h4>Desglose de Inasistencias</h4>
+          <div id="modalDesglose" class="desglose-container">
+            <p class="mensaje-vacio">Sin inasistencias en este periodo</p>
+          </div>
+        </div>
+
+        <!-- Historial de Inasistencias -->
+        <div class="seccion-detalle">
+          <h4>Historial de Inasistencias</h4>
+          <div id="modalHistorial" class="historial-container">
+            <p class="mensaje-vacio">Sin inasistencias en este periodo</p>
+          </div>
+        </div>
+
+        <!-- Asistencia de la Semana -->
+        <div class="seccion-detalle">
+          <h4 id="modalTituloSemana">Asistencia de la Semana</h4>
+          <div id="modalAsistenciaSemana" class="asistencia-semana-container">
+            <p class="mensaje-vacio">Sin asistencias en esta semana</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="../assets/js/storage.js"></script>

@@ -10,8 +10,8 @@ const dashboardState = {
   añoActual: 2026,
   fechaDiaria: null, // Para vista diaria
   filtros: {
-    departamento: 'Todos',
-    turno: 'Todos',
+    departamentos: ['Todos'], // Array de departamentos seleccionados
+    turnos: ['Todos'], // Array de turnos seleccionados
     busqueda: ''
   },
   datos: {
@@ -46,11 +46,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar departamentos en filtro
   await cargarDepartamentos();
 
+  // Cargar turnos en filtro
+  await cargarTurnos();
+
   // Cargar datos iniciales
   await cargarDatos();
 
   // Configurar event listeners
   configurarEventListeners();
+
+  // Configurar actualización en tiempo real
+  configurarActualizacionTiempoReal();
 
   // Actualizar hora de sync
   actualizarHoraSync();
@@ -60,22 +66,101 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * Carga los departamentos en el filtro
+ * Carga los departamentos en el filtro multiselect
  */
 async function cargarDepartamentos() {
-  const departamentos = await asistenciaService.getDepartamentos();
-  const select = document.getElementById('filtroDepartamento');
+  // Lista completa de departamentos de MI Technologies (siempre se muestran todos)
+  const departamentosPredefinidos = [
+    'Administración',
+    'Almacén',
+    'Calidad',
+    'Compras',
+    'Contabilidad',
+    'Dirección',
+    'Finanzas',
+    'Ingeniería',
+    'Logística',
+    'Mantenimiento',
+    'Producción',
+    'Recursos Humanos',
+    'Seguridad',
+    'Sistemas',
+    'Ventas'
+  ];
 
-  // Limpiar opciones existentes (excepto "Todos")
-  select.innerHTML = '<option value="Todos">Todos</option>';
+  // Obtener departamentos adicionales de colaboradores (por si hay departamentos personalizados)
+  const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+  const departamentosColaboradores = colaboradores.map(c => c.departamento).filter(d => d);
 
-  // Agregar departamentos
+  // Combinar y eliminar duplicados
+  const todosDepartamentos = [...new Set([...departamentosPredefinidos, ...departamentosColaboradores])];
+  const departamentos = todosDepartamentos.sort();
+
+  const container = document.getElementById('optionsFiltroDepartamento');
+
+  // Limpiar opciones existentes
+  container.innerHTML = '';
+
+  // Agregar opción "Todos"
+  const labelTodos = document.createElement('label');
+  labelTodos.className = 'multiselect-option';
+  labelTodos.innerHTML = `
+    <input type="checkbox" value="Todos" checked data-departamento>
+    <span>Todos</span>
+  `;
+  container.appendChild(labelTodos);
+
+  // Agregar TODOS los departamentos (predefinidos + personalizados)
   departamentos.forEach(depto => {
-    const option = document.createElement('option');
-    option.value = depto;
-    option.textContent = depto;
-    select.appendChild(option);
+    const label = document.createElement('label');
+    label.className = 'multiselect-option';
+    label.innerHTML = `
+      <input type="checkbox" value="${depto}" data-departamento>
+      <span>${depto}</span>
+    `;
+    container.appendChild(label);
   });
+
+  // Configurar event listeners para los checkboxes
+  configurarMultiselectDepartamentos();
+}
+
+/**
+ * Carga los turnos en el filtro multiselect
+ */
+async function cargarTurnos() {
+  // Obtener todos los turnos únicos de TODOS los colaboradores
+  const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+  const turnosSet = new Set(colaboradores.map(c => c.turno).filter(t => t));
+  const turnos = Array.from(turnosSet).sort();
+
+  const container = document.getElementById('optionsFiltroTurno');
+
+  // Limpiar opciones existentes
+  container.innerHTML = '';
+
+  // Agregar opción "Todos"
+  const labelTodos = document.createElement('label');
+  labelTodos.className = 'multiselect-option';
+  labelTodos.innerHTML = `
+    <input type="checkbox" value="Todos" checked data-turno>
+    <span>Todos</span>
+  `;
+  container.appendChild(labelTodos);
+
+  // Agregar turnos del sistema
+  turnos.forEach(turno => {
+    const label = document.createElement('label');
+    label.className = 'multiselect-option';
+    label.innerHTML = `
+      <input type="checkbox" value="${turno}" data-turno>
+      <span>${turno}</span>
+    `;
+    container.appendChild(label);
+  });
+
+  // Configurar event listeners para los checkboxes
+  configurarMultiselectTurnos();
 }
 
 /**
@@ -122,9 +207,15 @@ function getFiltrosActuales() {
     dashboardState.añoActual
   );
 
+  const departamentos = dashboardState.filtros.departamentos;
+  const todosDeptosSeleccionado = departamentos.includes('Todos') || departamentos.length === 0;
+
+  const turnos = dashboardState.filtros.turnos;
+  const todosTurnosSeleccionado = turnos.includes('Todos') || turnos.length === 0;
+
   return {
-    departamento: dashboardState.filtros.departamento,
-    turno: dashboardState.filtros.turno,
+    departamentos: todosDeptosSeleccionado ? null : departamentos, // null = todos
+    turnos: todosTurnosSeleccionado ? null : turnos, // null = todos
     fechaInicio,
     fechaFin
   };
@@ -137,7 +228,7 @@ async function cargarVistaSemanal() {
   dashboardState.datos.vistaSemanal = await asistenciaService.getVistaSemanal(
     dashboardState.semanaActual,
     dashboardState.añoActual,
-    { departamento: dashboardState.filtros.departamento }
+    getFiltrosActuales()
   );
 
   // Actualizar rango de fechas
@@ -236,12 +327,13 @@ function actualizarTablaSemanal() {
   let colaboradoresFiltrados = vistaSemanal.colaboradores;
   if (dashboardState.filtros.busqueda) {
     const busqueda = dashboardState.filtros.busqueda.toLowerCase();
-    colaboradoresFiltrados = colaboradoresFiltrados.filter(c =>
-      c.nombre.toLowerCase().includes(busqueda) ||
-      c.numeroNomina.toString().includes(busqueda) ||
-      (c.puesto && c.puesto.toLowerCase().includes(busqueda)) ||
-      (c.departamento && c.departamento.toLowerCase().includes(busqueda))
-    );
+    colaboradoresFiltrados = colaboradoresFiltrados.filter(c => {
+      const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
+      return nombreCompleto.includes(busqueda) ||
+        (c.numeroEmpleado && c.numeroEmpleado.toString().includes(busqueda)) ||
+        (c.puesto && c.puesto.toLowerCase().includes(busqueda)) ||
+        (c.departamento && c.departamento.toLowerCase().includes(busqueda));
+    });
   }
 
   // Crear filas
@@ -255,8 +347,9 @@ function actualizarTablaSemanal() {
 
     // Foto
     const tdFoto = document.createElement('td');
-    if (colaborador.photo) {
-      tdFoto.innerHTML = `<img src="${colaborador.photo}" alt="${colaborador.nombre}" class="colaborador-foto">`;
+    const nombreCompleto = `${colaborador.nombres} ${colaborador.apellidos}`;
+    if (colaborador.foto) {
+      tdFoto.innerHTML = `<img src="${colaborador.foto}" alt="${nombreCompleto}" class="colaborador-foto">`;
     } else {
       tdFoto.innerHTML = `<div class="colaborador-foto-placeholder">
         <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
@@ -272,17 +365,17 @@ function actualizarTablaSemanal() {
     tdNombre.classList.add('nombre-cell');
     if (colaborador.baja) {
       tdNombre.innerHTML = `
-        ${colaborador.nombre}
+        ${nombreCompleto}
         <span class="badge-baja">BAJA</span>
       `;
     } else {
-      tdNombre.textContent = colaborador.nombre;
+      tdNombre.textContent = nombreCompleto;
     }
     tr.appendChild(tdNombre);
 
     // Número de nómina
     const tdNomina = document.createElement('td');
-    tdNomina.textContent = colaborador.numeroNomina;
+    tdNomina.textContent = colaborador.numeroEmpleado || '-';
     tr.appendChild(tdNomina);
 
     // Puesto
@@ -330,6 +423,10 @@ function actualizarTablaSemanal() {
     `;
     tr.appendChild(tdTotal);
 
+    // Hacer la fila clickeable
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => abrirModalDetalleColaborador(colaborador.id);
+
     tbody.appendChild(tr);
   });
 
@@ -349,9 +446,24 @@ function actualizarTablaSemanal() {
  * Carga los datos de la vista diaria
  */
 async function cargarVistaDiaria() {
-  const colaboradores = await asistenciaService.getColaboradoresActivos();
+  let colaboradores = await asistenciaService.getColaboradoresActivos();
+
+  // Aplicar filtros de departamentos y turnos
+  const filtros = getFiltrosActuales();
+  if (filtros.departamentos && filtros.departamentos.length > 0) {
+    colaboradores = colaboradores.filter(c =>
+      filtros.departamentos.includes(c.departamento)
+    );
+  }
+
+  if (filtros.turnos && filtros.turnos.length > 0) {
+    colaboradores = colaboradores.filter(c =>
+      filtros.turnos.includes(c.turno)
+    );
+  }
+
   const registros = await asistenciaService.getRegistrosAsistencia({
-    departamento: dashboardState.filtros.departamento,
+    ...filtros,
     fechaInicio: dashboardState.fechaDiaria,
     fechaFin: dashboardState.fechaDiaria
   });
@@ -382,8 +494,9 @@ async function cargarVistaTiempoExtra() {
     dashboardState.añoActual
   );
 
+  const filtros = getFiltrosActuales();
   const tiemposExtra = await asistenciaService.getTiemposExtra({
-    departamento: dashboardState.filtros.departamento,
+    ...filtros,
     fechaInicio,
     fechaFin
   });
@@ -444,12 +557,13 @@ function actualizarTablaDiaria() {
   let colaboradoresFiltrados = vistaDiaria.colaboradores;
   if (dashboardState.filtros.busqueda) {
     const busqueda = dashboardState.filtros.busqueda.toLowerCase();
-    colaboradoresFiltrados = colaboradoresFiltrados.filter(c =>
-      c.nombre.toLowerCase().includes(busqueda) ||
-      c.numeroNomina.toString().includes(busqueda) ||
-      (c.puesto && c.puesto.toLowerCase().includes(busqueda)) ||
-      (c.departamento && c.departamento.toLowerCase().includes(busqueda))
-    );
+    colaboradoresFiltrados = colaboradoresFiltrados.filter(c => {
+      const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
+      return nombreCompleto.includes(busqueda) ||
+        (c.numeroEmpleado && c.numeroEmpleado.toString().includes(busqueda)) ||
+        (c.puesto && c.puesto.toLowerCase().includes(busqueda)) ||
+        (c.departamento && c.departamento.toLowerCase().includes(busqueda));
+    });
   }
 
   // Crear filas
@@ -463,8 +577,9 @@ function actualizarTablaDiaria() {
 
     // Foto
     const tdFoto = document.createElement('td');
-    if (colaborador.photo) {
-      tdFoto.innerHTML = `<img src="${colaborador.photo}" alt="${colaborador.nombre}" class="colaborador-foto">`;
+    const nombreCompleto = `${colaborador.nombres} ${colaborador.apellidos}`;
+    if (colaborador.foto) {
+      tdFoto.innerHTML = `<img src="${colaborador.foto}" alt="${nombreCompleto}" class="colaborador-foto">`;
     } else {
       tdFoto.innerHTML = `<div class="colaborador-foto-placeholder">
         <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
@@ -480,17 +595,17 @@ function actualizarTablaDiaria() {
     tdNombre.classList.add('nombre-cell');
     if (colaborador.baja) {
       tdNombre.innerHTML = `
-        ${colaborador.nombre}
+        ${nombreCompleto}
         <span class="badge-baja">BAJA</span>
       `;
     } else {
-      tdNombre.textContent = colaborador.nombre;
+      tdNombre.textContent = nombreCompleto;
     }
     tr.appendChild(tdNombre);
 
     // Número de nómina
     const tdNomina = document.createElement('td');
-    tdNomina.textContent = colaborador.numeroNomina || 'N/A';
+    tdNomina.textContent = colaborador.numeroEmpleado || '-';
     tr.appendChild(tdNomina);
 
     // Puesto
@@ -518,6 +633,10 @@ function actualizarTablaDiaria() {
     }
 
     tr.appendChild(tdEstado);
+
+    // Hacer la fila clickeable
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => abrirModalDetalleColaborador(colaborador.id);
 
     tbody.appendChild(tr);
   });
@@ -578,10 +697,11 @@ function actualizarTablaTiempoExtra() {
   let registrosFiltrados = todosLosRegistros;
   if (dashboardState.filtros.busqueda) {
     const busqueda = dashboardState.filtros.busqueda.toLowerCase();
-    registrosFiltrados = todosLosRegistros.filter(r =>
-      r.colaborador.nombre.toLowerCase().includes(busqueda) ||
-      r.colaborador.numeroNomina.toString().includes(busqueda)
-    );
+    registrosFiltrados = todosLosRegistros.filter(r => {
+      const nombreCompleto = `${r.colaborador.nombres} ${r.colaborador.apellidos}`.toLowerCase();
+      return nombreCompleto.includes(busqueda) ||
+        (r.colaborador.numeroEmpleado && r.colaborador.numeroEmpleado.toString().includes(busqueda));
+    });
   }
 
   // Crear filas
@@ -595,8 +715,9 @@ function actualizarTablaTiempoExtra() {
 
     // Foto
     const tdFoto = document.createElement('td');
-    if (registro.colaborador.photo) {
-      tdFoto.innerHTML = `<img src="${registro.colaborador.photo}" alt="${registro.colaborador.nombre}" class="colaborador-foto">`;
+    const nombreCompleto = `${registro.colaborador.nombres} ${registro.colaborador.apellidos}`;
+    if (registro.colaborador.foto) {
+      tdFoto.innerHTML = `<img src="${registro.colaborador.foto}" alt="${nombreCompleto}" class="colaborador-foto">`;
     } else {
       tdFoto.innerHTML = `<div class="colaborador-foto-placeholder">
         <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
@@ -609,13 +730,13 @@ function actualizarTablaTiempoExtra() {
 
     // Nombre
     const tdNombre = document.createElement('td');
-    tdNombre.textContent = registro.colaborador.nombre;
+    tdNombre.textContent = nombreCompleto;
     tdNombre.classList.add('nombre-cell');
     tr.appendChild(tdNombre);
 
     // Número de nómina
     const tdNomina = document.createElement('td');
-    tdNomina.textContent = registro.colaborador.numeroNomina || 'N/A';
+    tdNomina.textContent = registro.colaborador.numeroEmpleado || '-';
     tr.appendChild(tdNomina);
 
     // Puesto
@@ -647,6 +768,10 @@ function actualizarTablaTiempoExtra() {
     const tdAutorizado = document.createElement('td');
     tdAutorizado.textContent = registro.autorizadoPor || '-';
     tr.appendChild(tdAutorizado);
+
+    // Hacer la fila clickeable
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => abrirModalDetalleColaborador(registro.colaborador.id);
 
     tbody.appendChild(tr);
   });
@@ -705,6 +830,228 @@ function actualizarHoraSync() {
   document.getElementById('lastSync').textContent = `${hora}:${minutos}:${segundos} ${ampm}`;
 }
 
+/* ============================================
+   MULTISELECT DEPARTAMENTOS
+   ============================================ */
+
+/**
+ * Configura el multiselect de departamentos
+ */
+function configurarMultiselectDepartamentos() {
+  const button = document.getElementById('btnFiltroDepartamento');
+  const dropdown = document.getElementById('dropdownFiltroDepartamento');
+  const searchInput = document.getElementById('searchFiltroDepartamento');
+  const checkboxes = document.querySelectorAll('[data-departamento]');
+
+  // Toggle dropdown
+  button.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.style.display === 'block';
+    dropdown.style.display = isOpen ? 'none' : 'block';
+    button.classList.toggle('active', !isOpen);
+  });
+
+  // Cerrar dropdown al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && e.target !== button) {
+      dropdown.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+
+  // Búsqueda en departamentos
+  searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const options = dropdown.querySelectorAll('.multiselect-option');
+
+    options.forEach(option => {
+      const text = option.textContent.toLowerCase();
+      option.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+  });
+
+  // Manejar selección de checkboxes
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const value = e.target.value;
+
+      if (value === 'Todos') {
+        // Si se selecciona "Todos", desmarcar todos los demás
+        if (e.target.checked) {
+          checkboxes.forEach(cb => {
+            if (cb.value !== 'Todos') {
+              cb.checked = false;
+            }
+          });
+        }
+      } else {
+        // Si se selecciona un departamento específico, desmarcar "Todos"
+        const todosCheckbox = document.querySelector('[data-departamento][value="Todos"]');
+        if (todosCheckbox) {
+          todosCheckbox.checked = false;
+        }
+
+        // Si no hay ninguno seleccionado, volver a marcar "Todos"
+        const algunoSeleccionado = Array.from(checkboxes).some(cb =>
+          cb.value !== 'Todos' && cb.checked
+        );
+
+        if (!algunoSeleccionado && todosCheckbox) {
+          todosCheckbox.checked = true;
+        }
+      }
+
+      actualizarLabelDepartamentos();
+      aplicarFiltros();
+    });
+  });
+
+  actualizarLabelDepartamentos();
+}
+
+/**
+ * Actualiza el label del botón con los departamentos seleccionados
+ */
+function actualizarLabelDepartamentos() {
+  const checkboxes = document.querySelectorAll('[data-departamento]');
+  const seleccionados = Array.from(checkboxes).filter(cb => cb.checked && cb.value !== 'Todos');
+  const label = document.getElementById('labelFiltroDepartamento');
+  const todosCheckbox = document.querySelector('[data-departamento][value="Todos"]');
+
+  if (todosCheckbox && todosCheckbox.checked) {
+    label.innerHTML = 'Todos los departamentos';
+  } else if (seleccionados.length === 0) {
+    label.innerHTML = 'Seleccionar departamentos...';
+  } else if (seleccionados.length === 1) {
+    label.innerHTML = seleccionados[0].value;
+  } else {
+    label.innerHTML = `${seleccionados.length} departamentos <span class="filter-badge">${seleccionados.length}</span>`;
+  }
+}
+
+/**
+ * Aplica los filtros seleccionados
+ */
+function aplicarFiltros() {
+  const checkboxes = document.querySelectorAll('[data-departamento]');
+  const todosCheckbox = document.querySelector('[data-departamento][value="Todos"]');
+
+  if (todosCheckbox && todosCheckbox.checked) {
+    dashboardState.filtros.departamentos = ['Todos'];
+  } else {
+    dashboardState.filtros.departamentos = Array.from(checkboxes)
+      .filter(cb => cb.checked && cb.value !== 'Todos')
+      .map(cb => cb.value);
+  }
+
+  cargarDatos();
+}
+
+/* ============================================
+   MULTISELECT TURNOS
+   ============================================ */
+
+/**
+ * Configura el multiselect de turnos
+ */
+function configurarMultiselectTurnos() {
+  const button = document.getElementById('btnFiltroTurno');
+  const dropdown = document.getElementById('dropdownFiltroTurno');
+  const checkboxes = document.querySelectorAll('[data-turno]');
+
+  // Toggle dropdown
+  button.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.style.display === 'block';
+    dropdown.style.display = isOpen ? 'none' : 'block';
+    button.classList.toggle('active', !isOpen);
+  });
+
+  // Cerrar dropdown al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && e.target !== button) {
+      dropdown.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+
+  // Manejar selección de checkboxes
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const value = e.target.value;
+
+      if (value === 'Todos') {
+        // Si se selecciona "Todos", desmarcar todos los demás
+        if (e.target.checked) {
+          checkboxes.forEach(cb => {
+            if (cb.value !== 'Todos') {
+              cb.checked = false;
+            }
+          });
+        }
+      } else {
+        // Si se selecciona un turno específico, desmarcar "Todos"
+        const todosCheckbox = document.querySelector('[data-turno][value="Todos"]');
+        if (todosCheckbox) {
+          todosCheckbox.checked = false;
+        }
+
+        // Si no hay ninguno seleccionado, volver a marcar "Todos"
+        const algunoSeleccionado = Array.from(checkboxes).some(cb =>
+          cb.value !== 'Todos' && cb.checked
+        );
+
+        if (!algunoSeleccionado && todosCheckbox) {
+          todosCheckbox.checked = true;
+        }
+      }
+
+      actualizarLabelTurnos();
+      aplicarFiltrosTurnos();
+    });
+  });
+
+  actualizarLabelTurnos();
+}
+
+/**
+ * Actualiza el label del botón con los turnos seleccionados
+ */
+function actualizarLabelTurnos() {
+  const checkboxes = document.querySelectorAll('[data-turno]');
+  const seleccionados = Array.from(checkboxes).filter(cb => cb.checked && cb.value !== 'Todos');
+  const label = document.getElementById('labelFiltroTurno');
+  const todosCheckbox = document.querySelector('[data-turno][value="Todos"]');
+
+  if (todosCheckbox && todosCheckbox.checked) {
+    label.innerHTML = 'Todos los turnos';
+  } else if (seleccionados.length === 0) {
+    label.innerHTML = 'Seleccionar turnos...';
+  } else if (seleccionados.length === 1) {
+    label.innerHTML = seleccionados[0].value;
+  } else {
+    label.innerHTML = `${seleccionados.length} turnos <span class="filter-badge">${seleccionados.length}</span>`;
+  }
+}
+
+/**
+ * Aplica los filtros de turnos seleccionados
+ */
+function aplicarFiltrosTurnos() {
+  const checkboxes = document.querySelectorAll('[data-turno]');
+  const todosCheckbox = document.querySelector('[data-turno][value="Todos"]');
+
+  if (todosCheckbox && todosCheckbox.checked) {
+    dashboardState.filtros.turnos = ['Todos'];
+  } else {
+    dashboardState.filtros.turnos = Array.from(checkboxes)
+      .filter(cb => cb.checked && cb.value !== 'Todos')
+      .map(cb => cb.value);
+  }
+
+  cargarDatos();
+}
+
 /**
  * Configura todos los event listeners
  */
@@ -715,15 +1062,8 @@ function configurarEventListeners() {
   });
 
   // Filtros
-  document.getElementById('filtroDepartamento').addEventListener('change', (e) => {
-    dashboardState.filtros.departamento = e.target.value;
-    cargarDatos();
-  });
-
-  document.getElementById('filtroTurno').addEventListener('change', (e) => {
-    dashboardState.filtros.turno = e.target.value;
-    cargarDatos();
-  });
+  // Filtro de departamento ahora usa multiselect (manejado en configurarMultiselectDepartamentos)
+  // Filtro de turno ahora usa multiselect (manejado en configurarMultiselectTurnos)
 
   // Búsqueda
   document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -845,6 +1185,35 @@ function configurarEventListeners() {
 }
 
 /**
+ * Configura la actualización en tiempo real desde otras pestañas
+ * Detecta cambios en localStorage hechos desde otras ventanas/pestañas
+ */
+function configurarActualizacionTiempoReal() {
+  // Listener para cambios en localStorage desde otras pestañas
+  window.addEventListener('storage', async (e) => {
+    // Solo reaccionar a cambios en las keys relevantes
+    const keysRelevantes = ['colaboradores', 'registrosAsistencia', 'tiemposExtra'];
+
+    if (keysRelevantes.includes(e.key)) {
+      console.log(`Cambio detectado en ${e.key}, actualizando dashboard...`);
+
+      // Mostrar notificación al usuario
+      showToast('Datos actualizados desde otra pestaña', 'info');
+
+      // Si cambiaron los departamentos, recargar el filtro
+      if (e.key === 'colaboradores') {
+        await cargarDepartamentos();
+      }
+
+      // Recargar todos los datos del dashboard
+      await cargarDatos();
+    }
+  });
+
+  console.log('Actualización en tiempo real configurada');
+}
+
+/**
  * Cambia la vista activa (semanal/diaria/tiempo-extra)
  */
 async function cambiarVista(vista) {
@@ -893,7 +1262,7 @@ function exportarCSV() {
   vistaSemanal.colaboradores.forEach((colaborador, index) => {
     csv += `${index + 1},`;
     csv += `"${colaborador.nombre}",`;
-    csv += `${colaborador.numeroNomina},`;
+    csv += `${colaborador.numeroEmpleado},`;
     csv += `"${colaborador.puesto || '-'}",`;
     csv += `"${colaborador.departamento || '-'}"`;
 
@@ -978,3 +1347,183 @@ function hideLoading() {
 if (localStorage.getItem('darkMode') === 'true') {
   document.body.classList.add('dark-mode');
 }
+
+/* ============================================
+   MODAL DETALLE COLABORADOR
+   ============================================ */
+
+/**
+ * Abre el modal con el detalle del colaborador
+ */
+async function abrirModalDetalleColaborador(colaboradorId) {
+  const colaborador = dashboardState.datos.colaboradores.find(c => c.id === colaboradorId);
+
+  if (!colaborador) {
+    showToast('Colaborador no encontrado', 'error');
+    return;
+  }
+
+  // Obtener registros de asistencia del colaborador
+  const registros = await asistenciaService.getRegistrosAsistencia({
+    departamento: dashboardState.filtros.departamento === 'Todos' ? null : dashboardState.filtros.departamento
+  });
+
+  const registrosColaborador = registros.filter(r => r.colaboradorId === colaboradorId);
+
+  // Calcular métricas
+  const presentes = registrosColaborador.filter(r => r.estado === 'Presente').length;
+  const ausentes = registrosColaborador.filter(r => r.estado === 'Ausente').length;
+  const totalDias = registrosColaborador.length;
+  const porcentajeAsistencia = totalDias > 0 ? Math.round((presentes / totalDias) * 100) : 0;
+
+  // Actualizar modal - Título
+  document.getElementById('modalTitulo').textContent = `${colaborador.nombres} ${colaborador.apellidos}`;
+
+  // Actualizar modal - Foto
+  const modalFoto = document.getElementById('modalFoto');
+  const nombreCompleto = `${colaborador.nombres} ${colaborador.apellidos}`;
+  if (colaborador.foto) {
+    modalFoto.innerHTML = `<img src="${colaborador.foto}" alt="${nombreCompleto}">`;
+  } else {
+    const initials = (colaborador.nombres.charAt(0) + colaborador.apellidos.charAt(0)).toUpperCase();
+    modalFoto.innerHTML = initials;
+    modalFoto.style.fontSize = '48px';
+  }
+
+  // Actualizar modal - Datos principales
+  document.getElementById('modalNombre').textContent = nombreCompleto;
+  document.getElementById('modalDepartamento').textContent = colaborador.departamento || '-';
+  document.getElementById('modalPuesto').textContent = colaborador.puesto || '-';
+  document.getElementById('modalTurno').textContent = colaborador.turno || '-';
+  document.getElementById('modalNumero').textContent = colaborador.numeroEmpleado || '-';
+
+  const fechaIngreso = colaborador.fechaIngreso
+    ? new Date(colaborador.fechaIngreso).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' })
+    : '-';
+  document.getElementById('modalFechaIngreso').textContent = fechaIngreso;
+
+  const estatusBadge = document.getElementById('modalEstatus');
+  const estatus = colaborador.estatus || 'Activo';
+  estatusBadge.textContent = estatus;
+  estatusBadge.style.background = estatus === 'Activo' ? '#d4edda' : '#f8d7da';
+  estatusBadge.style.color = estatus === 'Activo' ? 'var(--color-success)' : 'var(--color-danger)';
+
+  // Actualizar métricas
+  document.getElementById('modalTotalDias').textContent = totalDias;
+  document.getElementById('modalPresentes').textContent = presentes;
+  document.getElementById('modalAusentes').textContent = ausentes;
+  document.getElementById('modalPorcentaje').textContent = porcentajeAsistencia + '%';
+
+  // Desglose de inasistencias
+  const desglose = {};
+  registrosColaborador.filter(r => r.estado === 'Ausente').forEach(r => {
+    const tipo = r.tipo || 'Falta';
+    desglose[tipo] = (desglose[tipo] || 0) + 1;
+  });
+
+  const modalDesglose = document.getElementById('modalDesglose');
+  if (Object.keys(desglose).length === 0) {
+    modalDesglose.innerHTML = '<p class="mensaje-vacio">Sin inasistencias en este periodo</p>';
+  } else {
+    modalDesglose.innerHTML = `
+      <div class="desglose-lista">
+        ${Object.entries(desglose).map(([tipo, cantidad]) => `
+          <div class="desglose-item">
+            <span class="desglose-item-cantidad">${cantidad}</span>
+            <span>${tipo}${cantidad > 1 ? 's' : ''}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // Historial de inasistencias
+  const ausencias = registrosColaborador.filter(r => r.estado === 'Ausente').slice(-10);
+  const modalHistorial = document.getElementById('modalHistorial');
+
+  if (ausencias.length === 0) {
+    modalHistorial.innerHTML = '<p class="mensaje-vacio">Sin inasistencias en este periodo</p>';
+  } else {
+    modalHistorial.innerHTML = `
+      <div class="historial-lista">
+        ${ausencias.map(r => {
+          const fecha = new Date(r.fecha + 'T00:00:00');
+          const fechaFormateada = fecha.toLocaleDateString('es-MX', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          return `
+            <div class="historial-item">
+              <span class="historial-fecha">${fechaFormateada}</span>
+              <span class="historial-tipo">${r.tipo || 'Falta'}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  // Asistencia de la semana
+  if (dashboardState.vistaActual === 'semanal' && dashboardState.datos.vistaSemanal) {
+    const vistaSemanal = dashboardState.datos.vistaSemanal;
+    const colabData = vistaSemanal.colaboradores.find(c => c.id === colaboradorId);
+
+    if (colabData) {
+      const fechaInicio = new Date(vistaSemanal.fechaInicio + 'T00:00:00');
+      const fechaFin = new Date(vistaSemanal.fechaFin + 'T00:00:00');
+
+      document.getElementById('modalTituloSemana').textContent =
+        `Asistencia de la Semana (${fechaInicio.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })} - ${fechaFin.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })})`;
+
+      const modalAsistenciaSemana = document.getElementById('modalAsistenciaSemana');
+      const diasSemana = vistaSemanal.diasSemana;
+
+      modalAsistenciaSemana.innerHTML = `
+        <div class="asistencia-semana-dias">
+          ${diasSemana.map(dia => {
+            const estado = colabData.diasSemana[dia.fecha] || '-';
+            const claseEstado = estado === 'Presente' ? 'presente' : estado === 'Ausente' ? 'ausente' : '';
+
+            return `
+              <div class="dia-item ${claseEstado}">
+                <div class="dia-nombre">${dia.diaSemana}</div>
+                <div class="dia-numero">${dia.dia}</div>
+                <div class="dia-estado">${estado}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+  } else {
+    document.getElementById('modalAsistenciaSemana').innerHTML =
+      '<p class="mensaje-vacio">Cambia a vista semanal para ver este dato</p>';
+  }
+
+  // Mostrar modal
+  document.getElementById('modalDetalleColaborador').style.display = 'flex';
+}
+
+/**
+ * Cierra el modal de detalle
+ */
+function cerrarModalDetalle() {
+  document.getElementById('modalDetalleColaborador').style.display = 'none';
+}
+
+// Cerrar modal al hacer clic fuera
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('modalDetalleColaborador');
+  if (e.target === modal) {
+    cerrarModalDetalle();
+  }
+});
+
+// Cerrar modal con tecla Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    cerrarModalDetalle();
+  }
+});

@@ -2342,11 +2342,42 @@
 
           <!-- Vista: Lista de Departamentos -->
           <div id="asistencia-colaboradores-lista" style="display: none;">
-            <h2 class="section-title">Departamentos</h2>
-            <p class="section-subtitle">Selecciona un departamento para ver su personal</p>
+            <h2 class="section-title">Colaboradores</h2>
+            <p class="section-subtitle">Busca colaboradores o selecciona un departamento</p>
 
-            <div id="departamentos-container" class="modules-grid">
-              <!-- Los departamentos se cargarán aquí -->
+            <!-- Buscador Global de Colaboradores -->
+            <div class="search-colaboradores-container" style="margin: 20px 0 30px 0;">
+              <div style="position: relative; max-width: 600px; margin: 0 auto;">
+                <input
+                  type="text"
+                  id="search-colaboradores-global"
+                  class="search-input"
+                  placeholder="Buscar colaborador por nombre o número de nómina en todos los departamentos..."
+                  style="width: 100%; padding: 12px 40px 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                     style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none;">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Resultados de búsqueda -->
+            <div id="search-results-container" style="display: none; margin-bottom: 30px;">
+              <h3 style="margin-bottom: 20px; font-size: 18px; color: #333;">
+                Resultados de búsqueda: <span id="search-count" style="color: #667eea;">0</span>
+              </h3>
+              <div id="search-results-list" class="colab-list">
+                <!-- Results will load here -->
+              </div>
+            </div>
+
+            <!-- Departamentos (hide when searching) -->
+            <div id="departamentos-section">
+              <h3 style="margin-bottom: 20px; font-size: 18px; color: #333;">Departamentos</h3>
+              <div id="departamentos-container" class="modules-grid">
+                <!-- Los departamentos se cargarán aquí -->
+              </div>
             </div>
           </div>
 
@@ -5096,6 +5127,84 @@
           }
         });
       }
+
+      // Event listener para el buscador global de colaboradores
+      const searchColaboradoresGlobal = document.getElementById('search-colaboradores-global');
+      if (searchColaboradoresGlobal) {
+        searchColaboradoresGlobal.addEventListener('input', (e) => {
+          buscarColaboradoresGlobal(e.target.value);
+        });
+      }
+
+      // Función para buscar colaboradores en todos los departamentos
+      function buscarColaboradoresGlobal(searchTerm) {
+        const searchResultsContainer = document.getElementById('search-results-container');
+        const searchResultsList = document.getElementById('search-results-list');
+        const searchCount = document.getElementById('search-count');
+        const departamentosSection = document.getElementById('departamentos-section');
+
+        // Si no hay término de búsqueda, mostrar departamentos y ocultar resultados
+        if (!searchTerm || searchTerm.trim() === '') {
+          searchResultsContainer.style.display = 'none';
+          departamentosSection.style.display = 'block';
+          return;
+        }
+
+        // Obtener todos los colaboradores activos
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+        const colaboradoresActivos = colaboradores.filter(c => (c.estatus || 'Activo') === 'Activo');
+
+        // Filtrar por término de búsqueda
+        const term = searchTerm.toLowerCase();
+        const resultados = colaboradoresActivos.filter(c => {
+          const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
+          const numeroEmpleado = (c.numeroEmpleado || '').toString().toLowerCase();
+          return nombreCompleto.includes(term) || numeroEmpleado.includes(term);
+        });
+
+        // Actualizar contador
+        searchCount.textContent = resultados.length;
+
+        // Mostrar resultados y ocultar departamentos
+        searchResultsContainer.style.display = 'block';
+        departamentosSection.style.display = 'none';
+
+        // Renderizar resultados
+        if (resultados.length === 0) {
+          searchResultsList.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px; color: #999;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 12px;">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+              </svg>
+              <p style="font-size: 14px; margin: 0;">No se encontraron colaboradores</p>
+            </div>
+          `;
+        } else {
+          searchResultsList.innerHTML = resultados.map(colab => {
+            const initials = colab.nombres && colab.apellidos
+              ? (colab.nombres.charAt(0) + colab.apellidos.charAt(0)).toUpperCase()
+              : '??';
+
+            const nombreCompleto = `${colab.nombres} ${colab.apellidos}`;
+            const photoHTML = colab.foto
+              ? `<img src="${colab.foto}" alt="${colab.nombres}" onclick="event.stopPropagation(); abrirModalFoto('${colab.foto}', '${nombreCompleto}')">`
+              : initials;
+
+            const estatusClass = (colab.estatus || 'Activo').toLowerCase();
+
+            return `
+              <div class="colab-card-compact" onclick="verColaboradorDetalle(${colab.id})" style="cursor: pointer;">
+                <div class="colab-photo-small">${photoHTML}</div>
+                <div class="colab-info-compact">
+                  <h4>${colab.nombres} ${colab.apellidos}</h4>
+                  <p>${colab.puesto || 'Sin puesto'} • ${colab.departamento || 'Sin departamento'}</p>
+                </div>
+                <div class="colab-status-compact ${estatusClass}" title="${colab.estatus || 'Activo'}"></div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
     }
 
     /**
@@ -5198,8 +5307,8 @@
       if (searchTerm) {
         colaboradoresDept = colaboradoresDept.filter(c => {
           const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
-          const numeroNomina = (c.numeroNomina || '').toString().toLowerCase();
-          return nombreCompleto.includes(searchTerm) || numeroNomina.includes(searchTerm);
+          const numeroEmpleado = (c.numeroEmpleado || '').toString().toLowerCase();
+          return nombreCompleto.includes(searchTerm) || numeroEmpleado.includes(searchTerm);
         });
       }
 
@@ -5427,8 +5536,8 @@
       if (searchTerm) {
         colaboradoresFiltrados = colaboradoresDeptTodos.filter(c => {
           const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
-          const numeroNomina = (c.numeroNomina || '').toString().toLowerCase();
-          return nombreCompleto.includes(searchTerm) || numeroNomina.includes(searchTerm);
+          const numeroEmpleado = (c.numeroEmpleado || '').toString().toLowerCase();
+          return nombreCompleto.includes(searchTerm) || numeroEmpleado.includes(searchTerm);
         });
       }
 
