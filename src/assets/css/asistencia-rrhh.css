@@ -43,13 +43,13 @@ body {
    ============================================ */
 
 .dashboard-header {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #1565A0 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #002171 0%, #001E3C 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   padding: 16px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(30, 124, 186, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 30, 60, 0.5);
   position: sticky;
   top: 0;
   z-index: 100;
