@@ -1629,8 +1629,9 @@
         <strong>💡 Importante:</strong> Asegúrate de recordar tu respuesta. La necesitarás para recuperar tu contraseña.
       </div>
 
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button class="modal-btn modal-btn-confirm" onclick="saveSecurityQuestion()" style="width: 100%;">Guardar y Continuar</button>
+      <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+        <button class="modal-btn modal-btn-cancel" onclick="skipSecurityQuestion()" style="flex: 1;">Configurar después</button>
+        <button class="modal-btn modal-btn-confirm" onclick="saveSecurityQuestion()" style="flex: 1;">Guardar y Continuar</button>
       </div>
     </div>
   </div>

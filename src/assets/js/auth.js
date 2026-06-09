@@ -703,6 +703,27 @@ function openSetupSecurityQuestionModal() {
 }
 
 /**
+ * Skips security question setup - allows user to configure later
+ */
+window.skipSecurityQuestion = function() {
+  const modal = document.getElementById('setupSecurityQuestionModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+
+  // Show informative message
+  const showMessage = (msg, type) => {
+    if (typeof showToast === 'function') {
+      showToast(msg, type);
+    } else {
+      alert(msg);
+    }
+  };
+
+  showMessage('Puedes configurar tu pregunta de seguridad desde "Mi Perfil" en cualquier momento', 'info');
+};
+
+/**
  * Saves security question from setup modal
  */
 window.saveSecurityQuestion = function() {
