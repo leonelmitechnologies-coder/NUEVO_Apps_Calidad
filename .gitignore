@@ -44,3 +44,7 @@ coverage/
 # Build outputs (si se agregan en el futuro)
 dist/
 build/
+
+# Migration backups (datos sensibles - NO commitear)
+migration/*.json
+!migration/.gitkeep

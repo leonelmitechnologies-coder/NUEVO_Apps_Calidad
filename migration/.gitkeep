@@ -1,0 +1,2 @@
+# Este archivo mantiene el directorio migration/ en git
+# Los archivos .json de backup NO se commitean (están en .gitignore)
