@@ -6,7 +6,7 @@
 
 ### Para Empezar
 
-- **[Guía de Inicio Rápido](GETTING_STARTED.md)**
+- **[Guía de Inicio Rápido](01-getting-started/GETTING_STARTED.md)**
   - Instalación paso a paso
   - Configuración del entorno
   - Primer uso del sistema
@@ -24,46 +24,40 @@
 
 ### Arquitectura
 
-- **[Arquitectura del Sistema](ARCHITECTURE.md)**
+- **[Arquitectura del Sistema](02-architecture/ARCHITECTURE.md)**
   - Visión general de la arquitectura
   - Flujo de datos
   - Patrones de diseño
   - Decisiones técnicas
 
-- **[Estructura del Proyecto](PROJECT_STRUCTURE.md)**
+- **[Estructura del Proyecto](02-architecture/PROJECT_STRUCTURE.md)**
   - Organización de archivos y directorios
   - Convenciones de nomenclatura
   - Descripción de componentes
   - Guías de expansión
 
-### Diseño
-
-- **[Sistema de Diseño](DESIGN_SYSTEM.md)**
+- **[Sistema de Diseño](02-architecture/DESIGN_SYSTEM.md)**
   - Paleta de colores
   - Tipografía
   - Componentes UI
   - Guías de accesibilidad
   - Responsive design
 
-### API
+- **[Routing](02-architecture/ROUTING.md)**
+  - Sistema de rutas y navegación
+  - Single Page Application
+  - Gestión de estado de navegación
 
-- **[Documentación de API](API.md)**
-  - Endpoints disponibles (futuro)
-  - Modelos de datos
-  - Autenticación JWT
-  - Ejemplos de uso
-  - Códigos de error
+### Desarrollo
 
-### Código
-
-- **[Guía para Desarrolladores](DEVELOPER_GUIDE.md)**
+- **[Guía para Desarrolladores](03-development/DEVELOPER_GUIDE.md)**
   - Quick start para nuevos developers
   - Flujo de desarrollo
   - Estándares de código
   - Workflow diario
   - Tips y trucos
 
-- **[Ejemplos de Código](CODE_EXAMPLES.md)**
+- **[Ejemplos de Código](03-development/CODE_EXAMPLES.md)**
   - Autenticación
   - Validación de formularios
   - Gestión de estado
@@ -71,9 +65,22 @@
   - Patrones de UI
   - Testing
 
+- **[Convenciones](03-development/CONVENTIONS.md)**
+  - Estándares de código
+  - Nomenclatura
+  - Mejores prácticas
+  - Code review
+
+- **[Documentación de API](03-development/API.md)**
+  - Endpoints disponibles (futuro)
+  - Modelos de datos
+  - Autenticación JWT
+  - Ejemplos de uso
+  - Códigos de error
+
 ## 🧪 Testing
 
-- **[Guía de Testing](TESTING.md)**
+- **[Guía de Testing](04-testing/TESTING.md)**
   - Configuración de Playwright
   - Escribir tests E2E
   - Mejores prácticas
@@ -83,7 +90,7 @@
 
 ## 🚀 Despliegue
 
-- **[Guía de Despliegue](DEPLOYMENT.md)**
+- **[Guía de Despliegue](05-deployment/DEPLOYMENT.md)**
   - Entornos (dev, staging, producción)
   - Configuración de servidores
   - Nginx/Apache
@@ -113,16 +120,24 @@
 
 ```
 docs/
-├── README.md                    # Este archivo (índice)
-├── GETTING_STARTED.md          # Guía de inicio rápido
-├── ARCHITECTURE.md             # Arquitectura del sistema
-├── PROJECT_STRUCTURE.md        # Estructura del proyecto
-├── DESIGN_SYSTEM.md            # Sistema de diseño y UI/UX
-├── API.md                      # Documentación de API REST
-├── CODE_EXAMPLES.md            # Ejemplos de código
-├── TESTING.md                  # Guía de testing
-├── DEPLOYMENT.md               # Guía de despliegue
-└── superpowers/                # Specs avanzadas
+├── README.md                        # Este archivo (índice)
+├── 01-getting-started/              # Guías de inicio
+│   └── GETTING_STARTED.md          # Guía de inicio rápido
+├── 02-architecture/                 # Arquitectura del sistema
+│   ├── ARCHITECTURE.md             # Visión general de arquitectura
+│   ├── PROJECT_STRUCTURE.md        # Estructura del proyecto
+│   ├── DESIGN_SYSTEM.md            # Sistema de diseño y UI/UX
+│   └── ROUTING.md                  # Sistema de rutas
+├── 03-development/                  # Guías de desarrollo
+│   ├── DEVELOPER_GUIDE.md          # Guía para desarrolladores
+│   ├── CODE_EXAMPLES.md            # Ejemplos de código
+│   ├── CONVENTIONS.md              # Convenciones y estándares
+│   └── API.md                      # Documentación de API REST
+├── 04-testing/                      # Testing
+│   └── TESTING.md                  # Guía de testing
+├── 05-deployment/                   # Despliegue
+│   └── DEPLOYMENT.md               # Guía de despliegue
+└── superpowers/                     # Specs avanzadas
     └── specs/
         └── 2026-06-04-attendance-system-design.md
 ```
@@ -132,68 +147,68 @@ docs/
 ### Nuevo en el Proyecto
 
 1. Lee el [README Principal](../README.md) para visión general
-2. Sigue la [Guía de Inicio Rápido](GETTING_STARTED.md)
-3. Revisa [Ejemplos de Código](CODE_EXAMPLES.md)
+2. Sigue la [Guía de Inicio Rápido](01-getting-started/GETTING_STARTED.md)
+3. Revisa [Ejemplos de Código](03-development/CODE_EXAMPLES.md)
 4. Lee las [Guías de Contribución](../CONTRIBUTING.md)
 
 ### Frontend Developer
 
-1. [Sistema de Diseño](DESIGN_SYSTEM.md) - Variables CSS, componentes
-2. [Arquitectura](ARCHITECTURE.md) - Patrones y estructura
-3. [Ejemplos de Código](CODE_EXAMPLES.md) - Patrones de UI
-4. [Testing](TESTING.md) - Tests E2E con Playwright
+1. [Sistema de Diseño](02-architecture/DESIGN_SYSTEM.md) - Variables CSS, componentes
+2. [Arquitectura](02-architecture/ARCHITECTURE.md) - Patrones y estructura
+3. [Ejemplos de Código](03-development/CODE_EXAMPLES.md) - Patrones de UI
+4. [Testing](04-testing/TESTING.md) - Tests E2E con Playwright
 
 ### Backend Developer (Futuro)
 
-1. [API Documentation](API.md) - Endpoints planificados
-2. [Arquitectura](ARCHITECTURE.md) - Integración con frontend
-3. [Ejemplos de Código](CODE_EXAMPLES.md) - Cliente API
-4. [Deployment](DEPLOYMENT.md) - Configuración de servidor
+1. [API Documentation](03-development/API.md) - Endpoints planificados
+2. [Arquitectura](02-architecture/ARCHITECTURE.md) - Integración con frontend
+3. [Ejemplos de Código](03-development/CODE_EXAMPLES.md) - Cliente API
+4. [Deployment](05-deployment/DEPLOYMENT.md) - Configuración de servidor
 
 ### DevOps
 
-1. [Deployment](DEPLOYMENT.md) - Configuración completa
-2. [Testing](TESTING.md) - CI/CD pipelines
-3. [Architecture](ARCHITECTURE.md) - Infraestructura
+1. [Deployment](05-deployment/DEPLOYMENT.md) - Configuración completa
+2. [Testing](04-testing/TESTING.md) - CI/CD pipelines
+3. [Architecture](02-architecture/ARCHITECTURE.md) - Infraestructura
 
 ### QA / Tester
 
-1. [Getting Started](GETTING_STARTED.md) - Setup del proyecto
-2. [Testing](TESTING.md) - Escribir y ejecutar tests
-3. [Code Examples](CODE_EXAMPLES.md) - Ejemplos de tests
+1. [Getting Started](01-getting-started/GETTING_STARTED.md) - Setup del proyecto
+2. [Testing](04-testing/TESTING.md) - Escribir y ejecutar tests
+3. [Code Examples](03-development/CODE_EXAMPLES.md) - Ejemplos de tests
 
 ### UI/UX Designer
 
-1. [Design System](DESIGN_SYSTEM.md) - Completo
-2. [Architecture](ARCHITECTURE.md) - Componentes y flujos
-3. [Code Examples](CODE_EXAMPLES.md) - Patrones de UI
+1. [Design System](02-architecture/DESIGN_SYSTEM.md) - Completo
+2. [Architecture](02-architecture/ARCHITECTURE.md) - Componentes y flujos
+3. [Code Examples](03-development/CODE_EXAMPLES.md) - Patrones de UI
 
 ## 🔍 Búsqueda Rápida
 
 ### Por Tecnología
 
-- **HTML5:** [Design System](DESIGN_SYSTEM.md), [Code Examples](CODE_EXAMPLES.md)
-- **CSS3:** [Design System](DESIGN_SYSTEM.md), [Architecture](ARCHITECTURE.md)
-- **JavaScript:** [Code Examples](CODE_EXAMPLES.md), [Architecture](ARCHITECTURE.md)
-- **Playwright:** [Testing](TESTING.md)
+- **HTML5:** [Design System](02-architecture/DESIGN_SYSTEM.md), [Code Examples](03-development/CODE_EXAMPLES.md)
+- **CSS3:** [Design System](02-architecture/DESIGN_SYSTEM.md), [Architecture](02-architecture/ARCHITECTURE.md)
+- **JavaScript:** [Code Examples](03-development/CODE_EXAMPLES.md), [Architecture](02-architecture/ARCHITECTURE.md)
+- **Playwright:** [Testing](04-testing/TESTING.md)
 - **Git:** [Contributing](../CONTRIBUTING.md)
 
 ### Por Tema
 
-- **Accesibilidad:** [Design System](DESIGN_SYSTEM.md)
-- **Performance:** [Architecture](ARCHITECTURE.md), [Deployment](DEPLOYMENT.md)
-- **Seguridad:** [Architecture](ARCHITECTURE.md), [API](API.md)
-- **Responsive:** [Design System](DESIGN_SYSTEM.md), [Testing](TESTING.md)
-- **SEO:** [Deployment](DEPLOYMENT.md)
+- **Accesibilidad:** [Design System](02-architecture/DESIGN_SYSTEM.md)
+- **Performance:** [Architecture](02-architecture/ARCHITECTURE.md), [Deployment](05-deployment/DEPLOYMENT.md)
+- **Seguridad:** [Architecture](02-architecture/ARCHITECTURE.md), [API](03-development/API.md)
+- **Responsive:** [Design System](02-architecture/DESIGN_SYSTEM.md), [Testing](04-testing/TESTING.md)
+- **SEO:** [Deployment](05-deployment/DEPLOYMENT.md)
 
 ### Por Tarea
 
-- **Crear componente:** [Design System](DESIGN_SYSTEM.md) + [Code Examples](CODE_EXAMPLES.md)
-- **Agregar validación:** [Code Examples](CODE_EXAMPLES.md) sección Validación
-- **Hacer deploy:** [Deployment](DEPLOYMENT.md)
-- **Escribir test:** [Testing](TESTING.md)
+- **Crear componente:** [Design System](02-architecture/DESIGN_SYSTEM.md) + [Code Examples](03-development/CODE_EXAMPLES.md)
+- **Agregar validación:** [Code Examples](03-development/CODE_EXAMPLES.md) sección Validación
+- **Hacer deploy:** [Deployment](05-deployment/DEPLOYMENT.md)
+- **Escribir test:** [Testing](04-testing/TESTING.md)
 - **Reportar bug:** [Contributing](../CONTRIBUTING.md)
-- **Integrar API:** [API](API.md) + [Code Examples](CODE_EXAMPLES.md)
+- **Integrar API:** [API](03-development/API.md) + [Code Examples](03-development/CODE_EXAMPLES.md)
 
 ## 📖 Convenciones de Documentación
 
