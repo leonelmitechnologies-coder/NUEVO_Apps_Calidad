@@ -1,3 +1,4 @@
+// MiSync Backend API Server
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -28,9 +29,22 @@ const HOST = process.env.HOST || 'localhost';
 app.use(helmet());
 
 // CORS - permitir requests desde el frontend
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+  : ['http://localhost:8080'];
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:8080',
+    origin: (origin, callback) => {
+      // Permitir requests sin origin (como desde Postman, curl, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );

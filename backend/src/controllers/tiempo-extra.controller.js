@@ -28,12 +28,15 @@ function calcularHorasTotales(horaInicio, horaFin) {
  */
 export async function listTiempoExtra(req, res) {
   try {
-    // Verificar permisos: requiere permiso 'tiempoExtra' o 'historial'
-    if (!req.user.permisos?.tiempoExtra && !req.user.permisos?.historial) {
-      return res.status(403).json({
-        error: 'Prohibido',
-        message: 'No tienes permiso para ver tiempo extra',
-      });
+    // Verificar permisos solo si hay usuario autenticado
+    // Si no hay req.user, es acceso público (dashboard RRHH)
+    if (req.user) {
+      if (!req.user.permisos?.tiempoExtra && !req.user.permisos?.historial) {
+        return res.status(403).json({
+          error: 'Prohibido',
+          message: 'No tienes permiso para ver tiempo extra',
+        });
+      }
     }
 
     // Construir condiciones de filtrado
@@ -233,12 +236,14 @@ export async function getTiempoExtra(req, res) {
   try {
     const registroId = parseInt(req.params.id);
 
-    // Verificar permisos
-    if (!req.user.permisos?.tiempoExtra && !req.user.permisos?.historial) {
-      return res.status(403).json({
-        error: 'Prohibido',
-        message: 'No tienes permiso para ver tiempo extra',
-      });
+    // Verificar permisos solo si hay usuario autenticado
+    if (req.user) {
+      if (!req.user.permisos?.tiempoExtra && !req.user.permisos?.historial) {
+        return res.status(403).json({
+          error: 'Prohibido',
+          message: 'No tienes permiso para ver tiempo extra',
+        });
+      }
     }
 
     const [registro] = await db
@@ -503,12 +508,14 @@ export async function deleteTiempoExtra(req, res) {
  */
 export async function getTiempoExtraStats(req, res) {
   try {
-    // Verificar permisos
-    if (!req.user.permisos?.tiempoExtra && !req.user.permisos?.historial) {
-      return res.status(403).json({
-        error: 'Prohibido',
-        message: 'No tienes permiso para ver estadísticas de tiempo extra',
-      });
+    // Verificar permisos solo si hay usuario autenticado
+    if (req.user) {
+      if (!req.user.permisos?.tiempoExtra && !req.user.permisos?.historial) {
+        return res.status(403).json({
+          error: 'Prohibido',
+          message: 'No tienes permiso para ver estadísticas de tiempo extra',
+        });
+      }
     }
 
     // Obtener mes del query (default: mes actual)
