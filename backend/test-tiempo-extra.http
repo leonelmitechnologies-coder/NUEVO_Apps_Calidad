@@ -1,0 +1,97 @@
+### Variables
+@baseUrl = http://localhost:3000
+@token =
+
+### 1. Login (obtener token)
+# POST {{baseUrl}}/api/auth/login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "admin",
+  "password": "admin123"
+}
+
+### 2. Crear Tiempo Extra
+POST http://localhost:3000/api/tiempo-extra
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "colaboradorId": 1,
+  "departamento": "Produccion",
+  "fecha": "2024-06-12",
+  "horaInicio": "18:00",
+  "horaFin": "21:00",
+  "area": "Produccion",
+  "motivo": "Entrega urgente de proyecto",
+  "autorizadoPor": "Ing. García"
+}
+
+### 3. Crear Tiempo Extra con turno que cruza medianoche
+POST http://localhost:3000/api/tiempo-extra
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "colaboradorId": 1,
+  "departamento": "Produccion",
+  "fecha": "2024-06-13",
+  "horaInicio": "22:00",
+  "horaFin": "02:00",
+  "area": "Produccion",
+  "motivo": "Turno nocturno especial",
+  "autorizadoPor": "Ing. López"
+}
+
+### 4. Listar todos los registros
+GET http://localhost:3000/api/tiempo-extra
+Authorization: Bearer {{token}}
+
+### 5. Listar filtrado por departamento
+GET http://localhost:3000/api/tiempo-extra?departamento=Produccion
+Authorization: Bearer {{token}}
+
+### 6. Listar filtrado por fecha
+GET http://localhost:3000/api/tiempo-extra?fecha=2024-06-12
+Authorization: Bearer {{token}}
+
+### 7. Listar filtrado por mes
+GET http://localhost:3000/api/tiempo-extra?mes=2024-06
+Authorization: Bearer {{token}}
+
+### 8. Obtener estadísticas del mes actual
+GET http://localhost:3000/api/tiempo-extra/stats
+Authorization: Bearer {{token}}
+
+### 9. Obtener estadísticas de un mes específico
+GET http://localhost:3000/api/tiempo-extra/stats?mes=2024-06
+Authorization: Bearer {{token}}
+
+### 10. Obtener un registro específico
+GET http://localhost:3000/api/tiempo-extra/1
+Authorization: Bearer {{token}}
+
+### 11. Actualizar registro (cambiar horas)
+PUT http://localhost:3000/api/tiempo-extra/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "horaInicio": "18:30",
+  "horaFin": "21:30"
+}
+
+### 12. Actualizar registro (cambiar motivo)
+PUT http://localhost:3000/api/tiempo-extra/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "motivo": "Entrega urgente de proyecto actualizado",
+  "autorizadoPor": "Ing. García Martínez"
+}
+
+### 13. Eliminar registro (soft delete)
+DELETE http://localhost:3000/api/tiempo-extra/1
+Authorization: Bearer {{token}}
