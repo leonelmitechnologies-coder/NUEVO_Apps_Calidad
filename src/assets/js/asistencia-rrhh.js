@@ -25,7 +25,7 @@ const dashboardState = {
 
 // Inicialización del dashboard
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('Inicializando Dashboard de Asistencia RRHH...');
+  console.log('Inicializando Dashboard de Asistencia RRHH (Modo Público)...');
 
   // Establecer fecha actual
   const hoy = new Date();
@@ -88,8 +88,8 @@ async function cargarDepartamentos() {
     'Ventas'
   ];
 
-  // Obtener departamentos adicionales de colaboradores (por si hay departamentos personalizados)
-  const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+  // Obtener departamentos adicionales de colaboradores desde la API
+  const colaboradores = await asistenciaService.getColaboradores();
   const departamentosColaboradores = colaboradores.map(c => c.departamento).filter(d => d);
 
   // Combinar y eliminar duplicados
@@ -132,8 +132,8 @@ async function cargarTurnos() {
   // Turnos predefinidos del sistema (siempre se muestran)
   const turnosPredefinidos = ['Turno 1', 'Turno 2'];
 
-  // Obtener turnos adicionales de colaboradores (por si hay turnos personalizados)
-  const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+  // Obtener turnos adicionales de colaboradores desde la API
+  const colaboradores = await asistenciaService.getColaboradores();
   const turnosColaboradores = colaboradores.map(c => c.turno).filter(t => t);
 
   // Combinar y eliminar duplicados
@@ -530,10 +530,24 @@ async function cargarVistaTiempoExtra() {
   // Agrupar por colaborador
   const tiemposPorColaborador = {};
 
+  // Obtener todos los colaboradores únicos
+  const colaboradorIds = [...new Set(tiemposExtra.map(te => te.colaboradorId))];
+
+  // Cargar todos los colaboradores en paralelo
+  const colaboradoresPromises = colaboradorIds.map(id => asistenciaService.getColaboradorById(id));
+  const colaboradores = await Promise.all(colaboradoresPromises);
+
+  // Crear un mapa de colaboradores
+  const colaboradoresMap = new Map();
+  colaboradores.forEach(colab => {
+    if (colab) colaboradoresMap.set(colab.id, colab);
+  });
+
+  // Agrupar tiempos extra por colaborador
   tiemposExtra.forEach(te => {
     if (!tiemposPorColaborador[te.colaboradorId]) {
       tiemposPorColaborador[te.colaboradorId] = {
-        colaborador: asistenciaService.getColaboradorById(te.colaboradorId),
+        colaborador: colaboradoresMap.get(te.colaboradorId),
         registros: []
       };
     }
@@ -1256,51 +1270,22 @@ function configurarEventListeners() {
 }
 
 /**
- * Configura la actualización en tiempo real desde otras pestañas
- * Detecta cambios en localStorage hechos desde otras ventanas/pestañas
+ * Configura la actualización en tiempo real
+ * Actualiza datos cuando la página recibe foco
  */
 function configurarActualizacionTiempoReal() {
-  // Listener para cambios en localStorage desde otras pestañas
-  window.addEventListener('storage', async (e) => {
-    // Solo reaccionar a cambios en las keys relevantes
-    const keysRelevantes = ['colaboradores', 'historialAsistencia', 'tiemposExtra'];
+  // ELIMINADO: Ya no usamos localStorage para datos
+  // El sistema ahora obtiene datos en tiempo real de la API
 
-    if (keysRelevantes.includes(e.key)) {
-      console.log(`Cambio detectado en ${e.key}, actualizando dashboard...`);
+  // Listener para cuando la página se vuelve visible (cambio de pestaña o ventana)
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible') {
+      console.log('Página visible, actualizando datos desde API...');
 
       // Mostrar notificación al usuario
-      showToast('Datos actualizados desde otra pestaña', 'info');
+      showToast('Actualizando datos...', 'info');
 
-      // Si cambiaron los departamentos, recargar el filtro
-      if (e.key === 'colaboradores') {
-        await cargarDepartamentos();
-      }
-
-      // Recargar todos los datos del dashboard
-      await cargarDatos();
-    }
-  });
-
-  // Listener para cuando la página se vuelve visible (útil al navegar hacia atrás o cambiar de pestaña)
-  document.addEventListener('visibilitychange', async () => {
-    if (!document.hidden) {
-      console.log('Página visible, verificando actualizaciones...');
-
-      // Actualizar a la semana/fecha actual si estamos en vista semanal o diaria
-      const hoy = new Date();
-      if (dashboardState.vistaActual === 'semanal') {
-        dashboardState.semanaActual = asistenciaService.getNumeroSemana(hoy);
-        dashboardState.añoActual = hoy.getFullYear();
-        document.getElementById('inputSemana').value = dashboardState.semanaActual;
-        document.getElementById('inputAño').value = dashboardState.añoActual;
-      } else if (dashboardState.vistaActual === 'diaria') {
-        dashboardState.fechaDiaria = asistenciaService.formatFecha(hoy);
-        const inputFechaDiaria = document.getElementById('inputFechaDiaria');
-        if (inputFechaDiaria) {
-          inputFechaDiaria.value = dashboardState.fechaDiaria;
-        }
-      }
-
+      // Recargar todos los datos del dashboard desde la API
       await cargarDatos();
     }
   });
@@ -1314,7 +1299,7 @@ function configurarActualizacionTiempoReal() {
     }
   });
 
-  console.log('Actualización en tiempo real configurada');
+  console.log('Actualización en tiempo real configurada (API REST)');
 }
 
 /**

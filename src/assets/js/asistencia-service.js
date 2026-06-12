@@ -1,16 +1,38 @@
 /* ============================================
    MI Technologies - Asistencia Service
    Capa de servicios para datos de asistencia
-   Preparado para migración a API REST
+   Migrado a API REST de PostgreSQL
    ============================================ */
+
+// ========================================
+// CONFIGURACIÓN API
+// ========================================
+const API_BASE_URL = 'http://localhost:3001/api';
+
+// Helper para fetch SIN autenticación (dashboard público)
+async function fetchAPI(endpoint, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
 
 /**
  * Servicio de datos de asistencia
- * Actualmente usa localStorage, preparado para API REST
+ * Conectado a API REST de PostgreSQL
  */
 class AsistenciaService {
   constructor() {
-    this.baseUrl = '/api'; // Para futura implementación de API
+    this.baseUrl = API_BASE_URL;
   }
 
   /**
@@ -18,9 +40,13 @@ class AsistenciaService {
    * @returns {Array} Lista de colaboradores
    */
   async getColaboradores() {
-    // TODO: Reemplazar con fetch(this.baseUrl + '/colaboradores')
-    const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-    return colaboradores;
+    try {
+      const data = await fetchAPI('/colaboradores');
+      return data.colaboradores || [];
+    } catch (error) {
+      console.error('Error al cargar colaboradores:', error);
+      return [];
+    }
   }
 
   /**
@@ -28,8 +54,13 @@ class AsistenciaService {
    * @returns {Array} Lista de colaboradores activos
    */
   async getColaboradoresActivos() {
-    const colaboradores = await this.getColaboradores();
-    return colaboradores.filter(c => !c.baja);
+    try {
+      const data = await fetchAPI('/colaboradores?estatus=Activo');
+      return data.colaboradores || [];
+    } catch (error) {
+      console.error('Error al cargar colaboradores activos:', error);
+      return [];
+    }
   }
 
   /**
@@ -37,8 +68,13 @@ class AsistenciaService {
    * @returns {Array} Lista de colaboradores de baja
    */
   async getColaboradoresBaja() {
-    const colaboradores = await this.getColaboradores();
-    return colaboradores.filter(c => c.baja);
+    try {
+      const data = await fetchAPI('/colaboradores?estatus=Baja');
+      return data.colaboradores || [];
+    } catch (error) {
+      console.error('Error al cargar colaboradores de baja:', error);
+      return [];
+    }
   }
 
   /**
@@ -47,28 +83,55 @@ class AsistenciaService {
    * @returns {Array} Lista de registros de asistencia
    */
   async getRegistrosAsistencia(filtros = {}) {
-    // TODO: Reemplazar con fetch(this.baseUrl + '/asistencia', { params: filtros })
-    const registros = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+    try {
+      const params = new URLSearchParams();
 
-    let resultado = registros;
+      if (filtros.fechaInicio) params.append('fecha', filtros.fechaInicio);
+      if (filtros.colaboradorId) params.append('colaboradorId', filtros.colaboradorId);
 
-    // Aplicar filtros de departamentos (array)
-    if (filtros.departamentos && filtros.departamentos.length > 0) {
-      resultado = resultado.filter(r => {
-        const colaborador = this.getColaboradorById(r.colaboradorId);
-        return colaborador && filtros.departamentos.includes(colaborador.departamento);
-      });
+      // Manejar filtros de departamentos (array)
+      if (filtros.departamentos && filtros.departamentos.length > 0) {
+        // Si hay múltiples departamentos, necesitamos hacer requests por cada uno
+        // o filtrar en el cliente. Por simplicidad, filtraremos en el cliente.
+        const allRegistros = [];
+        for (const depto of filtros.departamentos) {
+          params.set('departamento', depto);
+          const queryString = params.toString();
+          const endpoint = `/asistencia${queryString ? '?' + queryString : ''}`;
+          const data = await fetchAPI(endpoint);
+          allRegistros.push(...(data.asistencias || []));
+        }
+
+        let registros = allRegistros;
+
+        // Filtrar por rango de fechas si se especificó fechaFin
+        if (filtros.fechaFin && filtros.fechaInicio) {
+          registros = registros.filter(r => {
+            return r.fecha >= filtros.fechaInicio && r.fecha <= filtros.fechaFin;
+          });
+        }
+
+        return registros;
+      }
+
+      const queryString = params.toString();
+      const endpoint = `/asistencia${queryString ? '?' + queryString : ''}`;
+
+      const data = await fetchAPI(endpoint);
+      let registros = data.asistencias || [];
+
+      // Filtrar por rango de fechas si se especificó fechaFin
+      if (filtros.fechaFin && filtros.fechaInicio) {
+        registros = registros.filter(r => {
+          return r.fecha >= filtros.fechaInicio && r.fecha <= filtros.fechaFin;
+        });
+      }
+
+      return registros;
+    } catch (error) {
+      console.error('Error al cargar registros de asistencia:', error);
+      return [];
     }
-
-    if (filtros.fechaInicio) {
-      resultado = resultado.filter(r => r.fecha >= filtros.fechaInicio);
-    }
-
-    if (filtros.fechaFin) {
-      resultado = resultado.filter(r => r.fecha <= filtros.fechaFin);
-    }
-
-    return resultado;
   }
 
   /**
@@ -77,25 +140,53 @@ class AsistenciaService {
    * @returns {Array} Lista de registros de tiempo extra
    */
   async getTiemposExtra(filtros = {}) {
-    // TODO: Reemplazar con fetch(this.baseUrl + '/tiempo-extra', { params: filtros })
-    const tiempos = JSON.parse(localStorage.getItem('tiemposExtra') || '[]');
+    try {
+      const params = new URLSearchParams();
 
-    let resultado = tiempos;
+      if (filtros.fechaInicio) params.append('fecha', filtros.fechaInicio);
+      if (filtros.mes) params.append('mes', filtros.mes);
 
-    // Aplicar filtros de departamentos (array)
-    if (filtros.departamentos && filtros.departamentos.length > 0) {
-      resultado = resultado.filter(t => filtros.departamentos.includes(t.departamento));
+      // Manejar filtros de departamentos (array)
+      if (filtros.departamentos && filtros.departamentos.length > 0) {
+        const allRegistros = [];
+        for (const depto of filtros.departamentos) {
+          params.set('departamento', depto);
+          const queryString = params.toString();
+          const endpoint = `/tiempo-extra${queryString ? '?' + queryString : ''}`;
+          const data = await fetchAPI(endpoint);
+          allRegistros.push(...(data.registros || []));
+        }
+
+        let registros = allRegistros;
+
+        // Filtrar por rango si se especificó fechaFin
+        if (filtros.fechaFin && filtros.fechaInicio) {
+          registros = registros.filter(r => {
+            return r.fecha >= filtros.fechaInicio && r.fecha <= filtros.fechaFin;
+          });
+        }
+
+        return registros;
+      }
+
+      const queryString = params.toString();
+      const endpoint = `/tiempo-extra${queryString ? '?' + queryString : ''}`;
+
+      const data = await fetchAPI(endpoint);
+      let registros = data.registros || [];
+
+      // Filtrar por rango si se especificó fechaFin
+      if (filtros.fechaFin && filtros.fechaInicio) {
+        registros = registros.filter(r => {
+          return r.fecha >= filtros.fechaInicio && r.fecha <= filtros.fechaFin;
+        });
+      }
+
+      return registros;
+    } catch (error) {
+      console.error('Error al cargar tiempos extra:', error);
+      return [];
     }
-
-    if (filtros.fechaInicio) {
-      resultado = resultado.filter(t => t.fecha >= filtros.fechaInicio);
-    }
-
-    if (filtros.fechaFin) {
-      resultado = resultado.filter(t => t.fecha <= filtros.fechaFin);
-    }
-
-    return resultado;
   }
 
   /**
@@ -103,9 +194,14 @@ class AsistenciaService {
    * @param {number} id - ID del colaborador
    * @returns {Object|null} Colaborador o null
    */
-  getColaboradorById(id) {
-    const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-    return colaboradores.find(c => c.id === id) || null;
+  async getColaboradorById(id) {
+    try {
+      const data = await fetchAPI(`/colaboradores/${id}`);
+      return data.colaborador || null;
+    } catch (error) {
+      console.error('Error al cargar colaborador:', error);
+      return null;
+    }
   }
 
   /**
@@ -158,9 +254,13 @@ class AsistenciaService {
       : 0;
 
     // Encontrar departamento con más faltas
+    // Optimización: crear un mapa de colaboradores para evitar múltiples requests
+    const colaboradoresMap = new Map();
+    colaboradores.forEach(c => colaboradoresMap.set(c.id, c));
+
     const faltasPorDepto = {};
     registros.filter(r => r.estado === 'ausente').forEach(r => {
-      const colaborador = this.getColaboradorById(r.colaboradorId);
+      const colaborador = colaboradoresMap.get(r.colaboradorId);
       if (colaborador && colaborador.departamento) {
         faltasPorDepto[colaborador.departamento] = (faltasPorDepto[colaborador.departamento] || 0) + 1;
       }
