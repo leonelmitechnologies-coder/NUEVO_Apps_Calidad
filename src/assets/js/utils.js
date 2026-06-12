@@ -75,41 +75,60 @@ function clearError(inputElement) {
 }
 
 /**
- * Gets value from localStorage
+ * Gets value from sessionStorage (for auth tokens) or localStorage (for other data)
  * @param {string} key - The key to retrieve
  * @returns {string|null}
  */
 function getStorage(key) {
   try {
+    // Las claves de autenticación van en sessionStorage
+    const authKeys = ['accessToken', 'refreshToken', 'rememberMe'];
+    if (authKeys.includes(key)) {
+      return sessionStorage.getItem(key);
+    }
+    // Otros datos van en localStorage
     return localStorage.getItem(key);
   } catch (error) {
-    console.error('Error reading from localStorage:', error);
+    console.error('Error reading from storage:', error);
     return null;
   }
 }
 
 /**
- * Sets value in localStorage
+ * Sets value in sessionStorage (for auth tokens) or localStorage (for other data)
  * @param {string} key - The key to set
  * @param {string} value - The value to store
  */
 function setStorage(key, value) {
   try {
-    localStorage.setItem(key, value);
+    // Las claves de autenticación van en sessionStorage
+    const authKeys = ['accessToken', 'refreshToken', 'rememberMe'];
+    if (authKeys.includes(key)) {
+      sessionStorage.setItem(key, value);
+    } else {
+      // Otros datos van en localStorage
+      localStorage.setItem(key, value);
+    }
   } catch (error) {
-    console.error('Error writing to localStorage:', error);
+    console.error('Error writing to storage:', error);
   }
 }
 
 /**
- * Removes value from localStorage
+ * Removes value from sessionStorage or localStorage
  * @param {string} key - The key to remove
  */
 function removeStorage(key) {
   try {
-    localStorage.removeItem(key);
+    // Las claves de autenticación van en sessionStorage
+    const authKeys = ['accessToken', 'refreshToken', 'rememberMe'];
+    if (authKeys.includes(key)) {
+      sessionStorage.removeItem(key);
+    } else {
+      localStorage.removeItem(key);
+    }
   } catch (error) {
-    console.error('Error removing from localStorage:', error);
+    console.error('Error removing from storage:', error);
   }
 }
 

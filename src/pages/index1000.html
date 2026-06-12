@@ -3667,10 +3667,11 @@
           setTimeout(() => {
             cargarFotoPerfil();
 
-            // Actualizar contraseña actual
+            // Mostrar placeholder para contraseña (el backend no retorna la contraseña por seguridad)
             const passwordActualDisplay = document.getElementById('passwordActualDisplay');
             if (passwordActualDisplay && window.currentUser) {
-              passwordActualDisplay.value = window.currentUser.password;
+              passwordActualDisplay.value = '••••••••';
+              passwordActualDisplay.setAttribute('data-password-hidden', 'true');
             }
           }, 100);
         }
@@ -3754,24 +3755,23 @@
         });
       }
 
-      // Inicializar window.currentUser si el usuario ya está autenticado
+      // Inicializar window.currentUser desde el backend API
       if (isAuthenticated()) {
-        const username = localStorage.getItem('username');
-        if (username) {
-          const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
-          const foundUser = appUsers.find(u => u.usuario === username);
-
-          if (foundUser) {
+        // Cargar usuario actual desde /api/auth/me
+        getCurrentUser().then(user => {
+          if (user) {
             window.currentUser = {
-              id: foundUser.id,
-              username: foundUser.usuario,
-              name: `${foundUser.nombre} ${foundUser.apellido}`,
-              photo: foundUser.photo || null,
-              password: foundUser.password,
-              departamento: foundUser.departamento || null,
-              departamentosPasarAsistencia: foundUser.departamentosPasarAsistencia || (foundUser.departamento ? [foundUser.departamento] : []),
-              departamentosTiempoExtra: foundUser.departamentosTiempoExtra || (foundUser.departamento ? [foundUser.departamento] : []),
-              permisos: foundUser.permisos || {
+              id: user.id,
+              usuario: user.usuario,
+              username: user.usuario, // alias
+              name: `${user.nombre} ${user.apellido}`,
+              nombre: user.nombre,
+              apellido: user.apellido,
+              photo: user.photo || null,
+              departamento: user.departamento || null,
+              departamentosPasarAsistencia: user.departamentosPasarAsistencia || [],
+              departamentosTiempoExtra: user.departamentosTiempoExtra || [],
+              permisos: user.permisos || {
                 usuarios: false,
                 asistencia: true,
                 pasarAsistencia: false,
@@ -3782,10 +3782,15 @@
                 bajas: false,
                 tiempoExtra: false,
                 miPerfil: true
-              }
+              },
+              securityQuestion: user.securityQuestion
             };
           }
-        }
+        }).catch(err => {
+          console.error('Error cargando usuario:', err);
+          // Si falla, hacer logout
+          logout();
+        });
       }
 
       // Vista inicial según autenticación
@@ -4173,7 +4178,7 @@
       });
     }
 
-    function createUser() {
+    async function createUser() {
       // Get form values
       const nombre = document.getElementById('nombre').value.trim();
       const apellido = document.getElementById('apellido').value.trim();
@@ -4207,56 +4212,81 @@
         document.querySelectorAll('#departamentos-tiempo-extra input[type="checkbox"]:checked')
       ).map(cb => cb.value);
 
-      // Get existing users from localStorage
-      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
 
-      // Create new user
-      const user = {
-        id: Date.now(),
-        nombre,
-        apellido,
-        usuario,
-        password,
-        puesto,
-        departamento,
-        photo: photo || null,
-        departamentosPasarAsistencia: deptsPasarAsistencia,
-        departamentosTiempoExtra: deptsTiempoExtra,
-        permisos: {
-          usuarios: permisoUsuarios,
-          asistencia: permisoAsistencia,
-          pasarAsistencia: permisoPasarAsistencia,
-          agregarColaborador: permisoAgregarColaborador,
-          historial: permisoHistorial,
-          inasistencia: permisoInasistencia,
-          colaboradores: permisoColaboradores,
-          bajas: permisoBajas,
-          tiempoExtra: permisoTiempoExtra,
-          miPerfil: permisoMiPerfil
-        },
-        fechaCreacion: new Date().toISOString()
-      };
+        // Crear usuario en el API
+        const response = await fetch(`${API_BASE_URL}/users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            usuario,
+            password,
+            nombre,
+            apellido,
+            puesto,
+            departamento,
+            departamentosPasarAsistencia: deptsPasarAsistencia,
+            departamentosTiempoExtra: deptsTiempoExtra,
+            photo: photo || null,
+            permisos: {
+              usuarios: permisoUsuarios,
+              asistencia: permisoAsistencia,
+              pasarAsistencia: permisoPasarAsistencia,
+              agregarColaborador: permisoAgregarColaborador,
+              historial: permisoHistorial,
+              inasistencia: permisoInasistencia,
+              colaboradores: permisoColaboradores,
+              bajas: permisoBajas,
+              tiempoExtra: permisoTiempoExtra,
+              miPerfil: permisoMiPerfil
+            }
+          })
+        });
 
-      // Check if username already exists
-      if (users.some(u => u.usuario === usuario)) {
-        showToast('El usuario ya existe', 'error');
-        return;
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return createUser();
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
+
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al crear usuario');
+        }
+
+        const data = await response.json();
+        showToast('Usuario creado exitosamente', 'success');
+
+        // Reset form
+        document.getElementById('userForm').reset();
+        window.resetPhotoUpload();
+
+        // Reload users list
+        loadUsers();
+
+        // Switch to "ver" tab
+        document.querySelector('[data-tab="ver"]').click();
+      } catch (error) {
+        console.error('Error creando usuario:', error);
+        showToast(error.message || 'Error al crear usuario', 'error');
       }
-
-      // Add new user
-      users.push(user);
-      localStorage.setItem('appUsers', JSON.stringify(users));
-      showToast('Usuario creado exitosamente', 'success');
-
-      // Reset form
-      document.getElementById('userForm').reset();
-      window.resetPhotoUpload();
-
-      // Switch to "ver" tab
-      document.querySelector('[data-tab="ver"]').click();
     }
 
-    function updateUser() {
+    async function updateUser() {
       // Get form values from EDIT form
       const nombre = document.getElementById('nombreEdit').value.trim();
       const apellido = document.getElementById('apellidoEdit').value.trim();
@@ -4290,114 +4320,174 @@
         document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]:checked')
       ).map(cb => cb.value);
 
-      // Get existing users
-      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
-
-      // Find user to update
-      const userIndex = users.findIndex(u => u.id === window.editingUserId);
-
-      if (userIndex === -1) {
-        showToast('Usuario no encontrado', 'error');
+      if (!window.editingUserId) {
+        showToast('Error: no se encontró el ID del usuario a editar', 'error');
         return;
       }
 
-      // Check if username is taken by another user
-      const existingUser = users.find(u => u.usuario === usuario && u.id !== window.editingUserId);
-      if (existingUser) {
-        showToast('El usuario ya existe', 'error');
-        return;
-      }
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
 
-      // Preservar la foto existente si no se seleccionó una nueva
-      const photoToSave = photo !== null && photo !== undefined ? photo : users[userIndex].photo;
-
-      // Update user
-      users[userIndex] = {
-        ...users[userIndex],
-        nombre,
-        apellido,
-        usuario,
-        password,
-        puesto,
-        departamento,
-        photo: photoToSave,
-        departamentosPasarAsistencia: deptsPasarAsistencia,
-        departamentosTiempoExtra: deptsTiempoExtra,
-        permisos: {
-          usuarios: permisoUsuarios,
-          asistencia: permisoAsistencia,
-          pasarAsistencia: permisoPasarAsistencia,
-          agregarColaborador: permisoAgregarColaborador,
-          historial: permisoHistorial,
-          inasistencia: permisoInasistencia,
-          colaboradores: permisoColaboradores,
-          bajas: permisoBajas,
-          tiempoExtra: permisoTiempoExtra,
-          miPerfil: permisoMiPerfil
-        },
-        fechaActualizacion: new Date().toISOString()
-      };
-
-      localStorage.setItem('appUsers', JSON.stringify(users));
-      showToast('Usuario actualizado exitosamente', 'success');
-
-      // Si el usuario editado es el usuario logueado, actualizar currentUser
-      if (window.currentUser && window.currentUser.username === usuario) {
-        window.currentUser.name = `${nombre} ${apellido}`;
-        window.currentUser.photo = photoToSave;
-        window.currentUser.password = password;
-        window.currentUser.departamento = departamento || null;
-        window.currentUser.departamentosPasarAsistencia = deptsPasarAsistencia;
-        window.currentUser.departamentosTiempoExtra = deptsTiempoExtra;
-        window.currentUser.permisos = {
-          usuarios: permisoUsuarios,
-          asistencia: permisoAsistencia,
-          pasarAsistencia: permisoPasarAsistencia,
-          agregarColaborador: permisoAgregarColaborador,
-          historial: permisoHistorial,
-          inasistencia: permisoInasistencia,
-          colaboradores: permisoColaboradores,
-          bajas: permisoBajas,
-          tiempoExtra: permisoTiempoExtra,
-          miPerfil: permisoMiPerfil
+        // Preparar datos para actualizar
+        const updateData = {
+          nombre,
+          apellido,
+          puesto,
+          departamento,
+          departamentosPasarAsistencia: deptsPasarAsistencia,
+          departamentosTiempoExtra: deptsTiempoExtra,
+          permisos: {
+            usuarios: permisoUsuarios,
+            asistencia: permisoAsistencia,
+            pasarAsistencia: permisoPasarAsistencia,
+            agregarColaborador: permisoAgregarColaborador,
+            historial: permisoHistorial,
+            inasistencia: permisoInasistencia,
+            colaboradores: permisoColaboradores,
+            bajas: permisoBajas,
+            tiempoExtra: permisoTiempoExtra,
+            miPerfil: permisoMiPerfil
+          }
         };
 
-        // Actualizar avatar en navbar
-        if (typeof updateUserAvatar === 'function') {
-          updateUserAvatar();
+        // Solo incluir photo si se proporcionó una
+        if (photo !== null && photo !== undefined) {
+          updateData.photo = photo;
         }
 
-        // Reaplicar permisos de módulos si estamos en el dashboard
-        if (typeof applyModulePermissions === 'function') {
-          applyModulePermissions();
+        // Actualizar usuario en el API
+        const response = await fetch(`${API_BASE_URL}/users/${window.editingUserId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updateData)
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return updateUser();
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
+
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al actualizar usuario');
         }
+
+        const data = await response.json();
+        showToast('Usuario actualizado exitosamente', 'success');
+
+        // Si el usuario editado es el usuario logueado, recargar currentUser
+        if (window.currentUser && window.currentUser.id === window.editingUserId) {
+          // Recargar datos del usuario actual desde el API
+          const updatedUser = await getCurrentUser();
+          if (updatedUser) {
+            window.currentUser = {
+              id: updatedUser.id,
+              usuario: updatedUser.usuario,
+              username: updatedUser.usuario,
+              name: `${updatedUser.nombre} ${updatedUser.apellido}`,
+              photo: updatedUser.photo,
+              departamento: updatedUser.departamento,
+              departamentosPasarAsistencia: updatedUser.departamentos_pasar_asistencia || [],
+              departamentosTiempoExtra: updatedUser.departamentos_tiempo_extra || [],
+              permisos: updatedUser.permisos
+            };
+
+            // Actualizar avatar en navbar
+            if (typeof updateUserAvatar === 'function') {
+              updateUserAvatar();
+            }
+
+            // Reaplicar permisos de módulos si estamos en el dashboard
+            if (typeof applyModulePermissions === 'function') {
+              applyModulePermissions();
+            }
+          }
+        }
+
+        // Reset edit mode
+        cancelEditMode();
+
+        // Reload users list
+        loadUsers();
+
+        // Switch to "ver" tab
+        document.querySelector('[data-tab="ver"]').click();
+      } catch (error) {
+        console.error('Error actualizando usuario:', error);
+        showToast(error.message || 'Error al actualizar usuario', 'error');
       }
-
-      // Reset edit mode
-      cancelEditMode();
-
-      // Switch to "ver" tab
-      document.querySelector('[data-tab="ver"]').click();
     }
 
-    function loadUsers() {
-      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+    async function loadUsers() {
       const grid = document.getElementById('usersGrid');
 
-      if (users.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-            </svg>
-            <h3>No hay usuarios creados</h3>
-            <p>Crea tu primer usuario usando el formulario</p>
-          </div>
-        `;
-        return;
-      }
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
 
-      grid.innerHTML = users.map(user => `
+        // Llamar al API
+        const response = await fetch(`${API_BASE_URL}/users`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Token expirado, intentar refrescar
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return loadUsers(); // Reintentar
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
+          throw new Error('Error al cargar usuarios');
+        }
+
+        const data = await response.json();
+        const users = data.users || [];
+
+        if (users.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+              </svg>
+              <h3>No hay usuarios creados</h3>
+              <p>Crea tu primer usuario usando el formulario</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Renderizar tarjetas de usuarios
+        grid.innerHTML = users.map(user => {
+        // Asegurarse de que permisos exista como objeto
+        const permisos = user.permisos || {};
+
+        return `
         <div class="user-card">
           <div class="user-card-header">
             <div class="user-avatar-large">
@@ -4414,35 +4504,35 @@
           <div class="user-card-details">
             <div class="user-detail">
               <span class="label">Puesto:</span>
-              <span class="value">${user.puesto}</span>
+              <span class="value">${user.puesto || 'N/A'}</span>
             </div>
             <div class="user-detail">
               <span class="label">Departamento:</span>
-              <span class="value">${user.departamento}</span>
+              <span class="value">${user.departamento || 'N/A'}</span>
             </div>
             <div class="user-detail">
               <span class="label">Permisos:</span>
               <span class="value" style="display: flex; gap: 6px; flex-wrap: wrap; flex-direction: column; align-items: flex-start;">
-                ${user.permisos.usuarios ? '<span class="user-badge">Usuarios</span>' : ''}
-                ${user.permisos.asistencia || user.permisos.asistencia === undefined ? `
+                ${permisos.usuarios ? '<span class="user-badge">Usuarios</span>' : ''}
+                ${permisos.asistencia || permisos.asistencia === undefined ? `
                   <div style="display: flex; flex-direction: column; gap: 4px;">
                     <span class="user-badge" style="background: #e8f5e9; color: #2e7d32;">Asistencia</span>
                     ${(() => {
                       const submodulos = [];
-                      if (user.permisos.pasarAsistencia) submodulos.push('Pasar Asistencia');
-                      if (user.permisos.agregarColaborador) submodulos.push('Agregar Colaborador');
-                      if (user.permisos.historial) submodulos.push('Historial');
-                      if (user.permisos.inasistencia) submodulos.push('Inasistencia');
-                      if (user.permisos.colaboradores) submodulos.push('Colaboradores');
-                      if (user.permisos.bajas) submodulos.push('Bajas');
-                      if (user.permisos.tiempoExtra) submodulos.push('Tiempo Extra');
+                      if (permisos.pasarAsistencia) submodulos.push('Pasar Asistencia');
+                      if (permisos.agregarColaborador) submodulos.push('Agregar Colaborador');
+                      if (permisos.historial) submodulos.push('Historial');
+                      if (permisos.inasistencia) submodulos.push('Inasistencia');
+                      if (permisos.colaboradores) submodulos.push('Colaboradores');
+                      if (permisos.bajas) submodulos.push('Bajas');
+                      if (permisos.tiempoExtra) submodulos.push('Tiempo Extra');
                       return submodulos.length > 0 ?
                         `<span style="font-size: 0.85em; color: #666; margin-left: 12px;">• ${submodulos.join(', ')}</span>` : '';
                     })()}
                   </div>
                 ` : ''}
-                ${user.permisos.miPerfil || user.permisos.miPerfil === undefined ? '<span class="user-badge" style="background: #f3e5f5; color: #7b1fa2;">Mi Perfil</span>' : ''}
-                ${!user.permisos.usuarios && !user.permisos.asistencia && !user.permisos.miPerfil ? '<span style="color: #999;">Sin permisos</span>' : ''}
+                ${permisos.miPerfil || permisos.miPerfil === undefined ? '<span class="user-badge" style="background: #f3e5f5; color: #7b1fa2;">Mi Perfil</span>' : ''}
+                ${!permisos.usuarios && !permisos.asistencia && !permisos.miPerfil ? '<span style="color: #999;">Sin permisos</span>' : ''}
               </span>
             </div>
           </div>
@@ -4462,84 +4552,133 @@
             </button>
           </div>
         </div>
-      `).join('');
+      `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Error cargando usuarios:', error);
+        showToast('Error al cargar usuarios', 'error');
+        grid.innerHTML = `
+          <div class="empty-state">
+            <h3>Error al cargar usuarios</h3>
+            <p>Por favor, intenta de nuevo más tarde</p>
+          </div>
+        `;
+      }
     }
 
     // Edit user - Load user data into EDIT form
-    window.editUser = function(userId) {
-      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
-      const user = users.find(u => u.id === userId);
+    window.editUser = async function(userId) {
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
 
-      if (!user) {
-        showToast('Usuario no encontrado', 'error');
+        // Obtener usuario del API
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return editUser(userId);
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
+          throw new Error('Error al obtener usuario');
+        }
+
+        const data = await response.json();
+        const user = data.user;
+
+        if (!user) {
+          showToast('Usuario no encontrado', 'error');
+          return;
+        }
+
+        // Show edit tab
+        document.getElementById('tabEditar').style.display = 'block';
+
+        // Switch to "editar" tab
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-tab="editar"]').classList.add('active');
+        document.getElementById('tab-editar').classList.add('active');
+
+        // Fill EDIT form with user data
+        document.getElementById('nombreEdit').value = user.nombre;
+        document.getElementById('apellidoEdit').value = user.apellido;
+        document.getElementById('usuario-generadoEdit').value = user.usuario;
+        document.getElementById('password-nuevoEdit').value = user.password;
+        document.getElementById('puestoEdit').value = user.puesto;
+        document.getElementById('departamentoEdit').value = user.departamento;
+
+        // Cargar permisos de módulos principales (con valores por defecto para retrocompatibilidad)
+        const permisos = user.permisos || {};
+        document.getElementById('permiso-usuariosEdit').checked = permisos.usuarios || false;
+        document.getElementById('permiso-asistenciaEdit').checked = permisos.asistencia !== undefined ? permisos.asistencia : true;
+        document.getElementById('permiso-mi-perfilEdit').checked = permisos.miPerfil !== undefined ? permisos.miPerfil : true;
+
+        // Cargar permisos de submódulos de Asistencia (valores por defecto en false para retrocompatibilidad)
+        document.getElementById('permiso-pasar-asistenciaEdit').checked = permisos.pasarAsistencia || false;
+        document.getElementById('permiso-agregar-colaboradorEdit').checked = permisos.agregarColaborador || false;
+        document.getElementById('permiso-historialEdit').checked = permisos.historial || false;
+        document.getElementById('permiso-inasistenciaEdit').checked = permisos.inasistencia || false;
+        document.getElementById('permiso-colaboradoresEdit').checked = permisos.colaboradores || false;
+        document.getElementById('permiso-bajasEdit').checked = permisos.bajas || false;
+        document.getElementById('permiso-tiempo-extraEdit').checked = permisos.tiempoExtra || false;
+
+        // Cargar departamentos seleccionados para Pasar Asistencia
+        const deptsPasarAsistencia = user.departamentosPasarAsistencia || (user.departamento ? [user.departamento] : []);
+        document.querySelectorAll('#departamentos-pasar-asistencia-edit input[type="checkbox"]').forEach(cb => {
+          cb.checked = deptsPasarAsistencia.includes(cb.value);
+        });
+
+        // Cargar departamentos seleccionados para Tiempo Extra
+        const deptsTiempoExtra = user.departamentosTiempoExtra || (user.departamento ? [user.departamento] : []);
+        document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]').forEach(cb => {
+          cb.checked = deptsTiempoExtra.includes(cb.value);
+        });
+
+        // Actualizar contadores de los dropdowns en el formulario de edición
+        setTimeout(() => {
+          updateDropdownCounter('departamentos-pasar-asistencia-edit');
+          updateDropdownCounter('departamentos-tiempo-extra-edit');
+        }, 100);
+
+        // Load photo if exists
+        if (user.photo) {
+          const photoPreviewEdit = document.getElementById('photoPreviewEdit');
+          photoPreviewEdit.innerHTML = `<img src="${user.photo}" alt="Preview">`;
+          document.getElementById('btnRemovePhotoEdit').style.display = 'flex';
+          // Store photo in edit context
+          window.currentPhotoEdit = user.photo;
+        } else {
+          window.resetPhotoUploadEdit();
+        }
+
+        // Store editing user ID
+        window.editingUserId = userId;
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      } catch (error) {
+        console.error('Error obteniendo usuario:', error);
+        showToast('Error al cargar usuario', 'error');
         return;
       }
-
-      // Show edit tab
-      document.getElementById('tabEditar').style.display = 'block';
-
-      // Switch to "editar" tab
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.querySelector('[data-tab="editar"]').classList.add('active');
-      document.getElementById('tab-editar').classList.add('active');
-
-      // Fill EDIT form with user data
-      document.getElementById('nombreEdit').value = user.nombre;
-      document.getElementById('apellidoEdit').value = user.apellido;
-      document.getElementById('usuario-generadoEdit').value = user.usuario;
-      document.getElementById('password-nuevoEdit').value = user.password;
-      document.getElementById('puestoEdit').value = user.puesto;
-      document.getElementById('departamentoEdit').value = user.departamento;
-
-      // Cargar permisos de módulos principales (con valores por defecto para retrocompatibilidad)
-      document.getElementById('permiso-usuariosEdit').checked = user.permisos.usuarios || false;
-      document.getElementById('permiso-asistenciaEdit').checked = user.permisos.asistencia !== undefined ? user.permisos.asistencia : true;
-      document.getElementById('permiso-mi-perfilEdit').checked = user.permisos.miPerfil !== undefined ? user.permisos.miPerfil : true;
-
-      // Cargar permisos de submódulos de Asistencia (valores por defecto en false para retrocompatibilidad)
-      document.getElementById('permiso-pasar-asistenciaEdit').checked = user.permisos.pasarAsistencia || false;
-      document.getElementById('permiso-agregar-colaboradorEdit').checked = user.permisos.agregarColaborador || false;
-      document.getElementById('permiso-historialEdit').checked = user.permisos.historial || false;
-      document.getElementById('permiso-inasistenciaEdit').checked = user.permisos.inasistencia || false;
-      document.getElementById('permiso-colaboradoresEdit').checked = user.permisos.colaboradores || false;
-      document.getElementById('permiso-bajasEdit').checked = user.permisos.bajas || false;
-      document.getElementById('permiso-tiempo-extraEdit').checked = user.permisos.tiempoExtra || false;
-
-      // Cargar departamentos seleccionados para Pasar Asistencia
-      const deptsPasarAsistencia = user.departamentosPasarAsistencia || (user.departamento ? [user.departamento] : []);
-      document.querySelectorAll('#departamentos-pasar-asistencia-edit input[type="checkbox"]').forEach(cb => {
-        cb.checked = deptsPasarAsistencia.includes(cb.value);
-      });
-
-      // Cargar departamentos seleccionados para Tiempo Extra
-      const deptsTiempoExtra = user.departamentosTiempoExtra || (user.departamento ? [user.departamento] : []);
-      document.querySelectorAll('#departamentos-tiempo-extra-edit input[type="checkbox"]').forEach(cb => {
-        cb.checked = deptsTiempoExtra.includes(cb.value);
-      });
-
-      // Actualizar contadores de los dropdowns en el formulario de edición
-      setTimeout(() => {
-        updateDropdownCounter('departamentos-pasar-asistencia-edit');
-        updateDropdownCounter('departamentos-tiempo-extra-edit');
-      }, 100);
-
-      // Load photo if exists
-      if (user.photo) {
-        const photoPreviewEdit = document.getElementById('photoPreviewEdit');
-        photoPreviewEdit.innerHTML = `<img src="${user.photo}" alt="Preview">`;
-        document.getElementById('btnRemovePhotoEdit').style.display = 'flex';
-        // Store photo in edit context
-        window.currentPhotoEdit = user.photo;
-      } else {
-        window.resetPhotoUploadEdit();
-      }
-
-      // Store editing user ID
-      window.editingUserId = userId;
-
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // Cancel edit
@@ -4567,18 +4706,6 @@
 
     // Delete user
     window.deleteUser = async function(userId, userName) {
-      // Get existing users
-      const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
-
-      // Find the user to delete
-      const userToDelete = users.find(u => u.id === userId);
-
-      // IMPORTANTE: No permitir eliminar el usuario actualmente logueado
-      if (window.currentUser && userToDelete && userToDelete.usuario === window.currentUser.username) {
-        showToast('No puedes eliminar tu propio usuario', 'error');
-        return;
-      }
-
       const confirmed = await showConfirm(
         `¿Estás seguro de que deseas eliminar al usuario "${userName}"? Esta acción no se puede deshacer.`,
         'Eliminar Usuario'
@@ -4586,17 +4713,47 @@
 
       if (!confirmed) return;
 
-      // Filter out the user to delete
-      const updatedUsers = users.filter(u => u.id !== userId);
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
 
-      // Save back to localStorage
-      localStorage.setItem('appUsers', JSON.stringify(updatedUsers));
+        // Eliminar usuario en el API
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-      // Show success message
-      showToast(`Usuario "${userName}" eliminado exitosamente`, 'success');
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return deleteUser(userId, userName);
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
 
-      // Reload users list
-      loadUsers();
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al eliminar usuario');
+        }
+
+        // Show success message
+        showToast(`Usuario "${userName}" eliminado exitosamente`, 'success');
+
+        // Reload users list
+        loadUsers();
+      } catch (error) {
+        console.error('Error eliminando usuario:', error);
+        showToast(error.message || 'Error al eliminar usuario', 'error');
+      }
     };
 
     // ============================================
@@ -4685,98 +4842,144 @@
         }
       }
 
-      // Submit del formulario
+      // Submit del formulario - MIGRADO A API REST
       colaboradorForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+        const colaboradorData = {
+          foto: currentPhotoColab,
+          nombres: document.getElementById('nombresColab').value,
+          apellidos: document.getElementById('apellidosColab').value,
+          departamento: document.getElementById('departamentoColab').value,
+          puesto: document.getElementById('puestoColab').value,
+          turno: document.getElementById('turnoColab').value,
+          numeroEmpleado: document.getElementById('numeroEmpleadoColab').value,
+          fechaIngreso: document.getElementById('fechaIngresoColab').value,
+          estatus: document.getElementById('estatusColab').value
+        };
 
-        // Check if we're editing an existing colaborador
-        if (window.editingColaboradorId) {
-          // UPDATE existing colaborador
-          const index = colaboradores.findIndex(c => c.id === window.editingColaboradorId);
+        try {
+          const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
 
-          if (index !== -1) {
-            colaboradores[index] = {
-              ...colaboradores[index],
-              foto: currentPhotoColab,
-              nombres: document.getElementById('nombresColab').value,
-              apellidos: document.getElementById('apellidosColab').value,
-              departamento: document.getElementById('departamentoColab').value,
-              puesto: document.getElementById('puestoColab').value,
-              turno: document.getElementById('turnoColab').value,
-              numeroEmpleado: document.getElementById('numeroEmpleadoColab').value,
-              fechaIngreso: document.getElementById('fechaIngresoColab').value,
-              estatus: document.getElementById('estatusColab').value
-            };
+          // Check if we're editing an existing colaborador
+          if (window.editingColaboradorId) {
+            // UPDATE existing colaborador
+            const response = await fetch(`${API_BASE_URL}/colaboradores/${window.editingColaboradorId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(colaboradorData)
+            });
 
-            localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+            if (!response.ok) {
+              if (response.status === 401) {
+                const refreshed = await refreshAccessToken();
+                if (refreshed) {
+                  return colaboradorForm.dispatchEvent(new Event('submit'));
+                }
+                logout();
+                return;
+              }
+              const error = await response.json();
+              throw new Error(error.message || 'Error al actualizar colaborador');
+            }
+
             showToast(`Colaborador actualizado exitosamente`, 'success');
 
             // Clear edit mode
             window.editingColaboradorId = null;
             document.querySelector('#colaboradorForm .btn-primary').textContent = 'Registrar Colaborador';
+          } else {
+            // CREATE new colaborador
+            const response = await fetch(`${API_BASE_URL}/colaboradores`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(colaboradorData)
+            });
+
+            if (!response.ok) {
+              if (response.status === 401) {
+                const refreshed = await refreshAccessToken();
+                if (refreshed) {
+                  return colaboradorForm.dispatchEvent(new Event('submit'));
+                }
+                logout();
+                return;
+              }
+              const error = await response.json();
+              throw new Error(error.message || 'Error al crear colaborador');
+            }
+
+            const data = await response.json();
+            const colaborador = data.colaborador;
+            showToast(`Colaborador ${colaborador.nombres} ${colaborador.apellidos} registrado exitosamente`, 'success');
           }
-        } else {
-          // CREATE new colaborador
-          const colaborador = {
-            id: Date.now(),
-            foto: currentPhotoColab,
-            nombres: document.getElementById('nombresColab').value,
-            apellidos: document.getElementById('apellidosColab').value,
-            departamento: document.getElementById('departamentoColab').value,
-            puesto: document.getElementById('puestoColab').value,
-            turno: document.getElementById('turnoColab').value,
-            numeroEmpleado: document.getElementById('numeroEmpleadoColab').value,
-            fechaIngreso: document.getElementById('fechaIngresoColab').value,
-            estatus: document.getElementById('estatusColab').value,
-            fechaRegistro: new Date().toISOString()
-          };
 
-          colaboradores.push(colaborador);
-          localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
-          showToast(`Colaborador ${colaborador.nombres} ${colaborador.apellidos} registrado exitosamente`, 'success');
+          // Volver al grid
+          navigateToLocation('asistencia-grid');
+        } catch (error) {
+          console.error('Error guardando colaborador:', error);
+          showToast(error.message || 'Error al guardar colaborador', 'error');
         }
-
-        // Volver al grid
-        navigateToLocation('asistencia-grid');
       });
     }
 
     // ===================================
-    // Editar Colaborador
+    // Editar Colaborador - MIGRADO A API REST
     // ===================================
-    window.editarColaborador = function(colaboradorId) {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-      const colaborador = colaboradores.find(c => c.id === colaboradorId);
+    window.editarColaborador = async function(colaboradorId) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
 
-      if (!colaborador) {
-        showToast('Colaborador no encontrado', 'error');
-        return;
-      }
+        const response = await fetch(`${API_BASE_URL}/colaboradores/${colaboradorId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-      // Navigate to colaborador form
-      navigateToLocation('agregar-colaborador');
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return editarColaborador(colaboradorId);
+            }
+            logout();
+            return;
+          }
+          throw new Error('Colaborador no encontrado');
+        }
 
-      // Fill form with colaborador data
-      document.getElementById('nombresColab').value = colaborador.nombres || '';
-      document.getElementById('apellidosColab').value = colaborador.apellidos || '';
-      document.getElementById('departamentoColab').value = colaborador.departamento || '';
-      document.getElementById('puestoColab').value = colaborador.puesto || '';
-      document.getElementById('turnoColab').value = colaborador.turno || '';
-      document.getElementById('numeroEmpleadoColab').value = colaborador.numeroEmpleado || '';
-      document.getElementById('fechaIngresoColab').value = colaborador.fechaIngreso || '';
-      document.getElementById('estatusColab').value = colaborador.estatus || 'Activo';
+        const data = await response.json();
+        const colaborador = data.colaborador;
 
-      // Load photo if exists
-      if (colaborador.foto) {
-        const photoPreview = document.getElementById('photoPreviewColab');
-        photoPreview.innerHTML = `<img src="${colaborador.foto}" alt="Preview">`;
-        document.getElementById('btnRemovePhotoColab').style.display = 'flex';
-        window.currentPhotoColab = colaborador.foto;
-      } else {
-        const photoPreview = document.getElementById('photoPreviewColab');
-        photoPreview.innerHTML = `
+        // Navigate to colaborador form
+        navigateToLocation('agregar-colaborador');
+
+        // Fill form with colaborador data
+        document.getElementById('nombresColab').value = colaborador.nombres || '';
+        document.getElementById('apellidosColab').value = colaborador.apellidos || '';
+        document.getElementById('departamentoColab').value = colaborador.departamento || '';
+        document.getElementById('puestoColab').value = colaborador.puesto || '';
+        document.getElementById('turnoColab').value = colaborador.turno || '';
+        document.getElementById('numeroEmpleadoColab').value = colaborador.numeroEmpleado || '';
+        document.getElementById('fechaIngresoColab').value = colaborador.fechaIngreso || '';
+        document.getElementById('estatusColab').value = colaborador.estatus || 'Activo';
+
+        // Load photo if exists
+        if (colaborador.foto) {
+          const photoPreview = document.getElementById('photoPreviewColab');
+          photoPreview.innerHTML = `<img src="${colaborador.foto}" alt="Preview">`;
+          document.getElementById('btnRemovePhotoColab').style.display = 'flex';
+          window.currentPhotoColab = colaborador.foto;
+        } else {
+          const photoPreview = document.getElementById('photoPreviewColab');
+          photoPreview.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
             <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
             <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
@@ -4786,18 +4989,22 @@
         window.currentPhotoColab = null;
       }
 
-      // Set edit mode
-      window.editingColaboradorId = colaboradorId;
+        // Set edit mode
+        window.editingColaboradorId = colaboradorId;
 
-      // Change button text
-      const submitBtn = document.querySelector('#colaboradorForm .btn-primary');
-      submitBtn.textContent = 'Actualizar Colaborador';
+        // Change button text
+        const submitBtn = document.querySelector('#colaboradorForm .btn-primary');
+        submitBtn.textContent = 'Actualizar Colaborador';
 
-      // Change title
-      document.querySelector('#asistencia-colaborador .section-title').textContent = 'Editar Colaborador';
+        // Change title
+        document.querySelector('#asistencia-colaborador .section-title').textContent = 'Editar Colaborador';
 
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        console.error('Error cargando colaborador:', error);
+        showToast(error.message || 'Error al cargar colaborador', 'error');
+      }
     };
 
     // ===================================
@@ -4810,6 +5017,127 @@
         showToast('No se pudo cargar la información del colaborador', 'error');
       }
     };
+
+    // ===================================
+    // FUNCIONES AUXILIARES DE COLABORADORES API
+    // ===================================
+
+    /**
+     * Función centralizada para cargar colaboradores desde la API
+     * @param {Object} filters - Filtros opcionales (departamento, estatus)
+     * @returns {Promise<Array>} Lista de colaboradores
+     */
+    async function loadColaboradoresFromAPI(filters = {}) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+
+        // Construir query params
+        const params = new URLSearchParams();
+        if (filters.departamento) params.append('departamento', filters.departamento);
+        if (filters.estatus) params.append('estatus', filters.estatus);
+
+        const queryString = params.toString();
+        const url = `${API_BASE_URL}/colaboradores${queryString ? '?' + queryString : ''}`;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return await loadColaboradoresFromAPI(filters);
+            }
+            logout();
+            return [];
+          }
+          throw new Error('Error al cargar colaboradores');
+        }
+
+        const data = await response.json();
+        return data.colaboradores || [];
+      } catch (error) {
+        console.error('Error cargando colaboradores:', error);
+        showToast('Error al cargar colaboradores', 'error');
+        return [];
+      }
+    }
+
+    /**
+     * Eliminar colaborador (soft delete)
+     * @param {number} colaboradorId - ID del colaborador
+     * @returns {Promise<boolean>} true si se eliminó correctamente
+     */
+    async function deleteColaboradorAPI(colaboradorId) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+
+        const response = await fetch(`${API_BASE_URL}/colaboradores/${colaboradorId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return await deleteColaboradorAPI(colaboradorId);
+            }
+            logout();
+            return false;
+          }
+          throw new Error('Error al eliminar colaborador');
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error eliminando colaborador:', error);
+        showToast('Error al eliminar colaborador', 'error');
+        return false;
+      }
+    }
+
+    /**
+     * Dar de baja colaborador
+     * @param {number} colaboradorId - ID del colaborador
+     * @returns {Promise<boolean>} true si se dio de baja correctamente
+     */
+    async function darDeBajaColaboradorAPI(colaboradorId) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+
+        const response = await fetch(`${API_BASE_URL}/colaboradores/${colaboradorId}/baja`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return await darDeBajaColaboradorAPI(colaboradorId);
+            }
+            logout();
+            return false;
+          }
+          throw new Error('Error al dar de baja colaborador');
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error dando de baja colaborador:', error);
+        showToast('Error al dar de baja colaborador', 'error');
+        return false;
+      }
+    }
 
     // ===================================
     // Autocomplete Departamentos
@@ -5031,7 +5359,7 @@
      * @param {string} location - Identificador único de la vista
      * @param {boolean} addToHistory - Si agregar a historial (default: true)
      */
-    window.navigateToLocation = function(location, addToHistory = true) {
+    window.navigateToLocation = async function(location, addToHistory = true) {
       // Validar permisos para submódulos de Asistencia
       if (window.currentUser && window.currentUser.permisos) {
         const permisos = window.currentUser.permisos;
@@ -5126,7 +5454,7 @@
         case 'colaboradores-lista':
           if (colaboradoresListaView) {
             colaboradoresListaView.style.display = 'block';
-            cargarDepartamentos();
+            await cargarDepartamentos();
           }
           break;
 
@@ -5165,35 +5493,35 @@
         case 'pasar-asistencia-lista':
           if (asistenciaPasarLista) {
             asistenciaPasarLista.style.display = 'block';
-            cargarDepartamentosAsistencia();
+            await cargarDepartamentosAsistencia();
           }
           break;
 
         case 'historial-asistencia-lista':
           if (historialListaView) {
             historialListaView.style.display = 'block';
-            cargarDepartamentosHistorial();
+            await cargarDepartamentosHistorial();
           }
           break;
 
         case 'inasistencia-lista':
           if (inasistenciaListaView) {
             inasistenciaListaView.style.display = 'block';
-            cargarDepartamentosInasistencia();
+            await cargarDepartamentosInasistencia();
           }
           break;
 
         case 'bajas-lista':
           if (bajasListaView) {
             bajasListaView.style.display = 'block';
-            cargarDepartamentosBajas();
+            await cargarDepartamentosBajas();
           }
           break;
 
         case 'tiempo-extra-lista':
           if (teListaView) {
             teListaView.style.display = 'block';
-            cargarDepartamentosTE();
+            await cargarDepartamentosTE();
           }
           break;
 
@@ -5203,25 +5531,25 @@
             const dept = location.replace('colaboradores-dept:', '');
             if (departamentoDetalleView) {
               departamentoDetalleView.style.display = 'block';
-              cargarColaboradoresDepartamento(dept);
+              await cargarColaboradoresDepartamento(dept);
             }
           } else if (location.startsWith('colaborador-detalle:')) {
             const id = parseInt(location.replace('colaborador-detalle:', ''));
             if (colaboradorDetalleView) {
               colaboradorDetalleView.style.display = 'block';
-              cargarDetalleColaborador(id);
+              await cargarDetalleColaborador(id);
             }
           } else if (location.startsWith('pasar-asistencia-dept:')) {
             const dept = location.replace('pasar-asistencia-dept:', '');
             if (asistenciaPasarDepartamento) {
               asistenciaPasarDepartamento.style.display = 'block';
-              cargarColaboradoresAsistencia(dept);
+              await cargarColaboradoresAsistencia(dept);
             }
           } else if (location.startsWith('historial-asistencia-dept:')) {
             const dept = location.replace('historial-asistencia-dept:', '');
             if (historialDeptView) {
               historialDeptView.style.display = 'block';
-              cargarHistorialDepartamento(dept);
+              await cargarHistorialDepartamento(dept);
             }
           } else if (location.startsWith('historial-dia-detalle:')) {
             // Formato: "historial-dia-detalle:DEPARTAMENTO:FECHA"
@@ -5230,32 +5558,32 @@
             const fecha = params[1];
             if (historialDiaView) {
               historialDiaView.style.display = 'block';
-              cargarDetalleDia(dept, fecha);
+              await cargarDetalleDia(dept, fecha);
             }
           } else if (location.startsWith('inasistencia-dept:')) {
             const dept = location.replace('inasistencia-dept:', '');
             if (inasistenciaDeptView) {
               inasistenciaDeptView.style.display = 'block';
-              cargarInasistenciaDepartamento(dept);
+              await cargarInasistenciaDepartamento(dept);
             }
           } else if (location.startsWith('inasistencia-colaborador:')) {
             // Formato: "inasistencia-colaborador:COLABORADOR_ID"
             const colaboradorId = parseInt(location.replace('inasistencia-colaborador:', ''));
             if (inasistenciaColabView) {
               inasistenciaColabView.style.display = 'block';
-              cargarHistorialColaborador(colaboradorId);
+              await cargarHistorialColaborador(colaboradorId);
             }
           } else if (location.startsWith('bajas-dept:')) {
             const dept = location.replace('bajas-dept:', '');
             if (bajasDeptView) {
               bajasDeptView.style.display = 'block';
-              cargarColaboradoresBaja(dept);
+              await cargarColaboradoresBaja(dept);
             }
           } else if (location.startsWith('baja-detalle:')) {
             const id = parseInt(location.replace('baja-detalle:', ''));
             if (bajasDetalleView) {
               bajasDetalleView.style.display = 'block';
-              cargarDetalleBaja(id);
+              await cargarDetalleBaja(id);
             }
           } else if (location.startsWith('tiempo-extra-dept:')) {
             const dept = location.replace('tiempo-extra-dept:', '');
@@ -5269,13 +5597,13 @@
             const registroId = params[1] ? parseInt(params[1]) : null;
             if (teRegistrarView) {
               teRegistrarView.style.display = 'block';
-              cargarFormularioTE(dept, registroId);
+              await cargarFormularioTE(dept, registroId);
             }
           } else if (location.startsWith('tiempo-extra-historial:')) {
             const dept = location.replace('tiempo-extra-historial:', '');
             if (teHistorialView) {
               teHistorialView.style.display = 'block';
-              cargarHistorialTE(dept);
+              await cargarHistorialTE(dept);
             }
           } else if (location.startsWith('tiempo-extra-semana:')) {
             // Formato: "tiempo-extra-semana:DEPT:SEMANA_KEY"
@@ -5284,13 +5612,13 @@
             const semanaKey = params[1];
             if (teSemanaDetalleView) {
               teSemanaDetalleView.style.display = 'block';
-              cargarDetalleSemanaTE(dept, semanaKey);
+              await cargarDetalleSemanaTE(dept, semanaKey);
             }
           } else if (location.startsWith('tiempo-extra-detalle:')) {
             const registroId = parseInt(location.replace('tiempo-extra-detalle:', ''));
             if (teDetalleView) {
               teDetalleView.style.display = 'block';
-              cargarDetalleTiempoExtra(registroId);
+              await cargarDetalleTiempoExtra(registroId);
             }
           }
           break;
@@ -5356,10 +5684,10 @@
       // Event listener para el buscador de colaboradores (lista)
       const searchColaboradoresLista = document.getElementById('search-colaboradores-lista');
       if (searchColaboradoresLista) {
-        searchColaboradoresLista.addEventListener('input', (e) => {
+        searchColaboradoresLista.addEventListener('input', async (e) => {
           // Re-cargar colaboradores con el filtro aplicado
           if (nombreDeptListaActual) {
-            cargarColaboradoresDepartamento(nombreDeptListaActual);
+            await cargarColaboradoresDepartamento(nombreDeptListaActual);
           }
         });
       }
@@ -5367,13 +5695,13 @@
       // Event listener para el buscador global de colaboradores
       const searchColaboradoresGlobal = document.getElementById('search-colaboradores-global');
       if (searchColaboradoresGlobal) {
-        searchColaboradoresGlobal.addEventListener('input', (e) => {
-          buscarColaboradoresGlobal(e.target.value);
+        searchColaboradoresGlobal.addEventListener('input', async (e) => {
+          await buscarColaboradoresGlobal(e.target.value);
         });
       }
 
       // Función para buscar colaboradores en todos los departamentos
-      function buscarColaboradoresGlobal(searchTerm) {
+      async function buscarColaboradoresGlobal(searchTerm) {
         const searchResultsContainer = document.getElementById('search-results-container');
         const searchResultsList = document.getElementById('search-results-list');
         const searchCount = document.getElementById('search-count');
@@ -5386,9 +5714,9 @@
           return;
         }
 
-        // Obtener todos los colaboradores activos
-        const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-        const colaboradoresActivos = colaboradores.filter(c => (c.estatus || 'Activo') === 'Activo');
+        // Obtener todos los colaboradores activos desde la API
+        const colaboradores = await loadColaboradoresFromAPI({ estatus: 'Activo' });
+        const colaboradoresActivos = colaboradores;
 
         // Filtrar por término de búsqueda
         const term = searchTerm.toLowerCase();
@@ -5491,13 +5819,13 @@
       return DEPARTAMENTOS;
     }
 
-    function cargarDepartamentos() {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarDepartamentos() {
+      const colaboradores = await loadColaboradoresFromAPI({ estatus: 'Activo' });
       const departamentosContainer = document.getElementById('departamentos-container');
 
       // Contar colaboradores ACTIVOS por departamento
       const contadores = {};
-      colaboradores.filter(c => (c.estatus || 'Activo') === 'Activo').forEach(colab => {
+      colaboradores.forEach(colab => {
         const dept = colab.departamento || 'Sin Departamento';
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
@@ -5528,10 +5856,10 @@
     let colaboradoresDeptListaActuales = [];
     let nombreDeptListaActual = '';
 
-    function cargarColaboradoresDepartamento(nombreDepartamento) {
+    async function cargarColaboradoresDepartamento(nombreDepartamento) {
       nombreDeptListaActual = nombreDepartamento;
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-      let colaboradoresDept = colaboradores.filter(c => c.departamento === nombreDepartamento && (c.estatus || 'Activo') === 'Activo');
+      const colaboradores = await loadColaboradoresFromAPI({ departamento: nombreDepartamento, estatus: 'Activo' });
+      let colaboradoresDept = colaboradores;
 
       // Guardar para el buscador
       colaboradoresDeptListaActuales = colaboradoresDept;
@@ -5594,8 +5922,8 @@
       `;
     }
 
-    function cargarDetalleColaborador(colaboradorId) {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarDetalleColaborador(colaboradorId) {
+      const colaboradores = await loadColaboradoresFromAPI();
       const colab = colaboradores.find(c => c.id === colaboradorId);
 
       if (!colab) {
@@ -5687,13 +6015,13 @@
       }
     }
 
-    function cargarDepartamentosAsistencia() {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarDepartamentosAsistencia() {
+      const colaboradores = await loadColaboradoresFromAPI({ estatus: 'Activo' });
       const departamentosContainer = document.getElementById('asistencia-departamentos-container');
 
       // Contar colaboradores activos por departamento
       const contadores = {};
-      colaboradores.filter(c => (c.estatus || 'Activo') === 'Activo').forEach(colab => {
+      colaboradores.forEach(colab => {
         const dept = colab.departamento || 'Sin Departamento';
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
@@ -5751,26 +6079,23 @@
     let colaboradoresDeptActuales = [];
     let nombreDepartamentoActual = '';
 
-    function cargarColaboradoresAsistencia(nombreDepartamento) {
+    async function cargarColaboradoresAsistencia(nombreDepartamento) {
       nombreDepartamentoActual = nombreDepartamento;
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-
-      // Filtrar por departamento y estatus activo
-      const colaboradoresDeptTodos = colaboradores.filter(c =>
-        c.departamento === nombreDepartamento &&
-        (c.estatus || 'Activo') === 'Activo'
-      );
+      const colaboradores = await loadColaboradoresFromAPI({
+        departamento: nombreDepartamento,
+        estatus: 'Activo'
+      });
 
       // Guardar para el buscador
-      colaboradoresDeptActuales = colaboradoresDeptTodos;
+      colaboradoresDeptActuales = colaboradores;
 
       // Aplicar filtro de búsqueda si existe
       const searchInput = document.getElementById('search-colaboradores-asistencia');
       const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
 
-      let colaboradoresFiltrados = colaboradoresDeptTodos;
+      let colaboradoresFiltrados = colaboradores;
       if (searchTerm) {
-        colaboradoresFiltrados = colaboradoresDeptTodos.filter(c => {
+        colaboradoresFiltrados = colaboradores.filter(c => {
           const nombreCompleto = `${c.nombres} ${c.apellidos}`.toLowerCase();
           const numeroEmpleado = (c.numeroEmpleado || '').toString().toLowerCase();
           return nombreCompleto.includes(searchTerm) || numeroEmpleado.includes(searchTerm);
@@ -5778,9 +6103,13 @@
       }
 
       // FILTRAR: Excluir colaboradores que ya tienen registro HOY
+      const colaboradoresDeptTodos = colaboradoresFiltrados;
+      const fechaHoy = obtenerFechaHoy();
+      const registrosHoy = await loadAsistenciaFromAPI({ fecha: fechaHoy, departamento: nombreDepartamento });
+      const idsConRegistro = new Set(registrosHoy.map(r => r.colaboradorId));
+
       const colaboradoresDept = colaboradoresFiltrados.filter(c => {
-        const registroHoy = obtenerRegistroAsistenciaHoy(c.id);
-        return !registroHoy; // Solo mostrar si NO tiene registro hoy
+        return !idsConRegistro.has(c.id); // Solo mostrar si NO tiene registro hoy
       });
 
       // Agrupar por turno (solo los pendientes)
@@ -5884,14 +6213,24 @@
 
     /**
      * Actualiza las estadísticas de asistencia
+     * MIGRADO: Ahora usa API para obtener registros
      */
-    function actualizarEstadisticasAsistencia(colaboradores) {
+    async function actualizarEstadisticasAsistencia(colaboradores) {
       const total = colaboradores.length;
+      const fechaHoy = obtenerFechaHoy();
+      const registrosHoy = await loadAsistenciaFromAPI({ fecha: fechaHoy });
+
+      // Crear mapa de registros por colaboradorId
+      const registrosPorColaborador = {};
+      registrosHoy.forEach(r => {
+        registrosPorColaborador[r.colaboradorId] = r;
+      });
+
       let presentes = 0;
       let ausentes = 0;
 
       colaboradores.forEach(colab => {
-        const registro = obtenerRegistroAsistenciaHoy(colab.id);
+        const registro = registrosPorColaborador[colab.id];
         if (registro) {
           if (registro.estado === 'presente') {
             presentes++;
@@ -5911,7 +6250,7 @@
     }
 
     // ===================================
-    // FUNCIONES DE ASISTENCIA
+    // FUNCIONES DE ASISTENCIA - MIGRADO A API
     // ===================================
 
     /**
@@ -5926,50 +6265,145 @@
     }
 
     /**
-     * Obtiene el registro de asistencia de hoy para un colaborador
+     * Helper para cargar asistencias desde la API
+     * @param {Object} filters - Filtros opcionales { fecha, departamento, colaboradorId }
+     * @returns {Promise<Array>} - Lista de asistencias
      */
-    function obtenerRegistroAsistenciaHoy(colaboradorId) {
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+    async function loadAsistenciaFromAPI(filters = {}) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+
+        // Construir query params
+        const params = new URLSearchParams();
+        if (filters.fecha) params.append('fecha', filters.fecha);
+        if (filters.departamento) params.append('departamento', filters.departamento);
+        if (filters.colaboradorId) params.append('colaboradorId', filters.colaboradorId);
+
+        const url = `${API_BASE_URL}/asistencia${params.toString() ? '?' + params.toString() : ''}`;
+
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) return await loadAsistenciaFromAPI(filters);
+            logout();
+            return [];
+          }
+          console.error('Error al cargar asistencia:', response.statusText);
+          return [];
+        }
+
+        const data = await response.json();
+        return data.asistencias || [];
+      } catch (error) {
+        console.error('Error en loadAsistenciaFromAPI:', error);
+        return [];
+      }
+    }
+
+    /**
+     * Helper para obtener estadísticas de asistencia desde la API
+     * @param {string} fecha - Fecha en formato YYYY-MM-DD (default: today)
+     * @returns {Promise<Object|null>} - Estadísticas
+     */
+    async function getAsistenciaStatsFromAPI(fecha) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        const url = `${API_BASE_URL}/asistencia/stats${fecha ? '?fecha=' + fecha : ''}`;
+
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) return await getAsistenciaStatsFromAPI(fecha);
+            logout();
+            return null;
+          }
+          return null;
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error en getAsistenciaStatsFromAPI:', error);
+        return null;
+      }
+    }
+
+    /**
+     * Obtiene el registro de asistencia de hoy para un colaborador
+     * MIGRADO: Ahora usa API en lugar de localStorage
+     */
+    async function obtenerRegistroAsistenciaHoy(colaboradorId) {
       const fechaHoy = obtenerFechaHoy();
-      return historial.find(r => r.colaboradorId === colaboradorId && r.fecha === fechaHoy);
+      const registros = await loadAsistenciaFromAPI({
+        colaboradorId: colaboradorId,
+        fecha: fechaHoy
+      });
+      return registros.length > 0 ? registros[0] : null;
     }
 
     /**
      * Marca un colaborador como presente
+     * MIGRADO: Ahora usa POST /api/asistencia
      */
-    window.marcarPresente = function(colaboradorId, nombres, apellidos, departamento) {
-      const fechaHoy = obtenerFechaHoy();
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+    window.marcarPresente = async function(colaboradorId, nombres, apellidos, departamento) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        const fechaHoy = obtenerFechaHoy();
 
-      // Verificar si ya existe un registro para hoy
-      const existeRegistro = historial.some(r => r.colaboradorId === colaboradorId && r.fecha === fechaHoy);
+        // Generar hora en formato HH:MM (24 horas)
+        const now = new Date();
+        const hora = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-      if (existeRegistro) {
-        showToast('Ya se registró la asistencia de este colaborador hoy', 'warning');
-        return;
+        const response = await fetch(`${API_BASE_URL}/asistencia`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            colaboradorId: colaboradorId,
+            fecha: fechaHoy,
+            hora: hora,
+            estado: 'presente'
+          })
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) return await marcarPresente(colaboradorId, nombres, apellidos, departamento);
+            logout();
+            return;
+          }
+          if (response.status === 409) {
+            // Conflicto - ya existe registro para hoy
+            showToast('Ya se registró la asistencia de este colaborador hoy', 'warning');
+            return;
+          }
+          const error = await response.json();
+          showToast(error.message || 'Error al registrar asistencia', 'error');
+          return;
+        }
+
+        const data = await response.json();
+
+        // Recargar la vista INMEDIATAMENTE (antes del toast)
+        await cargarColaboradoresAsistencia(departamento);
+
+        // Toast después de recargar para no bloquear
+        showToast(`${nombres} ${apellidos} marcado como presente`, 'success');
+      } catch (error) {
+        console.error('Error en marcarPresente:', error);
+        showToast('Error al registrar asistencia', 'error');
       }
-
-      // Crear nuevo registro
-      const registro = {
-        id: Date.now(),
-        colaboradorId: colaboradorId,
-        colaboradorNombre: `${nombres} ${apellidos}`,
-        departamento: departamento,
-        fecha: fechaHoy,
-        hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
-        estado: 'presente',
-        tipoInasistencia: null,
-        comentario: null
-      };
-
-      historial.push(registro);
-      localStorage.setItem('historialAsistencia', JSON.stringify(historial));
-
-      // Recargar la vista INMEDIATAMENTE (antes del toast)
-      cargarColaboradoresAsistencia(departamento);
-
-      // Toast después de recargar para no bloquear
-      showToast(`${nombres} ${apellidos} marcado como presente`, 'success');
     }
 
     /**
@@ -6007,53 +6441,97 @@
     }
 
     /**
-     * Maneja el envío del formulario de inasistencia
+     * Mapea los códigos de inasistencia del frontend a los valores aceptados por el backend
+     * Backend solo acepta: 'Falta', 'Incapacidad', 'Permiso', 'Vacaciones'
      */
-    document.getElementById('form-inasistencia').addEventListener('submit', function(e) {
+    function mapearTipoInasistencia(codigoFrontend) {
+      const mapeo = {
+        'FI': 'Falta',           // Falta Injustificada
+        'FJ': 'Falta',           // Falta Justificada
+        'PSG': 'Permiso',        // Permiso Sin Goce
+        'PCG': 'Permiso',        // Permiso Con Goce
+        'Suspension': 'Falta',   // Suspensión laboral
+        'Vacaciones': 'Vacaciones', // Días de vacaciones
+        'IT': 'Incapacidad',     // Incapacidad Temporal
+        'RET': 'Falta',          // Retardo
+        'CUM': 'Permiso',        // Día por cumpleaños
+        'FES': 'Permiso'         // Festivo Laborado
+      };
+      return mapeo[codigoFrontend] || codigoFrontend;
+    }
+
+    /**
+     * Maneja el envío del formulario de inasistencia
+     * MIGRADO: Ahora usa POST /api/asistencia
+     */
+    document.getElementById('form-inasistencia').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       if (!colaboradorSeleccionado) return;
 
-      const tipoInasistencia = document.querySelector('input[name="tipoInasistencia"]:checked').value;
-      const comentario = document.getElementById('comentario-inasistencia').value.trim();
-      const fechaHoy = obtenerFechaHoy();
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        const tipoInasistenciaOriginal = document.querySelector('input[name="tipoInasistencia"]:checked').value;
+        const tipoInasistencia = mapearTipoInasistencia(tipoInasistenciaOriginal);
+        const comentario = document.getElementById('comentario-inasistencia').value.trim();
+        const fechaHoy = obtenerFechaHoy();
 
-      // Verificar si ya existe un registro para hoy
-      const existeRegistro = historial.some(r =>
-        r.colaboradorId === colaboradorSeleccionado.id && r.fecha === fechaHoy
-      );
+        // Generar hora en formato HH:MM (24 horas)
+        const now = new Date();
+        const hora = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-      if (existeRegistro) {
-        showToast('Ya se registró la asistencia de este colaborador hoy', 'warning');
+        const response = await fetch(`${API_BASE_URL}/asistencia`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            colaboradorId: colaboradorSeleccionado.id,
+            fecha: fechaHoy,
+            hora: hora,
+            estado: 'ausente',
+            tipoInasistencia: tipoInasistencia,
+            comentario: comentario || null
+          })
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              // Reenviar el formulario
+              this.dispatchEvent(new Event('submit'));
+              return;
+            }
+            logout();
+            return;
+          }
+          if (response.status === 409) {
+            // Conflicto - ya existe registro para hoy
+            showToast('Ya se registró la asistencia de este colaborador hoy', 'warning');
+            cerrarModalInasistencia();
+            return;
+          }
+          const error = await response.json();
+          showToast(error.message || 'Error al registrar inasistencia', 'error');
+          return;
+        }
+
+        const data = await response.json();
+
+        // Cerrar modal primero
         cerrarModalInasistencia();
-        return;
+
+        // Recargar la vista INMEDIATAMENTE
+        await cargarColaboradoresAsistencia(colaboradorSeleccionado.departamento);
+
+        // Toast después de recargar para no bloquear
+        showToast(`Inasistencia registrada: ${tipoInasistencia}`, 'success');
+      } catch (error) {
+        console.error('Error en registrar inasistencia:', error);
+        showToast('Error al registrar inasistencia', 'error');
       }
-
-      // Crear nuevo registro
-      const registro = {
-        id: Date.now(),
-        colaboradorId: colaboradorSeleccionado.id,
-        colaboradorNombre: `${colaboradorSeleccionado.nombres} ${colaboradorSeleccionado.apellidos}`,
-        departamento: colaboradorSeleccionado.departamento,
-        fecha: fechaHoy,
-        hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
-        estado: 'ausente',
-        tipoInasistencia: tipoInasistencia,
-        comentario: comentario || null
-      };
-
-      historial.push(registro);
-      localStorage.setItem('historialAsistencia', JSON.stringify(historial));
-
-      // Cerrar modal primero
-      cerrarModalInasistencia();
-
-      // Recargar la vista INMEDIATAMENTE
-      cargarColaboradoresAsistencia(colaboradorSeleccionado.departamento);
-
-      // Toast después de recargar para no bloquear
-      showToast(`Inasistencia registrada: ${tipoInasistencia}`, 'success');
     });
 
     // ===================================
@@ -6119,8 +6597,8 @@
       }
     }
 
-    function cargarDepartamentosHistorial() {
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+    async function cargarDepartamentosHistorial() {
+      const historial = await loadAsistenciaFromAPI();
       const departamentosContainer = document.getElementById('historial-departamentos-container');
 
       // Contar registros por departamento
@@ -6176,11 +6654,11 @@
 
     window.toggleMes = toggleMes;
 
-    function cargarHistorialDepartamento(nombreDepartamento) {
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
+    async function cargarHistorialDepartamento(nombreDepartamento) {
+      const historial = await loadAsistenciaFromAPI({ departamento: nombreDepartamento });
 
       // Filtrar registros del departamento
-      const registrosDept = historial.filter(r => r.departamento === nombreDepartamento);
+      const registrosDept = historial;
 
       // Actualizar título
       document.getElementById('historial-dept-title').textContent = nombreDepartamento;
@@ -6308,15 +6786,11 @@
 
     /**
      * Carga el detalle de asistencia de un día específico
+     * MIGRADO: Ahora usa API
      */
-    function cargarDetalleDia(departamento, fecha) {
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-
-      // Filtrar registros del departamento y fecha
-      const registrosDia = historial.filter(r =>
-        r.departamento === departamento && r.fecha === fecha
-      );
+    async function cargarDetalleDia(departamento, fecha) {
+      const registrosDia = await loadAsistenciaFromAPI({ departamento: departamento, fecha: fecha });
+      const colaboradores = await loadColaboradoresFromAPI();
 
       // Actualizar título y subtítulo
       document.getElementById('historial-dia-title').textContent = formatearFechaDia(fecha);
@@ -6460,19 +6934,17 @@
       return { fechaInicio, fechaFin };
     }
 
-    function cargarDepartamentosInasistencia() {
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarDepartamentosInasistencia() {
+      const colaboradores = await loadColaboradoresFromAPI({ estatus: 'Activo' });
       const departamentosContainer = document.getElementById('inasistencia-departamentos-container');
 
       const rango = obtenerUltimos30Dias();
 
       // Crear un Set de IDs de colaboradores activos para búsqueda rápida
-      const colaboradoresActivosIds = new Set(
-        colaboradores
-          .filter(c => (c.estatus || 'Activo') === 'Activo')
-          .map(c => c.id)
-      );
+      const colaboradoresActivosIds = new Set(colaboradores.map(c => c.id));
+
+      // Obtener todas las asistencias (sin filtro de fecha, el backend podría optimizar esto)
+      const historial = await loadAsistenciaFromAPI();
 
       // Filtrar solo inasistencias de últimos 30 días de colaboradores ACTIVOS
       const inasistencias = historial.filter(r =>
@@ -6511,16 +6983,15 @@
       }).join('');
     }
 
-    function cargarInasistenciaDepartamento(nombreDepartamento) {
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarInasistenciaDepartamento(nombreDepartamento) {
+      const colaboradoresDept = await loadColaboradoresFromAPI({
+        departamento: nombreDepartamento,
+        estatus: 'Activo'
+      });
       const rango = obtenerUltimos30Dias();
 
-      // Filtrar colaboradores activos del departamento
-      const colaboradoresDept = colaboradores.filter(c =>
-        c.departamento === nombreDepartamento &&
-        (c.estatus || 'Activo') === 'Activo'
-      );
+      // Obtener historial de asistencia del departamento
+      const historial = await loadAsistenciaFromAPI({ departamento: nombreDepartamento });
 
       // Actualizar título
       document.getElementById('inasistencia-dept-title').textContent = nombreDepartamento;
@@ -6595,9 +7066,8 @@
         `${colaboradoresOrdenados.length} colaborador${colaboradoresOrdenados.length !== 1 ? 'es' : ''} con inasistencias - ${totalInasistencias} total (últimos 30 días)`;
     }
 
-    function cargarHistorialColaborador(colaboradorId) {
-      const historial = JSON.parse(localStorage.getItem('historialAsistencia') || '[]');
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarHistorialColaborador(colaboradorId) {
+      const colaboradores = await loadColaboradoresFromAPI();
       const rango = obtenerUltimos30Dias();
 
       const colaborador = colaboradores.find(c => c.id === colaboradorId);
@@ -6606,9 +7076,9 @@
         return;
       }
 
-      // Filtrar inasistencias del colaborador en últimos 30 días
+      // Filtrar inasistencias del colaborador
+      const historial = await loadAsistenciaFromAPI({ colaboradorId: colaboradorId });
       const inasistenciasColab = historial.filter(r =>
-        r.colaboradorId === colaboradorId &&
         r.estado === 'ausente' &&
         r.fecha >= rango.fechaInicio &&
         r.fecha <= rango.fechaFin
@@ -6694,14 +7164,14 @@
     /**
      * Abrir modal de baja
      */
-    window.abrirModalBaja = function() {
+    window.abrirModalBaja = async function() {
       const colaboradorId = window.currentColaboradorDetalleId;
       if (!colaboradorId) {
         showToast('No se pudo obtener el ID del colaborador', 'error');
         return;
       }
 
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+      const colaboradores = await loadColaboradoresFromAPI();
       const colab = colaboradores.find(c => c.id === colaboradorId);
 
       if (!colab) {
@@ -6741,7 +7211,7 @@
     /**
      * Confirmar baja
      */
-    window.confirmarBaja = function(event) {
+    window.confirmarBaja = async function(event) {
       event.preventDefault();
 
       const colaboradorId = window.currentColaboradorDetalleId;
@@ -6759,23 +7229,23 @@
         return;
       }
 
-      // Actualizar colaborador en localStorage
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-      const index = colaboradores.findIndex(c => c.id === colaboradorId);
+      // Obtener colaborador desde API
+      const colaboradores = await loadColaboradoresFromAPI();
+      const colab = colaboradores.find(c => c.id === colaboradorId);
 
-      if (index === -1) {
+      if (!colab) {
         showToast('Colaborador no encontrado', 'error');
         return;
       }
 
-      const colab = colaboradores[index];
-      colab.estatus = 'Baja';
-      colab.motivoBaja = motivo;
-      colab.comentariosBaja = comentarios || '';
-      colab.fechaBaja = new Date().toISOString();
+      // Dar de baja usando la API
+      // Nota: La API actual no soporta motivo y comentarios de baja
+      // TODO: Actualizar el backend para soportar estos campos
+      const success = await darDeBajaColaboradorAPI(colaboradorId);
 
-      colaboradores[index] = colab;
-      localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+      if (!success) {
+        return; // El helper ya muestra el mensaje de error
+      }
 
       // Cerrar modal
       cerrarModalBaja();
@@ -6797,13 +7267,13 @@
     /**
      * Cargar departamentos con colaboradores dados de baja
      */
-    function cargarDepartamentosBajas() {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarDepartamentosBajas() {
+      const colaboradores = await loadColaboradoresFromAPI({ estatus: 'Baja' });
       const departamentosContainer = document.getElementById('bajas-departamentos-container');
 
       // Contar colaboradores con estatus Baja por departamento
       const contadores = {};
-      colaboradores.filter(c => c.estatus === 'Baja').forEach(colab => {
+      colaboradores.forEach(colab => {
         const dept = colab.departamento || 'Sin Departamento';
         contadores[dept] = (contadores[dept] || 0) + 1;
       });
@@ -6832,15 +7302,16 @@
     /**
      * Cargar colaboradores dados de baja de un departamento
      */
-    function cargarColaboradoresBaja(dept) {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarColaboradoresBaja(dept) {
+      const colaboradores = await loadColaboradoresFromAPI({ departamento: dept, estatus: 'Baja' });
       const bajasList = document.getElementById('bajas-colaboradores-lista');
       const bajasEmpty = document.getElementById('bajas-empty');
 
-      // Filtrar colaboradores con estatus Baja del departamento
-      const colaboradoresBaja = colaboradores.filter(c => c.estatus === 'Baja' && c.departamento === dept);
+      // Colaboradores ya filtrados por departamento y estatus
+      const colaboradoresBaja = colaboradores;
 
       // Ordenar por fecha de baja (más reciente primero)
+      // TODO: Backend no soporta fechaBaja aún - usar updated_at como alternativa
       colaboradoresBaja.sort((a, b) => {
         const fechaA = a.fechaBaja ? new Date(a.fechaBaja) : new Date(0);
         const fechaB = b.fechaBaja ? new Date(b.fechaBaja) : new Date(0);
@@ -6890,8 +7361,8 @@
     /**
      * Cargar detalle de un colaborador dado de baja
      */
-    function cargarDetalleBaja(colaboradorId) {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function cargarDetalleBaja(colaboradorId) {
+      const colaboradores = await loadColaboradoresFromAPI();
       const colab = colaboradores.find(c => c.id === colaboradorId);
 
       if (!colab) {
@@ -6949,6 +7420,164 @@
     // Módulo de Tiempo Extra
     // ===================================
 
+    /**
+     * Helper function to load tiempo extra from API with filters
+     * @param {Object} filters - Optional filters { fecha, mes, departamento, colaboradorId }
+     * @returns {Promise<Array>} Lista de registros de tiempo extra
+     */
+    async function loadTiempoExtraFromAPI(filters = {}) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+
+        // Build query string
+        const params = new URLSearchParams();
+        if (filters.fecha) params.append('fecha', filters.fecha);
+        if (filters.mes) params.append('mes', filters.mes);
+        if (filters.departamento) params.append('departamento', filters.departamento);
+        if (filters.colaboradorId) params.append('colaboradorId', filters.colaboradorId);
+
+        const queryString = params.toString();
+        const url = `${API_BASE_URL}/tiempo-extra${queryString ? '?' + queryString : ''}`;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return await loadTiempoExtraFromAPI(filters);
+            }
+            logout();
+            return [];
+          }
+          throw new Error('Error al cargar tiempo extra');
+        }
+
+        const data = await response.json();
+        return data.registros || [];
+      } catch (error) {
+        console.error('Error cargando tiempo extra:', error);
+        showToast('Error al cargar tiempo extra', 'error');
+        return [];
+      }
+    }
+
+    /**
+     * Helper function to get tiempo extra stats from API
+     * @param {string} mes - Mes en formato YYYY-MM (opcional)
+     * @returns {Promise<Object|null>} Estadísticas de tiempo extra
+     */
+    async function getTiempoExtraStatsFromAPI(mes) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        const url = `${API_BASE_URL}/tiempo-extra/stats${mes ? '?mes=' + mes : ''}`;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return await getTiempoExtraStatsFromAPI(mes);
+            }
+            logout();
+            return null;
+          }
+          throw new Error('Error al cargar estadísticas');
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error cargando estadísticas:', error);
+        return null;
+      }
+    }
+
+    /**
+     * Helper function to delete tiempo extra registro from API
+     * @param {number} registroId - ID del registro a eliminar
+     * @returns {Promise<boolean>} true si se eliminó correctamente
+     */
+    async function deleteTiempoExtraAPI(registroId) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+
+        const response = await fetch(`${API_BASE_URL}/tiempo-extra/${registroId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return await deleteTiempoExtraAPI(registroId);
+            }
+            logout();
+            return false;
+          }
+          throw new Error('Error al eliminar registro');
+        }
+
+        showToast('Registro eliminado exitosamente', 'success');
+        return true;
+      } catch (error) {
+        console.error('Error eliminando registro:', error);
+        showToast('Error al eliminar registro', 'error');
+        return false;
+      }
+    }
+
+    /**
+     * Helper function to get single tiempo extra registro from API
+     * @param {number} registroId - ID del registro
+     * @returns {Promise<Object|null>} Registro de tiempo extra
+     */
+    async function getTiempoExtraByIdAPI(registroId) {
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+
+        const response = await fetch(`${API_BASE_URL}/tiempo-extra/${registroId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return await getTiempoExtraByIdAPI(registroId);
+            }
+            logout();
+            return null;
+          }
+          throw new Error('Error al cargar registro');
+        }
+
+        const data = await response.json();
+        return data.registro || null;
+      } catch (error) {
+        console.error('Error cargando registro:', error);
+        showToast('Error al cargar registro', 'error');
+        return null;
+      }
+    }
+
     function initTiempoExtra() {
       const linkTiempoExtra = document.getElementById('link-tiempo-extra');
 
@@ -6973,8 +7602,8 @@
       };
     }
 
-    function cargarDepartamentosTE() {
-      const registros = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+    async function cargarDepartamentosTE() {
+      const registros = await loadTiempoExtraFromAPI();
       const container = document.getElementById('te-departamentos-container');
 
       // Contar registros por departamento
@@ -7032,7 +7661,7 @@
       }
     }
 
-    function cargarFormularioTE(dept, registroId = null) {
+    async function cargarFormularioTE(dept, registroId = null) {
       // Guardar departamento actual
       window.currentTEDept = dept;
 
@@ -7041,8 +7670,7 @@
 
       // Si es modo edición, cargar datos del registro
       if (registroId) {
-        const registros = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
-        const registro = registros.find(r => r.id === registroId);
+        const registro = await getTiempoExtraByIdAPI(registroId);
 
         if (!registro) {
           showToast('Registro no encontrado', 'error');
@@ -7160,17 +7788,15 @@
       }
     }
 
-    function initBuscadorTE(dept) {
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
+    async function initBuscadorTE(dept) {
+      const colaboradores = await loadColaboradoresFromAPI({ departamento: dept, estatus: 'Activo' });
       const input = document.getElementById('te-buscar-colaborador');
       const dropdown = document.getElementById('te-search-dropdown');
 
       if (!input || !dropdown) return;
 
-      // Filtrar colaboradores activos del departamento
-      const colaboradoresDept = colaboradores.filter(c =>
-        c.departamento === dept && (c.estatus || 'Activo') === 'Activo'
-      );
+      // Los colaboradores ya vienen filtrados del API
+      const colaboradoresDept = colaboradores;
 
       // Limpiar input
       input.value = '';
@@ -7322,20 +7948,11 @@
       horasTotalesInput.value = `${horasDecimal} hrs`;
     }
 
-    window.registrarTiempoExtra = function(event) {
+    window.registrarTiempoExtra = async function(event) {
       event.preventDefault();
 
       if (!window.currentTEColaboradorId) {
         showToast('Por favor selecciona un colaborador', 'error');
-        return;
-      }
-
-      // Obtener datos del colaborador
-      const colaboradores = JSON.parse(localStorage.getItem('colaboradores') || '[]');
-      const colaborador = colaboradores.find(c => c.id === window.currentTEColaboradorId);
-
-      if (!colaborador) {
-        showToast('Colaborador no encontrado', 'error');
         return;
       }
 
@@ -7347,54 +7964,82 @@
       const motivo = document.getElementById('te-motivo').value;
       const autorizadoPor = document.getElementById('te-autorizado').value;
 
-      // Calcular horas totales en decimal
-      const [hInicio, mInicio] = horaInicio.split(':').map(Number);
-      const [hFin, mFin] = horaFin.split(':').map(Number);
-      let minutosInicio = hInicio * 60 + mInicio;
-      let minutosFin = hFin * 60 + mFin;
-      if (minutosFin < minutosInicio) minutosFin += 24 * 60;
-      const horasTotales = ((minutosFin - minutosInicio) / 60);
+      // Validar campos requeridos
+      if (!fecha || !horaInicio || !horaFin || !motivo || !autorizadoPor) {
+        showToast('Por favor completa todos los campos requeridos', 'error');
+        return;
+      }
 
-      // Obtener historial
-      let historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+      try {
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
 
-      // Verificar si estamos editando
-      if (window.currentTERegistroEditando) {
-        // MODO EDICIÓN: Actualizar registro existente
-        const index = historial.findIndex(r => r.id === window.currentTERegistroEditando);
-
-        if (index === -1) {
-          showToast('Error: Registro no encontrado', 'error');
-          return;
-        }
-
-        // Mantener datos originales importantes
-        const registroOriginal = historial[index];
-
-        // Actualizar registro
-        historial[index] = {
-          ...registroOriginal,
-          colaboradorId: colaborador.id,
-          colaboradorNombre: `${colaborador.nombres} ${colaborador.apellidos}`,
+        // Preparar datos para enviar al API
+        // IMPORTANTE: NO enviar horasTotales - el backend lo calcula
+        const requestData = {
+          colaboradorId: window.currentTEColaboradorId,
           departamento: window.currentTEDept,
-          puesto: colaborador.puesto,
-          foto: colaborador.foto || null,
-          fecha: fecha,
-          horaInicio: horaInicio,
-          horaFin: horaFin,
-          horasTotales: horasTotales,
-          area: area,
-          motivo: motivo,
-          autorizadoPor: autorizadoPor,
-          editadoPor: window.currentUser ? window.currentUser.name : 'Sistema',
-          fechaEdicion: new Date().toISOString()
+          fecha,
+          horaInicio,
+          horaFin,
+          area: area || null,
+          motivo,
+          autorizadoPor
         };
 
-        // Guardar
-        localStorage.setItem('historialTiempoExtra', JSON.stringify(historial));
+        let response;
 
-        // Mostrar toast de éxito
-        showToast('Tiempo extra actualizado exitosamente', 'success');
+        // Verificar si estamos editando
+        if (window.currentTERegistroEditando) {
+          // MODO EDICIÓN: PUT
+          response = await fetch(`${API_BASE_URL}/tiempo-extra/${window.currentTERegistroEditando}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              const refreshed = await refreshAccessToken();
+              if (refreshed) {
+                return await registrarTiempoExtra(event);
+              }
+              logout();
+              return;
+            }
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al actualizar tiempo extra');
+          }
+
+          showToast('Tiempo extra actualizado exitosamente', 'success');
+        } else {
+          // MODO CREAR: POST
+          response = await fetch(`${API_BASE_URL}/tiempo-extra`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              const refreshed = await refreshAccessToken();
+              if (refreshed) {
+                return await registrarTiempoExtra(event);
+              }
+              logout();
+              return;
+            }
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al registrar tiempo extra');
+          }
+
+          showToast('Tiempo extra registrado exitosamente', 'success');
+        }
 
         // Limpiar variables de edición
         window.currentTERegistroEditando = null;
@@ -7402,36 +8047,9 @@
         // Limpiar formulario y volver a sub-módulos
         limpiarFormularioTE();
         navigateToLocation('tiempo-extra-dept:' + window.currentTEDept);
-      } else {
-        // MODO CREAR: Crear nuevo registro
-        const registro = {
-          id: Date.now(),
-          colaboradorId: colaborador.id,
-          colaboradorNombre: `${colaborador.nombres} ${colaborador.apellidos}`,
-          departamento: window.currentTEDept,
-          puesto: colaborador.puesto,
-          foto: colaborador.foto || null,
-          fecha: fecha,
-          horaInicio: horaInicio,
-          horaFin: horaFin,
-          horasTotales: horasTotales,
-          area: area,
-          motivo: motivo,
-          autorizadoPor: autorizadoPor,
-          registradoPor: window.currentUser ? window.currentUser.name : 'Sistema',
-          fechaRegistro: new Date().toISOString()
-        };
-
-        // Guardar en localStorage
-        historial.push(registro);
-        localStorage.setItem('historialTiempoExtra', JSON.stringify(historial));
-
-        // Mostrar toast de éxito
-        showToast('Tiempo extra registrado exitosamente', 'success');
-
-        // Limpiar formulario y volver a sub-módulos
-        limpiarFormularioTE();
-        navigateToLocation('tiempo-extra-dept:' + window.currentTEDept);
+      } catch (error) {
+        console.error('Error en registrarTiempoExtra:', error);
+        showToast(error.message || 'Error al procesar tiempo extra', 'error');
       }
     }
 
@@ -7454,7 +8072,7 @@
       }
     }
 
-    function cargarHistorialTE(dept) {
+    async function cargarHistorialTE(dept) {
       // Actualizar título
       document.getElementById('te-historial-title').textContent = 'Historial Tiempo Extra';
       document.getElementById('te-historial-subtitle').textContent = dept;
@@ -7462,8 +8080,7 @@
       // Guardar departamento actual para navegación
       window.currentTEHistorialDept = dept;
 
-      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
-      const registrosDept = historial.filter(r => r.departamento === dept);
+      const registrosDept = await loadTiempoExtraFromAPI({ departamento: dept });
 
       const container = document.getElementById('te-historial-container');
       const emptyDiv = document.getElementById('te-historial-empty');
@@ -7509,7 +8126,7 @@
       container.innerHTML = semanasOrdenadas.map(semanaKey => {
         const semana = semanas[semanaKey];
         const totalRegistros = semana.registros.length;
-        const totalHoras = semana.registros.reduce((sum, r) => sum + r.horasTotales, 0).toFixed(2);
+        const totalHoras = semana.registros.reduce((sum, r) => sum + parseFloat(r.horasTotales || 0), 0).toFixed(2);
 
         // Calcular rango de fechas
         const fechaInicio = semana.fechaInicio;
@@ -7535,7 +8152,7 @@
                   <div style="font-size: 0.8rem; color: var(--color-text-muted);">${reg.puesto}</div>
                 </div>
                 <div class="te-registro-horas" style="padding: 6px 12px; background: linear-gradient(135deg, rgba(30, 124, 186, 0.1), rgba(30, 124, 186, 0.05)); border: 1px solid rgba(30, 124, 186, 0.2); border-radius: var(--radius-sm); font-weight: 700; font-size: 0.85rem; color: var(--color-primary);">
-                  ${reg.horasTotales.toFixed(2)} hrs
+                  ${parseFloat(reg.horasTotales || 0).toFixed(2)} hrs
                 </div>
               </div>
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.8rem;">
@@ -7585,9 +8202,8 @@
       navigateToLocation('tiempo-extra-semana:' + dept + ':' + semanaKey);
     }
 
-    function cargarDetalleSemanaTE(dept, semanaKey) {
-      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
-      const registrosDept = historial.filter(r => r.departamento === dept);
+    async function cargarDetalleSemanaTE(dept, semanaKey) {
+      const registrosDept = await loadTiempoExtraFromAPI({ departamento: dept });
 
       // Agrupar por semana para obtener los registros de esta semana específica
       const semanas = {};
@@ -7617,7 +8233,7 @@
       }
 
       const totalRegistros = semana.registros.length;
-      const totalHoras = semana.registros.reduce((sum, r) => sum + r.horasTotales, 0).toFixed(2);
+      const totalHoras = semana.registros.reduce((sum, r) => sum + parseFloat(r.horasTotales || 0), 0).toFixed(2);
 
       // Calcular rango de fechas
       const fechaInicio = semana.fechaInicio;
@@ -7648,7 +8264,7 @@
                 <p>${reg.puesto}</p>
               </div>
               <div class="te-detalle-semana-horas">
-                ${reg.horasTotales.toFixed(2)} hrs
+                ${parseFloat(reg.horasTotales || 0).toFixed(2)} hrs
               </div>
             </div>
             <div class="te-detalle-semana-body">
@@ -7693,10 +8309,9 @@
       }).join('');
     }
 
-    window.editarRegistroTE = function(registroId) {
+    window.editarRegistroTE = async function(registroId) {
       // Buscar el registro para obtener el departamento
-      const registros = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
-      const registro = registros.find(r => r.id === registroId);
+      const registro = await getTiempoExtraByIdAPI(registroId);
 
       if (!registro) {
         showToast('Registro no encontrado', 'error');
@@ -7707,8 +8322,8 @@
       navigateToLocation('tiempo-extra-registrar:' + registro.departamento + ':' + registroId);
     }
 
-    window.confirmarBorrarRegistroTE = function(registroId) {
-      const registro = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]').find(r => r.id === registroId);
+    window.confirmarBorrarRegistroTE = async function(registroId) {
+      const registro = await getTiempoExtraByIdAPI(registroId);
 
       if (!registro) {
         showToast('Registro no encontrado', 'error');
@@ -7720,27 +8335,22 @@
         `¿Estás seguro de que deseas borrar este registro?\n\n` +
         `Colaborador: ${registro.colaboradorNombre}\n` +
         `Fecha: ${formatDate(new Date(registro.fecha + 'T00:00:00'))}\n` +
-        `Horas: ${registro.horasTotales.toFixed(2)} hrs\n\n` +
+        `Horas: ${parseFloat(registro.horasTotales || 0).toFixed(2)} hrs\n\n` +
         `Esta acción no se puede deshacer.`
       );
 
       if (confirmar) {
-        borrarRegistroTE(registroId);
+        await borrarRegistroTE(registroId);
       }
     }
 
-    function borrarRegistroTE(registroId) {
-      // Obtener historial
-      let historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
+    async function borrarRegistroTE(registroId) {
+      // Eliminar mediante API
+      const eliminado = await deleteTiempoExtraAPI(registroId);
 
-      // Filtrar el registro a borrar
-      const historialFiltrado = historial.filter(r => r.id !== registroId);
-
-      // Guardar de nuevo
-      localStorage.setItem('historialTiempoExtra', JSON.stringify(historialFiltrado));
-
-      // Mostrar mensaje de éxito
-      showToast('Registro borrado exitosamente', 'success');
+      if (!eliminado) {
+        return;
+      }
 
       // Recargar la vista actual
       const currentLocation = window.navigationHistory[window.navigationHistory.length - 1];
@@ -7748,7 +8358,7 @@
         const params = currentLocation.replace('tiempo-extra-semana:', '').split(':');
         const dept = params[0];
         const semanaKey = params[1];
-        cargarDetalleSemanaTE(dept, semanaKey);
+        await cargarDetalleSemanaTE(dept, semanaKey);
       }
     }
 
@@ -7756,9 +8366,8 @@
       navigateToLocation('tiempo-extra-detalle:' + registroId);
     }
 
-    function cargarDetalleTiempoExtra(registroId) {
-      const historial = JSON.parse(localStorage.getItem('historialTiempoExtra') || '[]');
-      const registro = historial.find(r => r.id === registroId);
+    async function cargarDetalleTiempoExtra(registroId) {
+      const registro = await getTiempoExtraByIdAPI(registroId);
 
       if (!registro) {
         showToast('Registro no encontrado', 'error');
@@ -7783,14 +8392,14 @@
       // Cargar información básica
       document.getElementById('te-detalle-nombre').textContent = registro.colaboradorNombre;
       document.getElementById('te-detalle-puesto').textContent = registro.puesto;
-      document.getElementById('te-detalle-horas').textContent = `${registro.horasTotales.toFixed(2)} hrs`;
+      document.getElementById('te-detalle-horas').textContent = `${parseFloat(registro.horasTotales || 0).toFixed(2)} hrs`;
 
       // Cargar información del registro
       document.getElementById('te-detalle-departamento').textContent = registro.departamento;
       document.getElementById('te-detalle-fecha').textContent = formatDate(new Date(registro.fecha + 'T00:00:00'));
       document.getElementById('te-detalle-hora-inicio').textContent = registro.horaInicio;
       document.getElementById('te-detalle-hora-fin').textContent = registro.horaFin;
-      document.getElementById('te-detalle-horas-totales').textContent = `${registro.horasTotales.toFixed(2)} hrs`;
+      document.getElementById('te-detalle-horas-totales').textContent = `${parseFloat(registro.horasTotales || 0).toFixed(2)} hrs`;
       document.getElementById('te-detalle-area').textContent = registro.area;
       document.getElementById('te-detalle-motivo').textContent = registro.motivo;
       document.getElementById('te-detalle-autorizado').textContent = registro.autorizadoPor;
@@ -7852,10 +8461,11 @@
         perfilUsernameInput.value = window.currentUser.username;
       }
 
-      // Mostrar contraseña actual en el campo de solo lectura
+      // Mostrar placeholder para contraseña (el backend no retorna la contraseña por seguridad)
       const passwordActualDisplay = document.getElementById('passwordActualDisplay');
       if (passwordActualDisplay && window.currentUser) {
-        passwordActualDisplay.value = window.currentUser.password;
+        passwordActualDisplay.value = '••••••••';
+        passwordActualDisplay.setAttribute('data-password-hidden', 'true');
       }
 
       // Listener para cambio de foto
@@ -7922,22 +8532,51 @@
       }
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         const fotoBase64 = e.target.result;
 
         // Verificar que window.currentUser existe
-        if (!window.currentUser || !window.currentUser.username) {
+        if (!window.currentUser || !window.currentUser.id) {
           showToast('Error: usuario no autenticado', 'error');
           return;
         }
 
-        // Actualizar usuario en localStorage (appUsers)
-        const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
-        const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
+        try {
+          // Obtener token
+          const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+          if (!token) {
+            showToast('No autenticado', 'error');
+            return;
+          }
 
-        if (userIndex !== -1) {
-          usuarios[userIndex].photo = fotoBase64;
-          localStorage.setItem('appUsers', JSON.stringify(usuarios));
+          // Actualizar foto en el API
+          const response = await fetch(`${API_BASE_URL}/users/${window.currentUser.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              photo: fotoBase64
+            })
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              const refreshed = await refreshAccessToken();
+              if (refreshed) {
+                // Reintentar
+                return handleCambioFotoPerfil(event);
+              } else {
+                showToast('Sesión expirada', 'error');
+                logout();
+                return;
+              }
+            }
+
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al actualizar la foto');
+          }
 
           // Actualizar currentUser global
           window.currentUser.photo = fotoBase64;
@@ -7954,28 +8593,57 @@
           updateUserAvatar();
 
           showToast('Foto de perfil actualizada', 'success');
-        } else {
-          showToast('Error al actualizar la foto', 'error');
+        } catch (error) {
+          console.error('Error actualizando foto:', error);
+          showToast(error.message || 'Error al actualizar la foto', 'error');
         }
       };
 
       reader.readAsDataURL(file);
     }
 
-    function eliminarFotoPerfil() {
+    async function eliminarFotoPerfil() {
       // Verificar que window.currentUser existe
-      if (!window.currentUser || !window.currentUser.username) {
+      if (!window.currentUser || !window.currentUser.id) {
         showToast('Error: usuario no autenticado', 'error');
         return;
       }
 
-      // Actualizar usuario en localStorage (appUsers)
-      const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
-      const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
 
-      if (userIndex !== -1) {
-        delete usuarios[userIndex].photo;
-        localStorage.setItem('appUsers', JSON.stringify(usuarios));
+        // Eliminar foto en el API (enviar photo: null)
+        const response = await fetch(`${API_BASE_URL}/users/${window.currentUser.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            photo: null
+          })
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return eliminarFotoPerfil();
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
+
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al eliminar la foto');
+        }
 
         // Actualizar currentUser global
         delete window.currentUser.photo;
@@ -7991,12 +8659,13 @@
         if (input) input.value = '';
 
         showToast('Foto de perfil eliminada', 'success');
-      } else {
-        showToast('Error al eliminar la foto', 'error');
+      } catch (error) {
+        console.error('Error eliminando foto:', error);
+        showToast(error.message || 'Error al eliminar la foto', 'error');
       }
     }
 
-    function handleCambiarPassword(event) {
+    async function handleCambiarPassword(event) {
       event.preventDefault();
 
       const passwordNueva = document.getElementById('passwordNueva').value;
@@ -8009,40 +8678,59 @@
       }
 
       // Validar longitud mínima
-      if (passwordNueva.length < 6) {
-        showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+      if (passwordNueva.length < 8) {
+        showToast('La contraseña debe tener al menos 8 caracteres', 'error');
         return;
       }
 
-      // Validar que la nueva contraseña sea diferente a la actual
-      if (passwordNueva === window.currentUser.password) {
-        showToast('La nueva contraseña debe ser diferente a la actual', 'error');
+      if (!window.currentUser || !window.currentUser.id) {
+        showToast('Error: usuario no autenticado', 'error');
         return;
       }
 
-      // Actualizar usuario en localStorage (appUsers)
-      const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
-      const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
 
-      if (userIndex !== -1) {
-        usuarios[userIndex].password = passwordNueva;
-        localStorage.setItem('appUsers', JSON.stringify(usuarios));
+        // Actualizar contraseña en el API
+        const response = await fetch(`${API_BASE_URL}/users/${window.currentUser.id}/password`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            newPassword: passwordNueva
+          })
+        });
 
-        // Actualizar currentUser global
-        window.currentUser.password = passwordNueva;
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return handleCambiarPassword(event);
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
 
-        // Actualizar el campo de contraseña actual (display)
-        const passwordActualDisplay = document.getElementById('passwordActualDisplay');
-        if (passwordActualDisplay) {
-          passwordActualDisplay.value = passwordNueva;
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al actualizar la contraseña');
         }
 
         // Limpiar formulario
         limpiarFormularioPassword();
 
         showToast('Contraseña actualizada exitosamente', 'success');
-      } else {
-        showToast('Error al actualizar la contraseña', 'error');
+      } catch (error) {
+        console.error('Error actualizando contraseña:', error);
+        showToast(error.message || 'Error al actualizar la contraseña', 'error');
       }
     }
 
@@ -8050,6 +8738,17 @@
       const input = document.getElementById(inputId);
       if (!input) {
         console.error('Input not found:', inputId);
+        return;
+      }
+
+      // Check if this is a protected password field (no real password available)
+      if (input.hasAttribute('data-password-hidden')) {
+        // Show informative message
+        if (typeof showToast === 'function') {
+          showToast('La contraseña está protegida por seguridad. Usa "Cambiar Contraseña" para establecer una nueva.', 'info');
+        } else {
+          alert('La contraseña está protegida por seguridad. Usa "Cambiar Contraseña" para establecer una nueva.');
+        }
         return;
       }
 
@@ -8097,25 +8796,21 @@
         return;
       }
 
-      // BUGFIX: Si currentUser no tiene los campos, recargarlos desde localStorage
-      if (!currentUser.securityQuestion || !currentUser.securityAnswer) {
-        const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
-        const userFromStorage = appUsers.find(u => u.usuario === currentUser.username);
-
-        if (userFromStorage) {
-          window.currentUser.securityQuestion = userFromStorage.securityQuestion || null;
-          window.currentUser.securityAnswer = userFromStorage.securityAnswer || null;
-        }
-      }
-
       const currentAnswerInput = document.getElementById('currentSecurityAnswer');
       if (currentAnswerInput) {
-        const answer = currentUser.securityAnswer || 'Sin configurar';
-        currentAnswerInput.value = answer;
+        // Si el usuario tiene pregunta de seguridad configurada, mostrar placeholder
+        // El backend no retorna la respuesta por seguridad (está hasheada)
+        if (currentUser.securityQuestion) {
+          currentAnswerInput.value = '••••••••';
+          currentAnswerInput.setAttribute('data-password-hidden', 'true');
+        } else {
+          currentAnswerInput.value = 'Sin configurar';
+          currentAnswerInput.removeAttribute('data-password-hidden');
+        }
       }
     }
 
-    function handleActualizarPreguntaSeguridad(event) {
+    async function handleActualizarPreguntaSeguridad(event) {
       event.preventDefault();
 
       const newQuestion = document.getElementById('newSecurityQuestion').value;
@@ -8136,31 +8831,64 @@
         return;
       }
 
-      // Actualizar usuario en localStorage (appUsers)
-      const usuarios = JSON.parse(localStorage.getItem('appUsers') || '[]');
-      const userIndex = usuarios.findIndex(u => u.usuario === window.currentUser.username);
+      if (!window.currentUser || !window.currentUser.id) {
+        showToast('Error: usuario no autenticado', 'error');
+        return;
+      }
 
-      if (userIndex !== -1) {
-        usuarios[userIndex].securityQuestion = newQuestion;
-        usuarios[userIndex].securityAnswer = newAnswer.toLowerCase();
-        localStorage.setItem('appUsers', JSON.stringify(usuarios));
+      try {
+        // Obtener token
+        const token = getStorage(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          showToast('No autenticado', 'error');
+          return;
+        }
+
+        // Actualizar pregunta de seguridad en el API
+        const response = await fetch(`${API_BASE_URL}/users/${window.currentUser.id}/security-question`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            securityQuestion: newQuestion,
+            securityAnswer: newAnswer
+          })
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+              return handleActualizarPreguntaSeguridad(event);
+            } else {
+              showToast('Sesión expirada', 'error');
+              logout();
+              return;
+            }
+          }
+
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al actualizar la pregunta de seguridad');
+        }
 
         // Actualizar currentUser global
         window.currentUser.securityQuestion = newQuestion;
-        window.currentUser.securityAnswer = newAnswer.toLowerCase();
 
         // Actualizar el campo de respuesta actual (display)
         const currentAnswerInput = document.getElementById('currentSecurityAnswer');
         if (currentAnswerInput) {
-          currentAnswerInput.value = newAnswer.toLowerCase();
+          currentAnswerInput.value = '******'; // No mostrar la respuesta en texto plano
         }
 
         showToast('Pregunta de seguridad actualizada exitosamente', 'success');
 
         // Limpiar formulario
         limpiarFormularioSecurityQuestion();
-      } else {
-        showToast('Error al actualizar la pregunta de seguridad', 'error');
+      } catch (error) {
+        console.error('Error actualizando pregunta de seguridad:', error);
+        showToast(error.message || 'Error al actualizar la pregunta de seguridad', 'error');
       }
     }
 

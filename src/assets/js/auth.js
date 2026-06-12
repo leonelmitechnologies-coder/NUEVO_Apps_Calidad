@@ -1,207 +1,183 @@
 /* ============================================
    MI Technologies - Authentication Logic
+   MIGRADO A BACKEND API
    ============================================ */
 
-// Storage keys
-const STORAGE_KEYS = {
-  IS_LOGGED_IN: 'isLoggedIn',
-  USERNAME: 'username',
-  REMEMBER_ME: 'rememberMe',
-  TOKEN: 'token'
-};
+// API Configuration
+const API_BASE_URL = 'http://localhost:3001/api';
 
-// Development/Testing Credentials
-// TODO: Remove in production - use actual authentication
-const TEST_CREDENTIALS = {
-  username: 'admin',
-  password: 'admin123'
+// Storage keys (solo tokens ahora)
+const STORAGE_KEYS = {
+  ACCESS_TOKEN: 'accessToken',
+  REFRESH_TOKEN: 'refreshToken',
+  REMEMBER_ME: 'rememberMe'
 };
 
 /**
- * Mock login function - prepared for backend integration
+ * Login function - USA BACKEND API
  * @param {string} username - User's username
  * @param {string} password - User's password
+ * @param {boolean} rememberMe - Remember session
  * @returns {Promise<Object>} - Login result
  */
-async function login(username, password) {
-  // TODO: Replace with actual API call when backend is ready
-  /*
-  const response = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ username, password })
-  });
+async function login(username, password, rememberMe = false) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password, rememberMe })
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Credenciales incorrectas');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Credenciales incorrectas');
+    }
+
+    const data = await response.json();
+    // data = { success, accessToken, refreshToken, user }
+
+    return data;
+  } catch (error) {
+    console.error('Error en login:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data; // { success: true, token: '...', user: {...} }
-  */
-
-  // Mock implementation with credential validation
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // First, check against users created in the system (appUsers)
-      const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
-      const foundUser = appUsers.find(u => u.usuario === username && u.password === password);
-
-      if (foundUser) {
-        // User found in appUsers
-        resolve({
-          success: true,
-          token: 'mock-token-' + Date.now(),
-          user: {
-            id: foundUser.id,
-            username: foundUser.usuario,
-            name: `${foundUser.nombre} ${foundUser.apellido}`,
-            photo: foundUser.photo || null,
-            password: foundUser.password,
-            departamento: foundUser.departamento || null,
-            departamentosPasarAsistencia: foundUser.departamentosPasarAsistencia || (foundUser.departamento ? [foundUser.departamento] : []),
-            departamentosTiempoExtra: foundUser.departamentosTiempoExtra || (foundUser.departamento ? [foundUser.departamento] : []),
-            securityQuestion: foundUser.securityQuestion || null,
-            securityAnswer: foundUser.securityAnswer || null,
-            permisos: foundUser.permisos || {
-              usuarios: false,
-              asistencia: true,
-              pasarAsistencia: false,
-              agregarColaborador: false,
-              historial: false,
-              inasistencia: false,
-              colaboradores: false,
-              bajas: false,
-              tiempoExtra: false,
-              miPerfil: true
-            }
-          }
-        });
-      } else if (username === TEST_CREDENTIALS.username && password === TEST_CREDENTIALS.password) {
-        // Fallback to test credentials (admin/admin123)
-        // Check if admin exists in appUsers, if not create it
-        let adminUser = appUsers.find(u => u.usuario === 'admin');
-
-        if (!adminUser) {
-          // Create admin user in appUsers
-          adminUser = {
-            id: Date.now(),
-            usuario: 'admin',
-            password: 'admin123',
-            nombre: 'Administrador',
-            apellido: 'Sistema',
-            puesto: 'Administrador',
-            departamento: null,
-            departamentosPasarAsistencia: [],
-            departamentosTiempoExtra: [],
-            securityQuestion: null,
-            securityAnswer: null,
-            permisos: {
-              usuarios: true,
-              asistencia: true,
-              pasarAsistencia: true,
-              agregarColaborador: true,
-              historial: true,
-              inasistencia: true,
-              colaboradores: true,
-              bajas: true,
-              tiempoExtra: true,
-              miPerfil: true
-            }
-          };
-          appUsers.push(adminUser);
-          localStorage.setItem('appUsers', JSON.stringify(appUsers));
-        }
-
-        resolve({
-          success: true,
-          token: 'mock-token-' + Date.now(),
-          user: {
-            id: adminUser.id,
-            username: adminUser.usuario,
-            name: `${adminUser.nombre} ${adminUser.apellido}`,
-            password: adminUser.password,
-            departamento: adminUser.departamento || null,
-            departamentosPasarAsistencia: adminUser.departamentosPasarAsistencia || [],
-            departamentosTiempoExtra: adminUser.departamentosTiempoExtra || [],
-            securityQuestion: adminUser.securityQuestion || null,
-            securityAnswer: adminUser.securityAnswer || null,
-            permisos: adminUser.permisos || {
-              usuarios: true,
-              asistencia: true,
-              pasarAsistencia: true,
-              agregarColaborador: true,
-              historial: true,
-              inasistencia: true,
-              colaboradores: true,
-              bajas: true,
-              tiempoExtra: true,
-              miPerfil: true
-            }
-          }
-        });
-      } else {
-        reject(new Error('Usuario o contraseña incorrectos'));
-      }
-    }, 200); // Simulate network delay
-  });
 }
 
 /**
- * Saves session data to localStorage
+ * Saves session data to sessionStorage
+ * SOLO GUARDA TOKENS - Los datos del usuario vienen del backend
  * @param {Object} data - Session data from login
  * @param {boolean} rememberMe - Whether to persist session
  */
 function saveSession(data, rememberMe = false) {
-  setStorage(STORAGE_KEYS.IS_LOGGED_IN, 'true');
-  setStorage(STORAGE_KEYS.USERNAME, data.user.username);
-  setStorage(STORAGE_KEYS.TOKEN, data.token);
-  setStorage(STORAGE_KEYS.REMEMBER_ME, rememberMe ? 'true' : 'false');
+  sessionStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.accessToken);
+  sessionStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
+  sessionStorage.setItem(STORAGE_KEYS.REMEMBER_ME, rememberMe ? 'true' : 'false');
 }
 
 /**
  * Checks if user is authenticated
+ * Verifica que exista un access token
  * @returns {boolean}
  */
 function isAuthenticated() {
-  return getStorage(STORAGE_KEYS.IS_LOGGED_IN) === 'true';
+  const token = sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  return !!token;
 }
 
 /**
- * Gets current user data from storage
- * @returns {Object|null}
+ * Gets current user data from API
+ * MIGRADO: Ahora usa /api/auth/me en lugar de localStorage
+ * @returns {Promise<Object|null>}
  */
-function getCurrentUser() {
+async function getCurrentUser() {
   if (!isAuthenticated()) {
     return null;
   }
 
-  return {
-    username: getStorage(STORAGE_KEYS.USERNAME),
-    token: getStorage(STORAGE_KEYS.TOKEN)
-  };
+  try {
+    const token = sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      // Token inválido o expirado - intentar refresh
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        // Reintentar con el nuevo token
+        return await getCurrentUser();
+      }
+
+      // No se pudo renovar - logout
+      logout();
+      return null;
+    }
+
+    const data = await response.json();
+    return data.user;
+  } catch (error) {
+    console.error('Error obteniendo usuario actual:', error);
+    return null;
+  }
+}
+
+/**
+ * Renueva el access token usando el refresh token
+ * @returns {Promise<boolean>}
+ */
+async function refreshAccessToken() {
+  try {
+    const refreshToken = sessionStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+
+    if (!refreshToken) {
+      return false;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ refreshToken })
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const data = await response.json();
+
+    // Guardar nuevo access token
+    sessionStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.accessToken);
+
+    return true;
+  } catch (error) {
+    console.error('Error renovando token:', error);
+    return false;
+  }
 }
 
 /**
  * Logs out the current user
+ * MIGRADO: Llama a /api/auth/logout y limpia tokens
  */
-function logout() {
-  // Solo eliminar datos de sesión, NO los usuarios creados
-  removeStorage(STORAGE_KEYS.IS_LOGGED_IN);
-  removeStorage(STORAGE_KEYS.USERNAME);
-  removeStorage(STORAGE_KEYS.TOKEN);
-  removeStorage(STORAGE_KEYS.REMEMBER_ME);
-  clearNavigationHistory();
+async function logout() {
+  try {
+    const refreshToken = sessionStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
 
-  // Verificar si navigateTo existe
-  if (typeof navigateTo === 'function') {
-    navigateTo('login');
-  } else {
-    // Fallback: recargar página si navigateTo no está disponible
-    window.location.reload();
+    // Intentar invalidar el refresh token en el servidor
+    if (refreshToken) {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refreshToken })
+      });
+    }
+  } catch (error) {
+    console.error('Error en logout:', error);
+  } finally {
+    // Limpiar tokens locales
+    sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    sessionStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    sessionStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
+    clearNavigationHistory();
+
+    // Verificar si navigateTo existe
+    if (typeof navigateTo === 'function') {
+      navigateTo('login');
+    } else {
+      // Fallback: recargar página
+      window.location.reload();
+    }
   }
 }
 
@@ -254,6 +230,7 @@ function validateLoginForm(username, password) {
 
 /**
  * Handles login form submission
+ * ACTUALIZADO: Usa backend API
  * @param {Event} event - Form submit event
  */
 async function handleLogin(event) {
@@ -268,7 +245,7 @@ async function handleLogin(event) {
   // Get values
   const username = usernameInput.value;
   const password = passwordInput.value;
-  const rememberMe = rememberMeCheckbox.checked;
+  const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
 
   // Clear previous errors
   clearError(usernameInput);
@@ -292,30 +269,32 @@ async function handleLogin(event) {
     return;
   }
 
-  // Show loading state - keep button enabled per UX best practices
+  // Show loading state
   submitButton.classList.add('loading');
   submitButton.setAttribute('aria-busy', 'true');
 
   try {
-    // Attempt login
-    const result = await login(username, password);
+    // Attempt login con backend
+    const result = await login(username, password, rememberMe);
 
     if (result.success) {
-      // Save session
+      // Save session (solo tokens)
       saveSession(result, rememberMe);
 
-      // Set currentUser global with complete user data
+      // Set currentUser global con datos del backend
       window.currentUser = result.user;
 
       // Small delay for UX
       await sleep(100);
 
-      // Check if user needs to set up security question (first time login)
-      if (!result.user.securityQuestion || !result.user.securityAnswer) {
+      // Check if user needs to set up security question
+      if (!result.user.securityQuestion) {
         // Redirect to dashboard first, then show setup modal
         navigateTo('dashboard');
         setTimeout(() => {
-          openSetupSecurityQuestionModal();
+          if (typeof openSetupSecurityQuestionModal === 'function') {
+            openSetupSecurityQuestionModal();
+          }
         }, 500);
       } else {
         // Redirect to dashboard normally
@@ -324,7 +303,7 @@ async function handleLogin(event) {
     }
   } catch (error) {
     // Show error message
-    showError(passwordInput, 'Usuario o contraseña incorrectos');
+    showError(passwordInput, error.message || 'Usuario o contraseña incorrectos');
     passwordInput.focus();
     passwordInput.select();
   } finally {
@@ -366,7 +345,7 @@ function setupPasswordToggle() {
       }
     }
 
-    // Update aria-label and aria-pressed for better accessibility
+    // Update aria-label
     const newLabel = isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña';
     toggleButton.setAttribute('aria-label', newLabel);
     toggleButton.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
@@ -404,12 +383,15 @@ function setupInputValidation() {
  */
 function handleForgotPassword(event) {
   event.preventDefault();
-  openForgotPasswordModal();
+  if (typeof openForgotPasswordModal === 'function') {
+    openForgotPasswordModal();
+  }
 }
 
 /* ============================================
    PASSWORD RECOVERY - SECURITY QUESTION
-   New simplified flow
+   NOTA: Esta funcionalidad aún usa localStorage
+   TODO: Migrar a backend en Fase 2
    ============================================ */
 
 // State for recovery process
@@ -486,15 +468,23 @@ function goBackToRecoveryStep1() {
   showRecoveryStep(1);
 }
 
+// NOTE: Las funciones de recuperación de contraseña
+// (verifyUsernameForRecovery, verifySecurityAnswer, etc.)
+// aún usan localStorage temporalmente.
+// Se migrarán en la Fase 2 cuando se implementen los endpoints
+// de recuperación de contraseña en el backend.
+
 /**
- * Verifies username and shows security question (Step 1 -> Step 2)
+ * NOTA: Esta función aún usa localStorage (migrar en Fase 2)
  */
 function verifyUsernameForRecovery() {
   const usernameInput = document.getElementById('recoveryUsername');
   const username = usernameInput.value.trim();
 
   if (!username) {
-    showToast('Por favor ingresa tu nombre de usuario', 'warning');
+    if (typeof showToast === 'function') {
+      showToast('Por favor ingresa tu nombre de usuario', 'warning');
+    }
     usernameInput.focus();
     return;
   }
@@ -502,54 +492,56 @@ function verifyUsernameForRecovery() {
   // Check if user is locked out
   if (isLockedOut()) {
     const timeLeft = getRemainingLockoutTime();
-    showToast(`Demasiados intentos. Intenta en ${timeLeft} minutos`, 'error');
+    if (typeof showToast === 'function') {
+      showToast(`Demasiados intentos. Intenta en ${timeLeft} minutos`, 'error');
+    }
     return;
   }
 
-  // Check if user exists
+  // TODO: Reemplazar con API call a /api/auth/forgot-password
+  // Por ahora, usa localStorage
   const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
   const user = appUsers.find(u => u.usuario === username);
 
-  // SECURITY: Always show same message (prevent user enumeration)
   if (!user || !user.securityQuestion || !user.securityAnswer) {
-    showToast('Usuario no encontrado o sin pregunta configurada. Contacta al administrador.', 'error');
+    if (typeof showToast === 'function') {
+      showToast('Usuario no encontrado o sin pregunta configurada. Contacta al administrador.', 'error');
+    }
     return;
   }
 
-  // Store username and password for later
   recoveryState.username = username;
   recoveryState.userPassword = user.password;
 
-  // Show user's security question
   const questionLabel = document.getElementById('recoveryQuestion');
   if (questionLabel) {
     questionLabel.textContent = user.securityQuestion;
   }
 
-  // Clear answer input
   const answerInput = document.getElementById('recoveryAnswer');
   if (answerInput) {
     answerInput.value = '';
   }
 
-  // Go to step 2
   showRecoveryStep(2);
 }
 
 /**
- * Verifies security answer and shows password (Step 2 -> Step 3)
+ * NOTA: Esta función aún usa localStorage (migrar en Fase 2)
  */
 function verifySecurityAnswer() {
   const answerInput = document.getElementById('recoveryAnswer');
   const userAnswer = answerInput.value.trim().toLowerCase();
 
   if (!userAnswer) {
-    showToast('Por favor ingresa tu respuesta', 'warning');
+    if (typeof showToast === 'function') {
+      showToast('Por favor ingresa tu respuesta', 'warning');
+    }
     answerInput.focus();
     return;
   }
 
-  // Get user to verify answer
+  // TODO: Reemplazar con API call a /api/auth/verify-security-answer
   const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
   const user = appUsers.find(u => u.usuario === recoveryState.username);
 
@@ -558,26 +550,21 @@ function verifySecurityAnswer() {
     return;
   }
 
-  // Verify answer (case-insensitive)
   const correctAnswer = (user.securityAnswer || '').toLowerCase();
   const isCorrect = userAnswer === correctAnswer;
 
   if (isCorrect) {
-    // Success! Reset attempts and show password
     recoveryState.attempts = 0;
 
-    // Display the password
     const recoveredPasswordInput = document.getElementById('recoveredPassword');
     if (recoveredPasswordInput) {
       recoveredPasswordInput.value = recoveryState.userPassword;
     }
 
-    // Log security event
     logSecurityEvent('password_recovered', recoveryState.username);
 
     showRecoveryStep(3);
   } else {
-    // Failed attempt
     handleRecoveryFailedAttempt();
   }
 }
@@ -592,20 +579,21 @@ function handleRecoveryFailedAttempt() {
   const remainingAttempts = recoveryState.maxAttempts - recoveryState.attempts;
 
   if (remainingAttempts > 0) {
-    showToast(`Respuesta incorrecta. Intentos restantes: ${remainingAttempts}`, 'error');
+    if (typeof showToast === 'function') {
+      showToast(`Respuesta incorrecta. Intentos restantes: ${remainingAttempts}`, 'error');
+    }
   } else {
-    // Lock out user
-    showToast('Demasiados intentos fallidos. Bloqueado por 15 minutos', 'error');
+    if (typeof showToast === 'function') {
+      showToast('Demasiados intentos fallidos. Bloqueado por 15 minutos', 'error');
+    }
     closeForgotPasswordModal();
 
-    // Log security event
     logSecurityEvent('password_recovery_lockout', recoveryState.username);
   }
 }
 
 /**
  * Checks if user is locked out
- * @returns {boolean}
  */
 function isLockedOut() {
   if (recoveryState.attempts < recoveryState.maxAttempts) {
@@ -618,7 +606,6 @@ function isLockedOut() {
 
 /**
  * Gets remaining lockout time in minutes
- * @returns {number}
  */
 function getRemainingLockoutTime() {
   const timeSinceLastAttempt = Date.now() - recoveryState.lastAttempt;
@@ -630,16 +617,13 @@ function getRemainingLockoutTime() {
  * Closes recovery modal and fills login with username
  */
 function closeRecoveryAndFillLogin() {
-  // Auto-fill username in login form
   const usernameInput = document.getElementById('username');
   if (usernameInput && recoveryState.username) {
     usernameInput.value = recoveryState.username;
   }
 
-  // Close modal
   closeForgotPasswordModal();
 
-  // Focus password field
   const passwordInput = document.getElementById('password');
   if (passwordInput) {
     setTimeout(() => passwordInput.focus(), 300);
@@ -648,7 +632,6 @@ function closeRecoveryAndFillLogin() {
 
 /**
  * Toggles password visibility
- * @param {string} inputId - Input element ID
  */
 function togglePasswordVisibility(inputId) {
   const input = document.getElementById(inputId);
@@ -658,30 +641,35 @@ function togglePasswordVisibility(inputId) {
 }
 
 /**
- * Logs security events for audit trail
- * @param {string} event - Event type
- * @param {string} username - Username involved
+ * Logs security events
+ * TODO: Migrar a backend en Fase 2 - POST /api/audit-log
  */
-function logSecurityEvent(event, username) {
-  const securityLog = JSON.parse(localStorage.getItem('securityLog') || '[]');
+function logSecurityEvent(event, username, metadata = null) {
+  try {
+    const securityLog = JSON.parse(localStorage.getItem('securityLog') || '[]');
 
-  securityLog.push({
-    event,
-    username,
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent
-  });
+    securityLog.push({
+      event,
+      username,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      metadata
+    });
 
-  // Keep only last 100 events
-  if (securityLog.length > 100) {
-    securityLog.shift();
+    // Keep only last 100 events
+    if (securityLog.length > 100) {
+      securityLog.shift();
+    }
+
+    localStorage.setItem('securityLog', JSON.stringify(securityLog));
+  } catch (error) {
+    console.error('Error guardando log de seguridad:', error);
   }
-
-  localStorage.setItem('securityLog', JSON.stringify(securityLog));
 }
 
 /* ============================================
    SECURITY QUESTION SETUP (First Login)
+   TODO: Migrar a backend en Fase 2
    ============================================ */
 
 /**
@@ -691,21 +679,20 @@ function openSetupSecurityQuestionModal() {
   const modal = document.getElementById('setupSecurityQuestionModal');
   if (!modal) return;
 
-  // Clear inputs
   const questionSelect = document.getElementById('setupSecurityQuestion');
   const answerInput = document.getElementById('setupSecurityAnswer');
 
   if (questionSelect) questionSelect.value = '';
   if (answerInput) answerInput.value = '';
 
-  // Show modal
   modal.style.display = 'flex';
 }
 
 /**
  * Saves security question from setup modal
+ * Migrated to backend - PUT /api/users/:id/security-question
  */
-window.saveSecurityQuestion = function() {
+window.saveSecurityQuestion = async function() {
   try {
     const questionSelect = document.getElementById('setupSecurityQuestion');
     const answerInput = document.getElementById('setupSecurityAnswer');
@@ -719,7 +706,6 @@ window.saveSecurityQuestion = function() {
     const question = questionSelect.value;
     const answer = answerInput.value.trim();
 
-    // Helper to show message (with fallback)
     const showMessage = (msg, type) => {
       if (typeof showToast === 'function') {
         showToast(msg, type);
@@ -746,40 +732,85 @@ window.saveSecurityQuestion = function() {
       return;
     }
 
-    // Save to user's record
-    const appUsers = JSON.parse(localStorage.getItem('appUsers') || '[]');
-    const userIndex = appUsers.findIndex(u => u.usuario === window.currentUser.username);
+    // Get current user ID
+    const token = sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    if (!token) {
+      showMessage('No autenticado', 'error');
+      return;
+    }
 
-    if (userIndex !== -1) {
-      appUsers[userIndex].securityQuestion = question;
-      appUsers[userIndex].securityAnswer = answer.toLowerCase(); // Store lowercase
-      localStorage.setItem('appUsers', JSON.stringify(appUsers));
+    // Get current user info to obtain ID
+    const meResponse = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
 
-      // Update current user object
+    if (!meResponse.ok) {
+      throw new Error('Error al obtener información del usuario');
+    }
+
+    const meData = await meResponse.json();
+    const userId = meData.user.id;
+
+    // Call API to save security question
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/security-question`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        securityQuestion: question,
+        securityAnswer: answer
+      })
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Token expired, try to refresh
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          return saveSecurityQuestion(); // Retry
+        } else {
+          showMessage('Sesión expirada', 'error');
+          logout();
+          return;
+        }
+      }
+      throw new Error('Error al guardar la pregunta de seguridad');
+    }
+
+    const data = await response.json();
+
+    // Update current user in memory
+    if (window.currentUser) {
       window.currentUser.securityQuestion = question;
       window.currentUser.securityAnswer = answer.toLowerCase();
-
-      showMessage('Pregunta de seguridad configurada exitosamente', 'success');
-
-      // Close modal
-      const modal = document.getElementById('setupSecurityQuestionModal');
-      if (modal) {
-        modal.style.display = 'none';
-      }
-
-      // Log event
-      logSecurityEvent('security_question_setup', window.currentUser.username);
-
-      // Refresh the Mi Perfil section if it's visible
-      if (typeof cargarPreguntaSeguridad === 'function') {
-        cargarPreguntaSeguridad();
-      }
-    } else {
-      console.error('User not found in appUsers array');
-      showMessage('Error al guardar la pregunta de seguridad', 'error');
     }
+
+    showMessage('Pregunta de seguridad configurada exitosamente', 'success');
+
+    const modal = document.getElementById('setupSecurityQuestionModal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+
+    logSecurityEvent('security_question_setup', window.currentUser?.username || 'unknown');
+
+    if (typeof cargarPreguntaSeguridad === 'function') {
+      cargarPreguntaSeguridad();
+    }
+
   } catch (error) {
     console.error('Error in saveSecurityQuestion:', error);
-    alert('Error al guardar: ' + error.message);
+    const showMessage = (msg, type) => {
+      if (typeof showToast === 'function') {
+        showToast(msg, type);
+      } else {
+        alert(msg);
+      }
+    };
+    showMessage('Error al guardar: ' + error.message, 'error');
   }
 }
