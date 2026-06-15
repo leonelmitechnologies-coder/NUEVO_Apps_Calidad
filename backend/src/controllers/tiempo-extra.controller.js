@@ -543,7 +543,7 @@ export async function getTiempoExtraStats(req, res) {
     const statsPorDepartamento = await db
       .select({
         departamento: tiempoExtra.departamento,
-        totalHoras: sql`CAST(SUM(CAST(${tiempoExtra.horas_totales} AS NUMERIC)) AS DECIMAL(10,2))`,
+        totalHoras: sql`CAST(SUM(${tiempoExtra.horas_totales}) AS DECIMAL(10,2))`,
         totalRegistros: sql`COUNT(*)`,
       })
       .from(tiempoExtra)
@@ -562,7 +562,7 @@ export async function getTiempoExtraStats(req, res) {
         colaboradorId: tiempoExtra.colaborador_id,
         colaboradorNombre: sql`CONCAT(${colaboradores.nombres}, ' ', ${colaboradores.apellidos})`,
         departamento: tiempoExtra.departamento,
-        totalHoras: sql`CAST(SUM(CAST(${tiempoExtra.horas_totales} AS NUMERIC)) AS DECIMAL(10,2))`,
+        totalHoras: sql`CAST(SUM(${tiempoExtra.horas_totales}) AS DECIMAL(10,2))`,
         totalRegistros: sql`COUNT(*)`,
       })
       .from(tiempoExtra)
@@ -580,12 +580,12 @@ export async function getTiempoExtraStats(req, res) {
         colaboradores.apellidos,
         tiempoExtra.departamento
       )
-      .orderBy(sql`SUM(CAST(${tiempoExtra.horas_totales} AS NUMERIC)) DESC`);
+      .orderBy(sql`SUM(${tiempoExtra.horas_totales}) DESC`);
 
     // Total general
     const [totalGeneral] = await db
       .select({
-        totalHoras: sql`CAST(SUM(CAST(${tiempoExtra.horas_totales} AS NUMERIC)) AS DECIMAL(10,2))`,
+        totalHoras: sql`CAST(SUM(${tiempoExtra.horas_totales}) AS DECIMAL(10,2))`,
         totalRegistros: sql`COUNT(*)`,
       })
       .from(tiempoExtra)

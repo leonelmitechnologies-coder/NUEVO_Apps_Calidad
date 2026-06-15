@@ -14,7 +14,7 @@ import asistenciaRoutes from './routes/asistencia.routes.js';
 import tiempoExtraRoutes from './routes/tiempo-extra.routes.js';
 
 // Importar configuración de DB
-import { testConnection } from './config/database.js';
+import { testConnection } from '../config/database.js';
 
 // Crear app de Express
 const app = express();

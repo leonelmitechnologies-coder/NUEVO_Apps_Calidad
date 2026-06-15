@@ -4,7 +4,7 @@
    ============================================ */
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'http://192.168.80.103:3005/api';
 
 // Storage keys (solo tokens ahora)
 const STORAGE_KEYS = {

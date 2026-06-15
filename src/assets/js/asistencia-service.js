@@ -7,7 +7,7 @@
 // ========================================
 // CONFIGURACIÓN API
 // ========================================
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'http://192.168.80.103:3005/api';
 
 // Helper para fetch SIN autenticación (dashboard público)
 async function fetchAPI(endpoint, options = {}) {

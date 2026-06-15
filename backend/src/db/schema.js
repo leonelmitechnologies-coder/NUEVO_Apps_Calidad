@@ -1,11 +1,11 @@
-import { pgTable, serial, varchar, text, timestamp, boolean, jsonb, integer, date, time, decimal, unique } from 'drizzle-orm/pg-core';
+import { mysqlTable, serial, varchar, text, timestamp, boolean, json, int, date, time, decimal, unique } from 'drizzle-orm/mysql-core';
 
 /**
  * Tabla de usuarios
  * Migrado desde localStorage 'appUsers'
  */
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
+export const users = mysqlTable('users', {
+  id: serial('id').primaryKey().autoincrement(),
 
   // Datos básicos
   usuario: varchar('usuario', { length: 50 }).notNull().unique(),
@@ -17,9 +17,9 @@ export const users = pgTable('users', {
   // Departamento
   departamento: varchar('departamento', { length: 100 }),
 
-  // Arrays de departamentos (almacenados como JSONB)
-  departamentos_pasar_asistencia: jsonb('departamentos_pasar_asistencia').default([]),
-  departamentos_tiempo_extra: jsonb('departamentos_tiempo_extra').default([]),
+  // Arrays de departamentos (almacenados como JSON)
+  departamentos_pasar_asistencia: json('departamentos_pasar_asistencia').default('[]'),
+  departamentos_tiempo_extra: json('departamentos_tiempo_extra').default('[]'),
 
   // Foto (opcional, puede ser URL o null)
   photo: text('photo'),
@@ -28,22 +28,11 @@ export const users = pgTable('users', {
   security_question: varchar('security_question', { length: 255 }),
   security_answer_hash: varchar('security_answer_hash', { length: 255 }),
 
-  // Permisos (almacenados como JSONB)
-  permisos: jsonb('permisos').notNull().default({
-    usuarios: false,
-    asistencia: true,
-    pasarAsistencia: false,
-    agregarColaborador: false,
-    historial: false,
-    inasistencia: false,
-    colaboradores: false,
-    bajas: false,
-    tiempoExtra: false,
-    miPerfil: true
-  }),
+  // Permisos (almacenados como JSON)
+  permisos: json('permisos').notNull().default('{"usuarios":false,"asistencia":true,"pasarAsistencia":false,"agregarColaborador":false,"historial":false,"inasistencia":false,"colaboradores":false,"bajas":false,"tiempoExtra":false,"miPerfil":true}'),
 
   // Seguridad
-  failed_login_attempts: integer('failed_login_attempts').default(0),
+  failed_login_attempts: int('failed_login_attempts').default(0),
   locked_until: timestamp('locked_until'),
 
   // Auditoría
@@ -58,9 +47,9 @@ export const users = pgTable('users', {
 /**
  * Tabla de refresh tokens para JWT
  */
-export const refresh_tokens = pgTable('refresh_tokens', {
-  id: serial('id').primaryKey(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+export const refresh_tokens = mysqlTable('refresh_tokens', {
+  id: serial('id').primaryKey().autoincrement(),
+  user_id: int('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   token: varchar('token', { length: 500 }).notNull().unique(),
   expires_at: timestamp('expires_at').notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
@@ -72,14 +61,14 @@ export const refresh_tokens = pgTable('refresh_tokens', {
  * Tabla de logs de seguridad
  * Migrado desde localStorage 'securityLog'
  */
-export const security_logs = pgTable('security_logs', {
-  id: serial('id').primaryKey(),
+export const security_logs = mysqlTable('security_logs', {
+  id: serial('id').primaryKey().autoincrement(),
   event: varchar('event', { length: 100 }).notNull(),
   username: varchar('username', { length: 50 }),
-  user_id: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  user_id: int('user_id').references(() => users.id, { onDelete: 'set null' }),
   ip_address: varchar('ip_address', { length: 45 }),
   user_agent: text('user_agent'),
-  metadata: jsonb('metadata'),
+  metadata: json('metadata'),
   created_at: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -87,8 +76,8 @@ export const security_logs = pgTable('security_logs', {
  * Tabla de colaboradores
  * Migrado desde localStorage 'colaboradores'
  */
-export const colaboradores = pgTable('colaboradores', {
-  id: serial('id').primaryKey(),
+export const colaboradores = mysqlTable('colaboradores', {
+  id: serial('id').primaryKey().autoincrement(),
 
   // Datos personales
   foto: text('foto'),
@@ -115,11 +104,11 @@ export const colaboradores = pgTable('colaboradores', {
  * Tabla de asistencia
  * Migrado desde localStorage 'historialAsistencia'
  */
-export const asistencia = pgTable('asistencia', {
-  id: serial('id').primaryKey(),
+export const asistencia = mysqlTable('asistencia', {
+  id: serial('id').primaryKey().autoincrement(),
 
   // Relación con colaborador
-  colaborador_id: integer('colaborador_id').notNull().references(() => colaboradores.id),
+  colaborador_id: int('colaborador_id').notNull().references(() => colaboradores.id),
 
   // Datos del registro
   departamento: varchar('departamento', { length: 100 }).notNull(),
@@ -132,7 +121,7 @@ export const asistencia = pgTable('asistencia', {
   comentario: text('comentario'),
 
   // Auditoría
-  registrado_por: integer('registrado_por').references(() => users.id),
+  registrado_por: int('registrado_por').references(() => users.id),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
 
@@ -147,11 +136,11 @@ export const asistencia = pgTable('asistencia', {
  * Tabla de tiempo extra
  * Migrado desde localStorage 'historialTiempoExtra'
  */
-export const tiempoExtra = pgTable('tiempo_extra', {
-  id: serial('id').primaryKey(),
+export const tiempoExtra = mysqlTable('tiempo_extra', {
+  id: serial('id').primaryKey().autoincrement(),
 
   // Relación con colaborador
-  colaborador_id: integer('colaborador_id').notNull().references(() => colaboradores.id),
+  colaborador_id: int('colaborador_id').notNull().references(() => colaboradores.id),
 
   // Datos del registro
   departamento: varchar('departamento', { length: 100 }).notNull(),
@@ -166,8 +155,8 @@ export const tiempoExtra = pgTable('tiempo_extra', {
   autorizado_por: varchar('autorizado_por', { length: 100 }).notNull(),
 
   // Auditoría
-  registrado_por: integer('registrado_por').references(() => users.id),
-  editado_por: integer('editado_por').references(() => users.id),
+  registrado_por: int('registrado_por').references(() => users.id),
+  editado_por: int('editado_por').references(() => users.id),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
 
