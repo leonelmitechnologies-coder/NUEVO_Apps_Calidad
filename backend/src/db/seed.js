@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import db from '../config/database.js';
+import db from '../../config/database.js';
 import { users } from './schema.js';
 import { hashPassword } from '../utils/password.js';
 import { eq } from 'drizzle-orm';
