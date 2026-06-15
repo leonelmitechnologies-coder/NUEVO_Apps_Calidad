@@ -1,5 +1,5 @@
 import { eq, and, isNull, or, ilike } from 'drizzle-orm';
-import db from '../config/database.js';
+import db from '../../config/database.js';
 import { users } from '../db/schema.js';
 import { hashPassword, validatePassword } from '../utils/password.js';
 

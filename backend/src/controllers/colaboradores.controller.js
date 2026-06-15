@@ -1,5 +1,5 @@
 import { eq, and, isNull, ilike, desc, asc } from 'drizzle-orm';
-import db from '../config/database.js';
+import db from '../../config/database.js';
 import { colaboradores } from '../db/schema.js';
 
 /**

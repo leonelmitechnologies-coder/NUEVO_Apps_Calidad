@@ -1,5 +1,5 @@
 import { eq, and, isNull, desc, gte, lte, sql } from 'drizzle-orm';
-import db from '../config/database.js';
+import db from '../../config/database.js';
 import { tiempoExtra, colaboradores, users } from '../db/schema.js';
 
 /**
