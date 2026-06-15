@@ -1,5 +1,5 @@
 import { eq, and, isNull } from 'drizzle-orm';
-import db from '../config/database.js';
+import db from '../../config/database.js';
 import { users, refresh_tokens, security_logs } from '../db/schema.js';
 import { comparePassword, hashPassword } from '../utils/password.js';
 import {
