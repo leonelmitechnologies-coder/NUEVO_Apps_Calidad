@@ -44,3 +44,4 @@ coverage/
 # Build outputs (si se agregan en el futuro)
 dist/
 build/
+nul
