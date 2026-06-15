@@ -1,4 +1,4 @@
-import { mysqlTable, serial, varchar, text, timestamp, boolean, json, int, date, time, decimal, unique } from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, varchar, text, timestamp, boolean, json, int, bigint, date, time, decimal, unique } from 'drizzle-orm/mysql-core';
 
 /**
  * Tabla de usuarios
@@ -49,7 +49,7 @@ export const users = mysqlTable('users', {
  */
 export const refresh_tokens = mysqlTable('refresh_tokens', {
   id: serial('id').primaryKey().autoincrement(),
-  user_id: int('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: bigint('user_id', { mode: 'number', unsigned: true }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   token: varchar('token', { length: 500 }).notNull().unique(),
   expires_at: timestamp('expires_at').notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
@@ -65,7 +65,7 @@ export const security_logs = mysqlTable('security_logs', {
   id: serial('id').primaryKey().autoincrement(),
   event: varchar('event', { length: 100 }).notNull(),
   username: varchar('username', { length: 50 }),
-  user_id: int('user_id').references(() => users.id, { onDelete: 'set null' }),
+  user_id: bigint('user_id', { mode: 'number', unsigned: true }).references(() => users.id, { onDelete: 'set null' }),
   ip_address: varchar('ip_address', { length: 45 }),
   user_agent: text('user_agent'),
   metadata: json('metadata'),
@@ -108,7 +108,7 @@ export const asistencia = mysqlTable('asistencia', {
   id: serial('id').primaryKey().autoincrement(),
 
   // Relación con colaborador
-  colaborador_id: int('colaborador_id').notNull().references(() => colaboradores.id),
+  colaborador_id: bigint('colaborador_id', { mode: 'number', unsigned: true }).notNull().references(() => colaboradores.id),
 
   // Datos del registro
   departamento: varchar('departamento', { length: 100 }).notNull(),
@@ -121,7 +121,7 @@ export const asistencia = mysqlTable('asistencia', {
   comentario: text('comentario'),
 
   // Auditoría
-  registrado_por: int('registrado_por').references(() => users.id),
+  registrado_por: bigint('registrado_por', { mode: 'number', unsigned: true }).references(() => users.id),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
 
@@ -140,7 +140,7 @@ export const tiempoExtra = mysqlTable('tiempo_extra', {
   id: serial('id').primaryKey().autoincrement(),
 
   // Relación con colaborador
-  colaborador_id: int('colaborador_id').notNull().references(() => colaboradores.id),
+  colaborador_id: bigint('colaborador_id', { mode: 'number', unsigned: true }).notNull().references(() => colaboradores.id),
 
   // Datos del registro
   departamento: varchar('departamento', { length: 100 }).notNull(),
@@ -155,8 +155,8 @@ export const tiempoExtra = mysqlTable('tiempo_extra', {
   autorizado_por: varchar('autorizado_por', { length: 100 }).notNull(),
 
   // Auditoría
-  registrado_por: int('registrado_por').references(() => users.id),
-  editado_por: int('editado_por').references(() => users.id),
+  registrado_por: bigint('registrado_por', { mode: 'number', unsigned: true }).references(() => users.id),
+  editado_por: bigint('editado_por', { mode: 'number', unsigned: true }).references(() => users.id),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
 
